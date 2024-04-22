@@ -118,12 +118,13 @@ public class AbsensiImpl implements AbsensiService {
     }
     @Override
     public String uploadFoto( MultipartFile image) throws IOException {
+
         // Create a BlobId object with the image data and metadata
         BlobId blobId = BlobId.of("absensireact.appspot.com", image.getOriginalFilename());
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType("media")
                 .build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/ServiceAccount.json"));
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, image.getBytes());
         return String.format(DOWNLOAD_URL, URLEncoder.encode(image.getOriginalFilename(), StandardCharsets.UTF_8));
