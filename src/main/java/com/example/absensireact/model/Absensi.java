@@ -39,7 +39,7 @@ public class Absensi {
     @JsonIgnore
     @OneToOne
     @MapsId
-    @JoinColumn(name = "user")
+    @JoinColumn(name = "userId")
     private User  user;
 
 

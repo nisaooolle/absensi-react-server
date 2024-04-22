@@ -58,7 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // API controller
             "/api/user/**",
             "/api/login",
-            "/api/absensi/**"
+            "/api/absensi/**",
+            "/api/karyawan/**"
 
 
     };

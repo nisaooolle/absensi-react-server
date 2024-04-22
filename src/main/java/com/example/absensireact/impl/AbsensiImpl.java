@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.NotActiveException;
@@ -49,8 +50,13 @@ public class AbsensiImpl implements AbsensiService {
 
     @Override
     public Absensi PostAbsensi(Long userId, MultipartFile image) throws IOException {
-//        set Absensi
-        Absensi absensi = new Absensi();
+        // Mencari User dari repository
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new EntityNotFoundException("User dengan ID " + userId + " tidak ditemukan.");
+        }
+
         // Set waktu masuk
         Date masuk = new Date();
 
@@ -71,6 +77,8 @@ public class AbsensiImpl implements AbsensiService {
         String keterangan = (jamMasuk < 7) ? "Tidak Terlambat" : "Terlambat";
 
         // Set nilai absensi
+        Absensi absensi = new Absensi();
+        absensi.setUser(user);
         absensi.setJamMasuk(String.valueOf(masuk));
         absensi.setJamPulang("-");
         absensi.setTanggalAbsen(tanggalHariIni);
@@ -88,9 +96,9 @@ public class AbsensiImpl implements AbsensiService {
 
     @Override
     public Absensi PutPulang(Long userId, MultipartFile image) throws IOException {
-        Optional<User> user = userRepository.findById(userId);
+        User user = userRepository.findById(userId).orElse(null);
 
-        if (user.isPresent()) {
+        if (user != null) {
             Absensi absensi = new Absensi();
             // Set waktu pulang
             Date pulang = new Date();
@@ -116,6 +124,7 @@ public class AbsensiImpl implements AbsensiService {
             throw new NotFoundException("User not found with id: " + userId);
         }
     }
+
     @Override
     public String uploadFoto( MultipartFile image) throws IOException {
 
