@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class UserDetail implements UserDetails {
     private static final long serialVersionUID = 1L;
@@ -71,6 +72,15 @@ public class UserDetail implements UserDetails {
     public void setOrganisasi(String organisasi) {
         this.organisasi = organisasi;
     }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
 
     @Override
     public String getPassword() {
@@ -79,39 +89,37 @@ public class UserDetail implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return username;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        return true;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        UserDetail admin = (UserDetail) o;
+        return Objects.equals(id, admin.id);
     }
 
-    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
 }

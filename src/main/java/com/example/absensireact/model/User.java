@@ -1,7 +1,7 @@
 package com.example.absensireact.model;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 
 import javax.persistence.*;
 import java.util.Date;
@@ -25,6 +25,8 @@ public class User {
 
     @Column(name = "organisasi"  )
     private  String organisasi;
+
+
 
 
     public Long getId() {
