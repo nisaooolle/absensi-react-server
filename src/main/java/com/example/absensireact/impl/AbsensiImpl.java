@@ -123,7 +123,7 @@ public class AbsensiImpl implements AbsensiService {
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType("media")
                 .build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/ServiceAccount.json"));
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/ServiceAccount.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, image.getBytes());
         return String.format(DOWNLOAD_URL, URLEncoder.encode(image.getOriginalFilename(), StandardCharsets.UTF_8));
