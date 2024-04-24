@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface  AbsensiService {
-    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/lowongan-a0c4a.appspot.com/o/%s?alt=media";
 
 
     List<Absensi> getAllAbsensi();
@@ -40,7 +39,7 @@ public interface  AbsensiService {
 
     Absensi PostAbsensi(Long userId, MultipartFile image) throws IOException;
 
-    Absensi PutPulang( Long userId, MultipartFile image) throws IOException;
+    Absensi PutPulang( Long id, MultipartFile image) throws IOException;
 
     String uploadFoto(MultipartFile image) throws IOException;
 

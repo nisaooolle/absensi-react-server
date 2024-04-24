@@ -18,6 +18,9 @@ public class Karyawan {
     @Column(name = "shift")
     private String shift;
 
+    @Column(name = "fotoKaryawan")
+    private String fotoKaryawan;
+
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "userId")
@@ -27,10 +30,11 @@ public class Karyawan {
 
     }
 
-    public Karyawan(Long id, String jabatan, String shift, User user) {
+    public Karyawan(Long id, String jabatan, String shift,String fotoKaryawan ,User user) {
         this.id = id;
         this.jabatan = jabatan;
         this.shift = shift;
+        this.fotoKaryawan = fotoKaryawan;
         this.user = user;
     }
 
@@ -64,5 +68,13 @@ public class Karyawan {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getFotoKaryawan() {
+        return fotoKaryawan;
+    }
+
+    public void setFotoKaryawan(String fotoKaryawan) {
+        this.fotoKaryawan = fotoKaryawan;
     }
 }

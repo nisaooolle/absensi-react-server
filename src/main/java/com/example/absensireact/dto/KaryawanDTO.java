@@ -10,6 +10,8 @@ public class KaryawanDTO {
 
     private String shift;
 
+    private String fotoKaryawan;
+
     private User user;
 
     public Long getId() {
@@ -26,6 +28,14 @@ public class KaryawanDTO {
 
     public void setJabatan(String jabatan) {
         this.jabatan = jabatan;
+    }
+
+    public String getFotoKaryawan() {
+        return fotoKaryawan;
+    }
+
+    public void setFotoKaryawan(String fotoKaryawan) {
+        this.fotoKaryawan = fotoKaryawan;
     }
 
     public String getShift() {
