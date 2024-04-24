@@ -61,7 +61,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/absensi/**",
             "/api/karyawan/**",
             "/api/admin/**",
-            "/api/cuti/**"
+            "/api/cuti/**",
+            "/api/jabatan/**",
+            "/api/profiles/upload",
+            "/api/profiles/**"
 
 
     };
