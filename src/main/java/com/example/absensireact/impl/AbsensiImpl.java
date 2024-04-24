@@ -1,5 +1,6 @@
 package com.example.absensireact.impl;
 
+import com.example.absensireact.exception.InternalErrorException;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.exception.ResponseHelper;
 import com.example.absensireact.model.Absensi;
@@ -18,11 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.NotActiveException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -50,104 +50,72 @@ public class AbsensiImpl implements AbsensiService {
 
 
 
-    @Override
     public Absensi PostAbsensi(Long userId, MultipartFile image) throws IOException {
-        // Mencari User dari repository
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User dengan ID " + userId + " tidak ditemukan."));
 
-        if (user == null) {
-            throw new EntityNotFoundException("User dengan ID " + userId + " tidak ditemukan.");
-        }
-
-        // Set waktu masuk
         Date masuk = new Date();
+        Date tanggalHariIni = truncateTime(new Date());
+        String keterangan = (getHourOfDay(masuk) < 7) ? "Tidak Terlambat" : "Terlambat";
 
-        // Set tanggal hari ini
-        Date tanggalHariIni = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(tanggalHariIni);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        tanggalHariIni = cal.getTime();
-
-        // Validasi Keterangan hadir
-        Calendar calJamMasuk = Calendar.getInstance();
-        calJamMasuk.setTime(masuk);
-        int jamMasuk = calJamMasuk.get(Calendar.HOUR_OF_DAY);
-        String keterangan = (jamMasuk < 7) ? "Tidak Terlambat" : "Terlambat";
-
-        // Set nilai absensi
         Absensi absensi = new Absensi();
         absensi.setUser(user);
+        absensi.setTanggalAbsen(tanggalHariIni);
         absensi.setJamMasuk(String.valueOf(masuk));
         absensi.setJamPulang("-");
-        absensi.setTanggalAbsen(tanggalHariIni);
         absensi.setKeterangan(keterangan);
 
-        // Upload foto ke Firebase
-        String fotoUrl = uploadFoto(image);
-
-        // Set URL foto pada absensi
+        String fotoUrl = uploadFile(image, "foto_masuk_" + userId);
         absensi.setFotoMasuk(fotoUrl);
 
-        // Simpan absensi ke repository
         return absensiRepository.save(absensi);
     }
 
-    @Override
     public Absensi PutPulang(Long id, MultipartFile image) throws IOException {
-        User user = userRepository.findById(id).orElse(null);
+        Absensi absensi = absensiRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Absensi not found with id: " + id));
 
-        if (user != null) {
-            Absensi absensi = new Absensi();
-            // Set waktu pulang
-            Date pulang = new Date();
-            Calendar calJamMasuk = Calendar.getInstance();
-            calJamMasuk.setTime(pulang);
-            int jamMasuk = calJamMasuk.get(Calendar.HOUR_OF_DAY);
+        Date pulang = new Date();
+        int jamMasuk = getHourOfDay(absensi.getTanggalAbsen());
 
-            if (jamMasuk > 14 ) {
-
-            // Set nilai absensi
+        if (jamMasuk > 14) {
             absensi.setJamPulang(String.valueOf(pulang));
-            // Upload foto ke Firebase
-            String fotoUrl = uploadFoto(image);
-            // Set URL foto pada absensi
+            String fotoUrl = uploadFile(image, "foto_pulang_" + absensi.getUser().getId());
             absensi.setFotoPulang(fotoUrl);
             return absensiRepository.save(absensi);
-            } else {
-
-            throw new NotActiveException("Belum Waktunya Pulang ");
-            }
-
         } else {
-            throw new NotFoundException("User not found with id: " + id);
+            throw new NotActiveException("Belum Waktunya Pulang");
         }
     }
 
-    @Override
-    public String uploadFoto(MultipartFile image) throws IOException {
+    private Date truncateTime(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
 
+    private int getHourOfDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    private String uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "fotoAbsen/";
-        String fileName = folderPath + timestamp + "_" + image.getOriginalFilename();
-        BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType("media")
-                .build();
-
-        // Membuat kredensial dan objek Storage
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/FirebaseConfig.json"));
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/serviceAccount.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-
-        // Mengunggah file ke Firebase Storage
-        storage.create(blobInfo, image.getBytes());
-
-        // Mengembalikan URL untuk mengakses file yang diunggah
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+        storage.create(blobInfo, multipartFile.getBytes());
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
+
     @Override
     public Optional<Absensi> getAbsensiById(Long id) {
         return absensiRepository.findById(id);
@@ -155,12 +123,20 @@ public class AbsensiImpl implements AbsensiService {
 
     @Override
     public Absensi updateAbsensi(Long id, Absensi absensi) {
-        if (absensiRepository.existsById(id)) {
-            absensi.setId(id);
-            return absensiRepository.save(absensi);
-        } else {
-            throw new NotFoundException("Absensi not found with id: " + id);
-        }
+        return absensiRepository.findById(id)
+                .map(existingAbsensi -> {
+                    existingAbsensi.setTanggalAbsen(absensi.getTanggalAbsen());
+                    existingAbsensi.setJamMasuk(absensi.getJamMasuk());
+                    existingAbsensi.setJamPulang(absensi.getJamPulang());
+                    existingAbsensi.setLokasiMasuk(absensi.getLokasiMasuk());
+                    existingAbsensi.setLokasiPulang(absensi.getLokasiPulang());
+                    existingAbsensi.setKeterangan(absensi.getKeterangan());
+                    existingAbsensi.setFotoMasuk(absensi.getFotoMasuk());
+                    existingAbsensi.setFotoPulang(absensi.getFotoPulang());
+                    existingAbsensi.setStatus(absensi.getStatus());
+                    return absensiRepository.save(existingAbsensi);
+                })
+                .orElseThrow(() -> new NotFoundException("Absensi not found with id: " + id));
     }
 
     @Override

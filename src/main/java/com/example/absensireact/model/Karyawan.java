@@ -26,6 +26,8 @@ public class Karyawan {
     @JoinColumn(name = "userId")
     private User user;
 
+
+
     public Karyawan(){
 
     }

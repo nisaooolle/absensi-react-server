@@ -3,7 +3,7 @@ package com.example.absensireact.config;
 import com.example.absensireact.security.AccessDenied;
 import com.example.absensireact.security.AuthEntryPointJwt;
 import com.example.absensireact.security.AuthTokenFilter;
-import com.example.absensireact.service.UserDetailService;
+import com.example.absensireact.detail.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,6 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/login",
             "/api/absensi/**",
             "/api/karyawan/**",
+            "/api/admin/**",
             "/api/cuti/**",
             "/api/jabatan/**",
             "/api/profiles/upload",

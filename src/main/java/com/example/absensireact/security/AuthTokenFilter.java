@@ -1,6 +1,6 @@
 package com.example.absensireact.security;
 
-import com.example.absensireact.service.UserDetailService;
+import com.example.absensireact.detail.UserDetailService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -20,12 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class AuthTokenFilter extends OncePerRequestFilter {
+public class AuthTokenFilter extends OncePerRequestFilter  {
     @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
-    private UserDetailService adminDetailsService;
+    private UserDetailService userDetailService;
+
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
@@ -36,7 +37,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                UserDetails userDetails = adminDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -57,10 +58,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-
-
-    private static final String AUTH_HEADER_NAME = "auth-tgh";
-    private static final String JWT_PREFIX = "jwt ";
+    private static final String AUTH_HEADER_NAME = "Authorization";
+    private static final String JWT_PREFIX = "Bearer ";
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader(AUTH_HEADER_NAME);
@@ -69,7 +68,4 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
-
-
 }

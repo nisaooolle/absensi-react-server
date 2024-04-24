@@ -1,12 +1,11 @@
 package com.example.absensireact.model;
 
 
-
 import javax.persistence.*;
 
 @Entity
-@Table
-public class User {
+@Table(name = "superAdmin")
+public class SuperAdmin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +20,25 @@ public class User {
     @Column(name = "username")
     private  String username;
 
-    @Column(name = "organisasi"  )
-    private  String organisasi;
+    @Column(name = "imageAdmin"  )
+    private  String imageAdmin;
 
 
     @Column(name = "role")
     private String role;
 
+    public SuperAdmin(){
+
+    }
+
+    public SuperAdmin(Long id, String email, String password, String username, String imageAdmin, String role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.imageAdmin = imageAdmin;
+        this.role = role;
+    }
 
     public Long getId() {
         return id;
@@ -53,7 +64,6 @@ public class User {
         this.password = password;
     }
 
-
     public String getUsername() {
         return username;
     }
@@ -62,12 +72,12 @@ public class User {
         this.username = username;
     }
 
-    public String getOrganisasi() {
-        return organisasi;
+    public String getImageAdmin() {
+        return imageAdmin;
     }
 
-    public void setOrganisasi(String organisasi) {
-        this.organisasi = organisasi;
+    public void setImageAdmin(String imageAdmin) {
+        this.imageAdmin = imageAdmin;
     }
 
     public String getRole() {

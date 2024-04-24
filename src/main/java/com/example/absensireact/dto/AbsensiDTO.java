@@ -17,7 +17,13 @@ public class AbsensiDTO {
 
     private String jamPulang;
 
-    private String foto;
+    private String lokasiMasuk;
+
+    private String lokasiPulang;
+
+    private String fotoMasuk;
+
+    private String fotoPulang;
 
     private String keterangan;
 
@@ -74,11 +80,35 @@ public class AbsensiDTO {
         this.user = user;
     }
 
-    public String getFoto() {
-        return foto;
+    public String getLokasiMasuk() {
+        return lokasiMasuk;
     }
 
-    public void setFoto(String foto) {
-        this.foto = foto;
+    public void setLokasiMasuk(String lokasiMasuk) {
+        this.lokasiMasuk = lokasiMasuk;
+    }
+
+    public String getLokasiPulang() {
+        return lokasiPulang;
+    }
+
+    public void setLokasiPulang(String lokasiPulang) {
+        this.lokasiPulang = lokasiPulang;
+    }
+
+    public String getFotoMasuk() {
+        return fotoMasuk;
+    }
+
+    public void setFotoMasuk(String fotoMasuk) {
+        this.fotoMasuk = fotoMasuk;
+    }
+
+    public String getFotoPulang() {
+        return fotoPulang;
+    }
+
+    public void setFotoPulang(String fotoPulang) {
+        this.fotoPulang = fotoPulang;
     }
 }

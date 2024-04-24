@@ -41,7 +41,6 @@ public interface  AbsensiService {
 
     Absensi PutPulang( Long id, MultipartFile image) throws IOException;
 
-    String uploadFoto(MultipartFile image) throws IOException;
 
 
 }
