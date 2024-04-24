@@ -4,6 +4,7 @@ import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.role.RoleEnum;
 import com.example.absensireact.security.JwtUtils;
 import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,11 @@ public class UserImpl implements UserService {
         user.setUsername(user.getUsername());
         user.setPassword(encoder.encode(user.getPassword()));
         user.setOrganisasi(user.getOrganisasi());
-        user.setRole("user");
+        if (user.getRole().name().equals("ADMIN")) {
+            user.setRole(RoleEnum.ADMIN);
+        } else if (user.getRole().name().equals("USER")) {
+            user.setRole(RoleEnum.USER);
+        }
         return userRepository.save(user);
     }
 

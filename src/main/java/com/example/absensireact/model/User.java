@@ -1,10 +1,8 @@
 package com.example.absensireact.model;
 
-
-
+import com.example.absensireact.role.RoleEnum;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table
@@ -26,9 +24,10 @@ public class User {
     @Column(name = "organisasi"  )
     private  String organisasi;
 
-   @Column(name = "role")
-   private String role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private RoleEnum role;
 
     public Long getId() {
         return id;
@@ -59,14 +58,6 @@ public class User {
         return username;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public void setUsername(String username) {
         this.username = username;
     }
@@ -77,5 +68,13 @@ public class User {
 
     public void setOrganisasi(String organisasi) {
         this.organisasi = organisasi;
+    }
+
+    public RoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(RoleEnum role) {
+        this.role = role;
     }
 }
