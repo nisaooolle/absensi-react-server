@@ -21,6 +21,13 @@ public class Absensi {
     @Column(name = "jamMasuk")
     private String jamMasuk;
 
+    @Column(name = "lokasiMasuk")
+    private String lokasiMasuk;
+
+    @Column(name = "lokasiPulang")
+    private String lokasiPulang;
+
+
     @Column(name = "jamPulang")
     private String jamPulang;
 
@@ -47,13 +54,15 @@ public class Absensi {
 
     }
 
-    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String jamPulang, String keterangan, String status ,String fotoMasuk , String fotoPulang, User user) {
+    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String jamPulang,String lokasiPulang ,String lokasiMasuk,String keterangan, String status ,String fotoMasuk , String fotoPulang, User user) {
         this.id = id;
         this.tanggalAbsen = tanggalAbsen;
         this.jamMasuk = jamMasuk;
         this.jamPulang = jamPulang;
         this.fotoPulang = fotoPulang;
         this.fotoMasuk = fotoMasuk;
+        this.lokasiMasuk = lokasiMasuk;
+        this.lokasiPulang = lokasiPulang;
         this.keterangan = keterangan;
         this.status = status;
         this.user = user;
@@ -90,6 +99,22 @@ public class Absensi {
 
     public void setJamPulang(String jamPulang) {
         this.jamPulang = jamPulang;
+    }
+
+    public String getLokasiMasuk() {
+        return lokasiMasuk;
+    }
+
+    public void setLokasiMasuk(String lokasiMasuk) {
+        this.lokasiMasuk = lokasiMasuk;
+    }
+
+    public String getLokasiPulang() {
+        return lokasiPulang;
+    }
+
+    public void setLokasiPulang(String lokasiPulang) {
+        this.lokasiPulang = lokasiPulang;
     }
 
     public String getKeterangan() {

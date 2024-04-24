@@ -1,19 +1,15 @@
 package com.example.absensireact.repository;
 
-
-import com.example.absensireact.model.User;
+import com.example.absensireact.model.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User , Long> {
+public interface AdminRepository extends JpaRepository<Admin , Long> {
 
-    Optional<User> findByIdAndRole(Long id, String role);
-
-    Optional<User> findByEmail(String email);
+    Optional<Admin> findByEmail(String email);
     Boolean existsByEmail(String email);
 
 }

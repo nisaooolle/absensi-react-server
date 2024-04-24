@@ -1,50 +1,42 @@
-package com.example.absensireact.service;
+package com.example.absensireact.detail;
 
-import com.example.absensireact.model.User;
+import com.example.absensireact.model.Admin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
-public class UserDetail implements UserDetails {
+public class AdminDetail implements UserDetails {
     private static final long serialVersionUID = 1L;
     private Long id;
-
     private String email;
-
     private String username;
-
-    private String organisasi;
-
-    @JsonIgnore
     private String password;
 
-    private Collection<? extends GrantedAuthority> authorities;
-
-
-    public UserDetail() {
-
+    public AdminDetail() {
     }
 
-    public UserDetail(Long id, String email, String password , String username , String organisasi) {
+    public AdminDetail(Long id, String email, String password, String username) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
-        this.organisasi = organisasi;
     }
 
-    public static UserDetail buildUser(User admin) {
-        return new UserDetail(
+    public static AdminDetail buildAdmin(Admin admin) {
+        return new AdminDetail(
                 admin.getId(),
                 admin.getEmail(),
                 admin.getPassword(),
-                admin.getUsername(),
-                admin.getOrganisasi() );
-
+                admin.getUsername()
+        );
     }
+
     public Long getId() {
         return id;
     }
@@ -53,35 +45,13 @@ public class UserDetail implements UserDetails {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getOrganisasi() {
-        return organisasi;
-    }
-
-    public void setOrganisasi(String organisasi) {
-        this.organisasi = organisasi;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ADMIN"));
+        return authorities;
     }
-
     @Override
     public String getPassword() {
         return password;
@@ -114,12 +84,14 @@ public class UserDetail implements UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        UserDetail admin = (UserDetail) o;
-        return Objects.equals(id, admin.id);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AdminDetail that = (AdminDetail) o;
+        return Objects.equals(id, that.id);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

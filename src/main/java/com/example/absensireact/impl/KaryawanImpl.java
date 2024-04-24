@@ -15,12 +15,14 @@ import com.google.cloud.storage.StorageOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -52,19 +54,39 @@ public class KaryawanImpl implements KaryawanService {
         return karyawanRepository.findById(id);
     }
 
+//    @Override
+//    public Karyawan TambahKaryawan(Long userId , Karyawan karyawan){
+//        // Dapatkan objek User dari UserRepository berdasarkan ID
+//        User user = userRepository.findById(userId).orElse(null);
+//
+//        if (user != null) {
+//            karyawan.setUser(user);
+//            karyawan.setJabatan(karyawan.getJabatan());
+//            karyawan.setShift(karyawan.getShift());
+//            karyawan.setUser(user);
+//            return karyawanRepository.save(karyawan);
+//        } else {
+//            throw new EntityNotFoundException("User dengan ID " + karyawan.getUser().getId() + " tidak ditemukan.");
+//        }
+//    }
     @Override
-    public Karyawan TambahKaryawan(Long userId , Karyawan karyawan){
-        // Dapatkan objek User dari UserRepository berdasarkan ID
-        User user = userRepository.findById(userId).orElse(null);
+    public Karyawan TambahKaryawan(Long userId, Karyawan karyawan) {
+        Optional<User> userOptional = userRepository.findByIdAndRole(userId, "ADMIN");
 
-        if (user != null) {
-            karyawan.setUser(user);
+        if (userOptional.isPresent()) {
+            User adminUser = userOptional.get();
+
+            Optional<Karyawan> existingKaryawanOptional = karyawanRepository.findByUser(adminUser);
+            if (existingKaryawanOptional.isPresent()) {
+                throw new EntityExistsException("Pengguna dengan ID " + userId + " sudah memiliki entri karyawan.");
+            }
+
+            karyawan.setUser(adminUser);
             karyawan.setJabatan(karyawan.getJabatan());
             karyawan.setShift(karyawan.getShift());
-            karyawan.setUser(user);
             return karyawanRepository.save(karyawan);
         } else {
-            throw new EntityNotFoundException("User dengan ID " + karyawan.getUser().getId() + " tidak ditemukan.");
+            throw new EntityNotFoundException("Pengguna dengan ID " + userId + " dan peran ADMIN tidak ditemukan.");
         }
     }
     @Override

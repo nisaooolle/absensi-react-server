@@ -37,7 +37,7 @@ public class Cuti {
 
     }
 
-    public Cuti(Long id, String awalCuti, String akhirCuti, String masukKerja, String keperluan, String status, User user) {
+    public Cuti(Long id, String awalCuti, String akhirCuti, String masukKerja, String keperluan, String status, User user   ) {
         this.id = id;
         this.awalCuti = awalCuti;
         this.akhirCuti = akhirCuti;
@@ -102,4 +102,6 @@ public class Cuti {
     public void setUser(User user) {
         this.user = user;
     }
+
+
 }

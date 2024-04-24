@@ -1,27 +1,37 @@
 package com.example.absensireact.impl;
 
+import com.example.absensireact.detail.AdminDetail;
+import com.example.absensireact.detail.UserDetail;
+import com.example.absensireact.detail.UserDetailService;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.User;
+import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
-import com.example.absensireact.role.RoleEnum;
 import com.example.absensireact.security.JwtUtils;
 import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -32,45 +42,90 @@ public class UserImpl implements UserService {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    @Autowired
+    UserDetailService userDetailService;
+
 
     @Override
     public Map<Object, Object> login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new NotFoundException("Email not found"));
+        Object userOrAdmin = getUserOrAdminByEmail(loginRequest.getEmail());
 
-        if (encoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-            return redirectAndValidate(authentication, user);
+        if (userOrAdmin == null) {
+            throw new BadCredentialsException("Invalid email or password");
         }
 
-        throw new NotFoundException("Invalid password");
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+        if (userOrAdmin instanceof User) {
+            User user = (User) userOrAdmin;
+            if (!user.getPassword().equals(loginRequest.getPassword())) {
+                throw new BadCredentialsException("Invalid password");
+            }
+            return redirectAndValidate(authentication, user);
+        } else if (userOrAdmin instanceof Admin) {
+            Admin admin = (Admin) userOrAdmin;
+            if (!admin.getPassword().equals(loginRequest.getPassword())) {
+                throw new BadCredentialsException("Invalid password");
+            }
+            return redirectAndValidate(authentication, admin);
+        }
+
+        throw new BadCredentialsException("Invalid email or password");
     }
 
-    private Map<Object, Object> redirectAndValidate(Authentication authentication, User user) {
-        String jwt = jwtUtils.generateToken(authentication);
-        userRepository.save(user);
-        Map<Object, Object> response = new HashMap<>();
-        response.put("data", user);
-        response.put("id", user.getId());
-        response.put("token", jwt);
+    private Map<Object, Object> redirectAndValidate(Authentication authentication, Object userOrAdmin) {
+        String jwt = jwtUtils.generateToken((UserDetails) authentication);
+        if (userOrAdmin instanceof User) {
+            User user = (User) userOrAdmin;
+            userRepository.save(user);
+            Map<Object, Object> response = new HashMap<>();
+            response.put("data", user);
+            response.put("id", user.getId());
+            response.put("token", jwt);
+            return response;
+        } else if (userOrAdmin instanceof Admin) {
+            Admin admin = (Admin) userOrAdmin;
+            adminRepository.save(admin);
+            Map<Object, Object> response = new HashMap<>();
+            response.put("data", admin);
+            response.put("id", admin.getId());
+            response.put("token", jwt);
+            return response;
+        }
 
-        return response;
+        throw new BadCredentialsException("Invalid email or password");
     }
+
+    public Optional<Object> getUserOrAdminByEmail(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            return Optional.of(userOptional.get());
+        } else {
+            Optional<Admin> adminOptional = adminRepository.findByEmail(email);
+            if (adminOptional.isPresent()) {
+                return Optional.of(adminOptional.get());
+            } else {
+                return Optional.empty();
+            }
+        }
+    }
+
 
     @Override
     public User Register(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new NotFoundException("Email sudah digunakan");
+        if (adminRepository.existsByEmail(user.getEmail())) {
+            throw new NotFoundException("Email sudah digunakan oleh admin");
         }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new NotFoundException("Email sudah digunakan oleh user ");
+        }
+
         user.setUsername(user.getUsername());
         user.setPassword(encoder.encode(user.getPassword()));
         user.setOrganisasi(user.getOrganisasi());
-        if (user.getRole().name().equals("ADMIN")) {
-            user.setRole(RoleEnum.ADMIN);
-        } else if (user.getRole().name().equals("USER")) {
-            user.setRole(RoleEnum.USER);
-        }
+        user.setRole("USER");
         return userRepository.save(user);
     }
 
