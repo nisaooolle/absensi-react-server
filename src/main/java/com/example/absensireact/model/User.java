@@ -26,7 +26,8 @@ public class User {
     @Column(name = "organisasi"  )
     private  String organisasi;
 
-
+   @Column(name = "role")
+   private String role;
 
 
     public Long getId() {
@@ -56,6 +57,14 @@ public class User {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public void setUsername(String username) {

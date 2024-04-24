@@ -31,6 +31,8 @@ import java.util.Optional;
 
 @Service
 public class AbsensiImpl implements AbsensiService {
+    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
+
     private final AbsensiRepository absensiRepository;
 
     private final UserRepository userRepository;
@@ -95,8 +97,8 @@ public class AbsensiImpl implements AbsensiService {
     }
 
     @Override
-    public Absensi PutPulang(Long userId, MultipartFile image) throws IOException {
-        User user = userRepository.findById(userId).orElse(null);
+    public Absensi PutPulang(Long id, MultipartFile image) throws IOException {
+        User user = userRepository.findById(id).orElse(null);
 
         if (user != null) {
             Absensi absensi = new Absensi();
@@ -106,7 +108,7 @@ public class AbsensiImpl implements AbsensiService {
             calJamMasuk.setTime(pulang);
             int jamMasuk = calJamMasuk.get(Calendar.HOUR_OF_DAY);
 
-            if (jamMasuk != 14 ) {
+            if (jamMasuk > 14 ) {
 
             // Set nilai absensi
             absensi.setJamPulang(String.valueOf(pulang));
@@ -121,22 +123,30 @@ public class AbsensiImpl implements AbsensiService {
             }
 
         } else {
-            throw new NotFoundException("User not found with id: " + userId);
+            throw new NotFoundException("User not found with id: " + id);
         }
     }
 
     @Override
-    public String uploadFoto( MultipartFile image) throws IOException {
+    public String uploadFoto(MultipartFile image) throws IOException {
 
-        // Create a BlobId object with the image data and metadata
-        BlobId blobId = BlobId.of("absensireact.appspot.com", image.getOriginalFilename());
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String folderPath = "fotoAbsen/";
+        String fileName = folderPath + timestamp + "_" + image.getOriginalFilename();
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType("media")
                 .build();
+
+        // Membuat kredensial dan objek Storage
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+
+        // Mengunggah file ke Firebase Storage
         storage.create(blobInfo, image.getBytes());
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(image.getOriginalFilename(), StandardCharsets.UTF_8));
+
+        // Mengembalikan URL untuk mengakses file yang diunggah
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
     }
     @Override
     public Optional<Absensi> getAbsensiById(Long id) {

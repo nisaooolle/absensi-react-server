@@ -65,11 +65,11 @@ public class AbsensiController {
         return new ResponseEntity<>(newAbsensi, HttpStatus.CREATED);
     }
 
-    @PutMapping("/absensi/absensi-pulang/{userId}")
-    public ResponseEntity<Absensi> PutPulang(@PathVariable Long userId,
+    @PutMapping("/absensi/absensi-pulang/{id}")
+    public ResponseEntity<Absensi> PutPulang(@PathVariable Long id,
                                              @RequestParam("image") MultipartFile image) {
         try {
-            Absensi updatedAbsensi = absensiService.PutPulang(userId, image);
+            Absensi updatedAbsensi = absensiService.PutPulang(id, image);
             return ResponseEntity.ok(updatedAbsensi);
         } catch (IOException e) {
 
