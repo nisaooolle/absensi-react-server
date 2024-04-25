@@ -44,7 +44,7 @@ public class Admin {
         this.idOrganisasi = idOrganisasi;
     }
 
-    public Admin getId() {
+    public Long getId() {
         return id;
     }
 
