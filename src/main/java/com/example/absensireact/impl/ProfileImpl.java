@@ -1,77 +1,50 @@
 package com.example.absensireact.impl;
 
-import com.example.absensireact.exception.ProfileNotFoundException;
-import com.example.absensireact.model.Profile;
-import com.example.absensireact.repository.ProfileRepository;
-import com.example.absensireact.service.ProfileService;
+import com.example.absensireact.dto.UserDTO;
+import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.User;
+import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.service.FirebaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.util.Optional;
 
 @Service
-public class ProfileImpl implements ProfileService {
+public class ProfileImpl {
 
     @Autowired
-    private ProfileRepository profileRepository;
+    private UserRepository userRepository;
 
-    @Override
-    public void saveProfile(String name, MultipartFile picture) {
-        try {
-            Profile profile = new Profile(null, name, picture.getBytes());
-            profileRepository.save(profile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    @Autowired
+    private PasswordEncoder encoder;
 
-    @Override
-    @Transactional
-    public void updateProfile(Long id, String name, MultipartFile picture) {
-        Optional<Profile> optionalProfile = profileRepository.findById(id);
-        if (optionalProfile.isPresent()) {
-            Profile profile = optionalProfile.get();
+    @Autowired
+    private FirebaseService firebaseService;
 
-            // Update profile name
-            profile.setName(name);
+    public User editProfile(Long id, UserDTO userDTO, String oldPassword, String newPassword, String confirmPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
-            // Check if new picture is provided
-            if (picture != null && !picture.isEmpty()) {
-                try {
-                    // Update profile picture
-                    profile.setPicture(picture.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Failed to update profile picture");
-                }
+        // Update username and email
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+
+        // Update password if provided
+        if (newPassword != null && !newPassword.isEmpty()) {
+            if (encoder.matches(oldPassword, user.getPassword()) &&
+                    newPassword.equals(confirmPassword)) {
+                user.setPassword(encoder.encode(newPassword));
+            } else {
+                throw new IllegalArgumentException("Invalid old password or new password mismatch.");
             }
-
-            // Save the updated profile
-            profileRepository.save(profile);
-        } else {
-            throw new ProfileNotFoundException("Profile with ID " + id + " not found");
         }
+
+        return userRepository.save(user);
     }
 
-
-
-    @Override
-    public void updateProfileName(Long id, String name) {
-
+    public String uploadProfilePhoto(Long id, MultipartFile file) {
+        // Panggil method di FirebaseService untuk mengunggah foto profil ke Firebase Storage
+        return firebaseService.uploadProfilePhoto(id, file);
     }
-
-    @Override
-    public void updateProfilePicture(Long id, MultipartFile picture) {
-
-    }
-
-
-    @Override
-    public void deleteProfile(Long id) {
-        profileRepository.deleteById(id);
-    }
-
 }
-
