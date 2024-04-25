@@ -1,69 +1,19 @@
-package com.example.absensireact.model;
+package com.example.absensireact.dto;
 
+import com.example.absensireact.model.Admin;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
-import java.util.Optional;
-
-@Entity
-@Table(name = "organisasi")
-public class Organisasi {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class OrganisasiDTO {
     private Long id;
-
-    @Column(name = "namaOrganisasi")
     private String namaOrganisasi;
-
-    @Column(name = "alamat")
     private String alamat;
-
-    @Column(name = "nomerTelepon")
     private String nomerTelepon;
-
-    @Column(name = "emailOrganisasi")
     private String emailOrganisasi;
-
-    @Column(name = "kecamatan")
     private String kecamatan;
-
-    @Column(name = "kabupaten")
     private String kabupaten;
-
-    @Column(name = "provinsi")
     private String provinsi;
-
-    @Column(name = "status")
     private String status;
-
-    @Column(name = "fotoOrganisasi")
     private String fotoOrganisasi;
-
-    @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "idAdmin")
     private Admin admin;
-
-    public Organisasi(){
-
-
-    }
-
-    public Organisasi(Long id, String namaOrganisasi, String alamat, String nomerTelepon, String emailOrganisasi, String kecamatan, String kabupaten, String provinsi, String status, String fotoOrganisasi, Admin admin) {
-        this.id = id;
-        this.namaOrganisasi = namaOrganisasi;
-        this.alamat = alamat;
-        this.nomerTelepon = nomerTelepon;
-        this.emailOrganisasi = emailOrganisasi;
-        this.kecamatan = kecamatan;
-        this.kabupaten = kabupaten;
-        this.provinsi = provinsi;
-        this.status = status;
-        this.fotoOrganisasi = fotoOrganisasi;
-        this.admin = admin;
-    }
 
     public Long getId() {
         return id;
@@ -152,6 +102,4 @@ public class Organisasi {
     public void setAdmin(Admin admin) {
         this.admin = admin;
     }
-
-
 }
