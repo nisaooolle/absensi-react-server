@@ -1,0 +1,59 @@
+package com.example.absensireact.controller;
+
+import com.example.absensireact.model.Organisasi;
+import com.example.absensireact.service.OrganisasiService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+@CrossOrigin(origins = "http://localhost:3000")
+@RestController
+@RequestMapping("/api")
+public class OrganisasiController {
+
+    @Autowired
+    private OrganisasiService organisasiService;
+
+    @GetMapping("/organisasi/all")
+    public ResponseEntity<List<Organisasi>> getAllOrganisasi() {
+        List<Organisasi> organisasiList = (List<Organisasi>) organisasiService.GetAllOrganisasi();
+        return ResponseEntity.ok(organisasiList);
+    }
+
+    @GetMapping("/organisasi/getById/{id}")
+    public ResponseEntity<Organisasi> getOrganisasiById(@PathVariable Long id) {
+        Optional<Organisasi> organisasi = organisasiService.GetOrganisasiById(id);
+        return organisasi.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/organisasi/getByIdAdmin/{idAdmin}")
+    public ResponseEntity<Organisasi> tambahOrganisasi(@PathVariable Long idAdmin, @RequestBody Organisasi organisasi, @RequestParam("image") MultipartFile image) throws IOException {
+        Organisasi newOrganisasi = organisasiService.TambahOrganisasi(idAdmin, organisasi, image);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newOrganisasi);
+    }
+
+    @PutMapping("/organisasi/putByIdAdmin/{idAdmin}")
+    public ResponseEntity<Organisasi> ubahDataOrganisasi(@PathVariable Long idAdmin, @RequestBody Organisasi organisasi, @RequestParam("image") MultipartFile image) {
+        Organisasi updatedOrganisasi = organisasiService.UbahDataOrgannisasi(idAdmin, organisasi, image);
+        return ResponseEntity.ok(updatedOrganisasi);
+    }
+
+    @PutMapping("/organisasi/editById/{id}")
+    public ResponseEntity<Organisasi> editOrganisasi(@PathVariable Long id, @RequestBody Organisasi organisasi, @RequestParam("image") MultipartFile image) throws IOException {
+        Organisasi updatedOrganisasi = organisasiService.EditByid(id, organisasi, image);
+        return ResponseEntity.ok(updatedOrganisasi);
+    }
+
+    @DeleteMapping("/organisasi/delete/{id}")
+    public ResponseEntity<Void> deleteOrganisasi(@PathVariable Long id) {
+        organisasiService.deleteKaryawan(id);
+        return ResponseEntity.noContent().build();
+    }
+}
