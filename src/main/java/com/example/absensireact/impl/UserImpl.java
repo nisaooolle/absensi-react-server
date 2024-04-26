@@ -1,16 +1,18 @@
 package com.example.absensireact.impl;
 
+import com.example.absensireact.config.AppConfig;
 import com.example.absensireact.detail.AdminDetail;
 import com.example.absensireact.detail.UserDetail;
-import com.example.absensireact.detail.UserDetailService;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
-import com.example.absensireact.security.JwtUtils;
 import com.example.absensireact.service.UserService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,10 +22,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 
 @Service
 public class UserImpl implements UserService {
@@ -33,83 +38,18 @@ public class UserImpl implements UserService {
     @Autowired
     private AdminRepository adminRepository;
 
+
     @Autowired
-    private JwtUtils jwtUtils;
+    private AppConfig appConfig;
+
+
 
     @Autowired
     PasswordEncoder encoder;
 
+
     @Autowired
     AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserDetailService userDetailService;
-
-
-    @Override
-    public Map<Object, Object> login(LoginRequest loginRequest) {
-        Object userOrAdmin = getUserOrAdminByEmail(loginRequest.getEmail());
-
-        if (userOrAdmin == null) {
-            throw new BadCredentialsException("Invalid email or password");
-        }
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-
-        if (userOrAdmin instanceof User) {
-            User user = (User) userOrAdmin;
-            if (!user.getPassword().equals(loginRequest.getPassword())) {
-                throw new BadCredentialsException("Invalid password");
-            }
-            return redirectAndValidate(authentication, user);
-        } else if (userOrAdmin instanceof Admin) {
-            Admin admin = (Admin) userOrAdmin;
-            if (!admin.getPassword().equals(loginRequest.getPassword())) {
-                throw new BadCredentialsException("Invalid password");
-            }
-            return redirectAndValidate(authentication, admin);
-        }
-
-        throw new BadCredentialsException("Invalid email or password");
-    }
-
-    private Map<Object, Object> redirectAndValidate(Authentication authentication, Object userOrAdmin) {
-        String jwt = jwtUtils.generateToken((UserDetails) authentication);
-        if (userOrAdmin instanceof User) {
-            User user = (User) userOrAdmin;
-            userRepository.save(user);
-            Map<Object, Object> response = new HashMap<>();
-            response.put("data", user);
-            response.put("id", user.getId());
-            response.put("token", jwt);
-            return response;
-        } else if (userOrAdmin instanceof Admin) {
-            Admin admin = (Admin) userOrAdmin;
-            adminRepository.save(admin);
-            Map<Object, Object> response = new HashMap<>();
-            response.put("data", admin);
-            response.put("id", admin.getId());
-            response.put("token", jwt);
-            return response;
-        }
-
-        throw new BadCredentialsException("Invalid email or password");
-    }
-
-    public Optional<Object> getUserOrAdminByEmail(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            return Optional.of(userOptional.get());
-        } else {
-            Optional<Admin> adminOptional = adminRepository.findByEmail(email);
-            if (adminOptional.isPresent()) {
-                return Optional.of(adminOptional.get());
-            } else {
-                return Optional.empty();
-            }
-        }
-    }
 
 
     @Override

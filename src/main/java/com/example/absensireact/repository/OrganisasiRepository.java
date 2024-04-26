@@ -9,7 +9,5 @@ import java.util.List;
 @Repository
 public interface OrganisasiRepository extends JpaRepository<Organisasi,Long> {
 
-    List<Organisasi>GetallById(Long id);
 
-    List<Organisasi>GetAllByIdAdmin(Long idAdmin);
 }

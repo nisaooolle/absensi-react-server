@@ -4,7 +4,6 @@ import com.example.absensireact.exception.InternalErrorException;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
-import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.repository.UserRepository;
@@ -15,7 +14,6 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,21 +23,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class OrganisasiImpl implements OrganisasiService {
     static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
 
-    @Autowired
-    private OrganisasiRepository organisasiRepository;
+    private final OrganisasiRepository organisasiRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
+
+    public OrganisasiImpl(OrganisasiRepository organisasiRepository, UserRepository userRepository, AdminRepository adminRepository) {
+        this.organisasiRepository = organisasiRepository;
+        this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
+    }
 
     @Override
     public Organisasi GetAllOrganisasi(){
@@ -50,14 +50,10 @@ public class OrganisasiImpl implements OrganisasiService {
     public Optional<Organisasi>GetOrganisasiById(Long id){
         return organisasiRepository.findById(id);
     }
-    @Override
-    public List<Organisasi> GetAllBYId(Long id){
-        return organisasiRepository.GetallById(id);
-    }
 
     @Override
-    public Organisasi GetAllByIdAdmin(Long idAdmin){
-        return (Organisasi) organisasiRepository.GetAllByIdAdmin(idAdmin);
+    public Optional<Organisasi> GetAllByIdAdmin(Long idAdmin){
+        return  organisasiRepository.findById(idAdmin);
     }
     @Override
     public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
@@ -143,7 +139,7 @@ public class OrganisasiImpl implements OrganisasiService {
         if (organisasi1 == null) {
             throw new NotFoundException("Organisasi dengan id " + id + " tidak ditemukan");
         }
-        Admin admin = organisasi.getAdmin().getId();
+        Admin admin = organisasi.getAdmin();
         organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
         organisasi.setAlamat(organisasi.getAlamat());
         organisasi.setKecamatan(organisasi.getKecamatan());

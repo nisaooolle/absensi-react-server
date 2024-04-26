@@ -2,7 +2,6 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.service.OrganisasiService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +17,22 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class OrganisasiController {
 
-    @Autowired
-    private OrganisasiService organisasiService;
+
+    private final OrganisasiService organisasiService;
+
+    public OrganisasiController(OrganisasiService organisasiService) {
+        this.organisasiService = organisasiService;
+    }
 
     @GetMapping("/organisasi/all")
     public ResponseEntity<List<Organisasi>> getAllOrganisasi() {
         List<Organisasi> organisasiList = (List<Organisasi>) organisasiService.GetAllOrganisasi();
         return ResponseEntity.ok(organisasiList);
+    }
+    @GetMapping("/organisasi/getAllByAdmin/{idAdmin}")
+    public ResponseEntity<Organisasi> getAllByadmin(@PathVariable Long idAdmin){
+        Optional<Organisasi> organisasiList = organisasiService.GetAllByIdAdmin(idAdmin);
+        return organisasiList.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/organisasi/getById/{id}")

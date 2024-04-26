@@ -1,16 +1,15 @@
 package com.example.absensireact.controller;
 
 
-import com.example.absensireact.model.LoginRequest;
-import com.example.absensireact.exception.CommonResponse;
-import com.example.absensireact.exception.ResponseHelper;
-import com.example.absensireact.impl.UserImpl;
+import com.example.absensireact.config.AppConfig;
 import com.example.absensireact.model.User;
+import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -18,13 +17,17 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserImpl userImpl;
+    UserService userImpl;
 
 
-    @PostMapping("/login")
-    public CommonResponse<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        return ResponseHelper.ok( userImpl.login(loginRequest));
-    }
+
+    @Autowired
+    private AppConfig appConfig;
+
+//    @PostMapping("/login")
+//    public Map<Object, Object> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+//        return userImpl.login(loginRequest, request);
+//    }
 
     @PostMapping("/user/register")
     public ResponseEntity<User> register(@RequestBody User user){
