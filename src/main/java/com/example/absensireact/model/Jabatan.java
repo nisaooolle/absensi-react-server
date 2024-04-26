@@ -17,17 +17,8 @@ public class Jabatan {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "id_admin")
+    @JoinColumn(name = "user_id") // Changed from id_admin to user_id
     private User admin;
-
-    public Jabatan() {
-    }
-
-    public Jabatan(Long idJabatan, String namaJabatan, User admin) {
-        this.idJabatan = idJabatan;
-        this.namaJabatan = namaJabatan;
-        this.admin = admin;
-    }
 
     public Long getIdJabatan() {
         return idJabatan;
