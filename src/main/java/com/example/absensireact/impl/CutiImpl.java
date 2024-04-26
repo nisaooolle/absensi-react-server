@@ -2,7 +2,6 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Cuti;
-import com.example.absensireact.model.Karyawan;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.CutiRepository;
 import com.example.absensireact.repository.KaryawanRepository;

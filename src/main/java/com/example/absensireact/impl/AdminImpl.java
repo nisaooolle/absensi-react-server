@@ -3,13 +3,11 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

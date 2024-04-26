@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -52,27 +53,14 @@ public class JwtTokenUtil implements Serializable {
     //generate token for user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        Collection<? extends GrantedAuthority> role = userDetails.getAuthorities();
+        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
 
-        if (role.contains(new SimpleGrantedAuthority("ADMIN"))) {
-            claims.put("ADMIN", true);
-        }
-
-        if (role.contains(new SimpleGrantedAuthority("USER"))) {
-            claims.put("USER", true);
-        }
-        if (role.contains(new SimpleGrantedAuthority("SUPERADMIN"))) {
-            claims.put("SUPERADMIN", true);
-        }
+        roles.forEach(role -> claims.put(role.getAuthority(), true));
 
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
-    //while creating the token -
-    //1. Define  claims of the token, like Issuer, Expiration, Subject, and the ID
-    //2. Sign the JWT using the HS512 algorithm and secret key.
-    //3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
-    //   compaction of the JWT to a URL-safe string
+
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
@@ -83,28 +71,11 @@ public class JwtTokenUtil implements Serializable {
     public List<SimpleGrantedAuthority> getRolesFromToken(String token) {
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 
-        List<SimpleGrantedAuthority> roles = null;
-
-        Boolean isUser = claims.get("ADMIN", Boolean.class);
-        Boolean isAdmin = claims.get("USER", Boolean.class);
-        Boolean isSuperAdmin = claims.get("SUPERADMIN", Boolean.class);
-
-        if (isAdmin != null && isAdmin) {
-            roles = Arrays.asList(new SimpleGrantedAuthority("ADMIN"));
-        }
-
-        if (isUser != null && isUser) {
-            roles = Arrays.asList(new SimpleGrantedAuthority("USER"));
-        }
-
-        if (isSuperAdmin != null && isSuperAdmin) {
-            roles = Arrays.asList(new SimpleGrantedAuthority("SUPERADMIN"));
-        }
-
-
-        return roles;
+        return claims.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(true))
+                .map(entry -> new SimpleGrantedAuthority(entry.getKey()))
+                .collect(Collectors.toList());
     }
-
 
     //validate token
     public Boolean validateToken(String token, UserDetails userDetails) {

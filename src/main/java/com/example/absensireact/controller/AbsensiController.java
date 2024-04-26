@@ -2,7 +2,6 @@ package com.example.absensireact.controller;
 
 
 import com.example.absensireact.exception.NotFoundException;
-import com.example.absensireact.impl.AbsensiImpl;
 import com.example.absensireact.impl.UserImpl;
 import com.example.absensireact.model.Absensi;
 import com.example.absensireact.service.AbsensiService;

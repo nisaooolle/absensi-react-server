@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -36,17 +37,9 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> signIn(@RequestBody JwtRequest authenticationRequest) {
+    public ResponseEntity<?> Login(@RequestBody JwtRequest authenticationRequest) {
         try {
-            authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-
-            final UserDetails userDetails = authService.loadUserByUsername(authenticationRequest.getEmail());
-
-            // Membuat token JWT
-            final String token = jwtTokenUtil.generateToken(userDetails);
-
-            // Membuat JwtResponse dengan token dan data pengguna
-            JwtResponse response = new JwtResponse(token, userDetails);
+            Map<String, Object> response = authService.loadUserByUsernameWithToken(authenticationRequest.getEmail());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -54,8 +47,6 @@ public class AuthController {
         }
     }
 
-
-    // Metode untuk melakukan autentikasi menggunakan AuthenticationManager
     private void authenticate(String email, String password) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
@@ -65,8 +56,6 @@ public class AuthController {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
     }
-
-
 
 
 

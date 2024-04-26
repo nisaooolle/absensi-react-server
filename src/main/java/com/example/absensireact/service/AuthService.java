@@ -2,9 +2,12 @@ package com.example.absensireact.service;
 
 
 
+import com.example.absensireact.detail.CustomUserDetails;
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.securityNew.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,40 +17,40 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AuthService  implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    CustomUserDetails customUserDetails;
 
     @Autowired
     AdminRepository adminRepository;
 
-    // mencari user berdasarkan username
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-        Admin adminModel = adminRepository.findByEmail(email);
-        if (adminModel != null) {
-            // Cek jika pengguna memiliki peran admin
-            if (adminModel.getRole().equals("ADMIN")) {
-                List<SimpleGrantedAuthority> roles = Arrays.asList(new SimpleGrantedAuthority("ADMIN"));
-                return new User(adminModel.getEmail(), adminModel.getPassword() ,roles);
-            }
-        }
-
-        com.example.absensireact.model.User userModel = userRepository.findByEmail(email);
-        if (userModel != null) {
-            // Cek jika pengguna memiliki peran admin
-            if (userModel.getRole().equals("USER")) {
-                List<SimpleGrantedAuthority> roles = Arrays.asList(new SimpleGrantedAuthority("USER"));
-                return new User(userModel.getEmail(), userModel.getPassword(), roles);
-            }
-        }
-
-
-        throw new UsernameNotFoundException("User not found with email: " + email);
+        UserDetails userDetails = customUserDetails.loadUserByUsername(email);
+        return userDetails;
     }
+
+    public Map<String, Object> loadUserByUsernameWithToken(String email) {
+        UserDetails userDetails = loadUserByUsername(email);
+        String token = jwtTokenUtil.generateToken(userDetails);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", userDetails);
+        response.put("token", token);
+
+        return response;
+    }
+
+
 }

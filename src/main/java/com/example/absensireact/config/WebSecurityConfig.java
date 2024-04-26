@@ -3,6 +3,7 @@ package com.example.absensireact.config;
 import com.example.absensireact.securityNew.JwtAuthenticationEntryPoint;
 import com.example.absensireact.securityNew.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -30,7 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public WebSecurityConfig(PasswordEncoderConfig passwordEncoder, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                             UserDetailsService jwtUserDetailsService,
+                             @Qualifier("customUserDetails") UserDetailsService jwtUserDetailsService,
                              JwtRequestFilter jwtRequestFilter) {
         this.passwordEncoder = passwordEncoder;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;

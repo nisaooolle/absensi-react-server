@@ -1,33 +1,20 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.config.AppConfig;
-import com.example.absensireact.detail.AdminDetail;
-import com.example.absensireact.detail.UserDetail;
-import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.UserService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Service
