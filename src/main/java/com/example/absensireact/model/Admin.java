@@ -99,4 +99,6 @@ public class Admin {
     public void setIdOrganisasi(String idOrganisasi) {
         this.idOrganisasi = idOrganisasi;
     }
+
+
 }
