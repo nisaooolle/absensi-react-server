@@ -2,7 +2,11 @@ package com.example.absensireact.model;
 
 
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table
@@ -28,6 +32,21 @@ public class User {
     @Column(name = "role")
     private String role;
 
+ public User(){
+
+ }
+
+    public User(Long id, String email, String password, String username, String organisasi, String role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.organisasi = organisasi;
+        this.role = role;
+    }
+
+    public User(String email, String password, List<SimpleGrantedAuthority> roles) {
+    }
 
     public Long getId() {
         return id;

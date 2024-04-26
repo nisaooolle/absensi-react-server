@@ -23,14 +23,12 @@ public class AbsensiController {
 
 
     private final AbsensiService absensiService;
-    private final UserImpl userImpl;
 
 
 
     @Autowired
     public AbsensiController(AbsensiService absensiService , UserImpl userImpl) {
         this.absensiService = absensiService;
-        this.userImpl = userImpl;
 
     }
 

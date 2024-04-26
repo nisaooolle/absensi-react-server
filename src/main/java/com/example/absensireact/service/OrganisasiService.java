@@ -10,8 +10,7 @@ public interface OrganisasiService {
     Organisasi GetAllOrganisasi();
 
     Optional<Organisasi> GetOrganisasiById(Long id);
-
-    Optional<Organisasi> GetAllBYId(Long id);
+    Optional<Organisasi> GetAllBYId(Long idA);
 
     Optional<Organisasi> GetAllByIdAdmin(Long idAdmin);
 

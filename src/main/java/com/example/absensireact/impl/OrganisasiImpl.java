@@ -14,7 +14,6 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,14 +29,17 @@ import java.util.Optional;
 public class OrganisasiImpl implements OrganisasiService {
     static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
 
-    @Autowired
-    private OrganisasiRepository organisasiRepository;
+    private final OrganisasiRepository organisasiRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
+
+    public OrganisasiImpl(OrganisasiRepository organisasiRepository, UserRepository userRepository, AdminRepository adminRepository) {
+        this.organisasiRepository = organisasiRepository;
+        this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
+    }
 
     @Override
     public Organisasi GetAllOrganisasi(){
@@ -48,15 +50,15 @@ public class OrganisasiImpl implements OrganisasiService {
     public Optional<Organisasi>GetOrganisasiById(Long id){
         return organisasiRepository.findById(id);
     }
+
+    @Override
+    public Optional<Organisasi> GetAllByIdAdmin(Long idAdmin){
+        return  organisasiRepository.findById(idAdmin);}
     @Override
     public Optional<Organisasi> GetAllBYId(Long id){
         return organisasiRepository.findById(id);
     }
 
-    @Override
-    public Optional<Organisasi> GetAllByIdAdmin(Long idAdmin){
-        return organisasiRepository.findById(idAdmin);
-    }
     @Override
     public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
         Optional<Admin> admin = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));

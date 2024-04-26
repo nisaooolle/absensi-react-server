@@ -6,60 +6,28 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class AdminDetail implements UserDetails {
-    private static final long serialVersionUID = 1L;
-    private Long id;
-    private String email;
-    private String username;
-    private String password;
+    private Admin admin;
 
-    public AdminDetail() {
+    public AdminDetail(Admin admin) {
+        this.admin = admin;
     }
-
-    public AdminDetail(Long id, String email, String password, String username) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.username = username;
-    }
-
-    public static AdminDetail buildAdmin(Admin admin) {
-        return new AdminDetail(
-                admin.getId(),
-                admin.getEmail(),
-                admin.getPassword(),
-                admin.getUsername()
-        );
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ADMIN"));
-        return authorities;
+        return Collections.singletonList(new SimpleGrantedAuthority("ADMIN"));
     }
+
     @Override
     public String getPassword() {
-        return password;
+        return admin.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return admin.getUsername();
     }
 
     @Override
@@ -82,16 +50,6 @@ public class AdminDetail implements UserDetails {
         return true;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AdminDetail that = (AdminDetail) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-}
+    public Long getId() {
+        return admin.getId();
+    }}
