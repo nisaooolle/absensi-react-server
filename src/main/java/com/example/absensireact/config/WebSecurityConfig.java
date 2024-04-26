@@ -65,8 +65,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/cuti/**",
             "/api/cuti/**",
             "/api/jabatan/**",
-            "/api/profiles/upload",
-            "/api/profiles/**"
+            "/api/profile/edit/**",
+            "/api/profile/upload/**"
 
 
     };
