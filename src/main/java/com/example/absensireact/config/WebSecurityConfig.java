@@ -45,6 +45,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    private static final String[] AUTH_WHITELIST = {
+            // -- Swagger UI v2
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
+            // -- Swagger UI v3 (OpenAPI)
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            // API controller
+            "/api/user/**",
+            "/api/login",
+            "/api/absensi/**",
+            "/api/karyawan/**",
+            "/api/admin/**",
+            "/api/organisasi/**",
+            "/api/cuti/**",
+            "/api/cuti/**",
+            "/api/jabatan/**",
+            "/api/profile/edit/**",
+            "/api/profile/upload/**"
+
+
+    };
+
+
 
     @Bean
     @Override
@@ -52,26 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    private static final String[] AUTH_WHITELIST = {
-            // -- Swagger UI v2
-            "/v2/api-docs",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            // -- Swagger UI v3 (OpenAPI)
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/api/login",
-            "/api/register-admin",
-            //Controller
-            "/api/absensi/**",
-            "/api/karyawan/**",
-            "/api/admin/**",
-            "/api/organisasi/**",
-            "/api/cuti/**",
-            "/api/jabatan/**",
-            "/api/profiles/upload",
-            "/api/profiles/**"
-    };
+ ;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

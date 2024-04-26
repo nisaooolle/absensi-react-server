@@ -53,8 +53,12 @@ public class OrganisasiImpl implements OrganisasiService {
 
     @Override
     public Optional<Organisasi> GetAllByIdAdmin(Long idAdmin){
-        return  organisasiRepository.findById(idAdmin);
+        return  organisasiRepository.findById(idAdmin);}
+    @Override
+    public Optional<Organisasi> GetAllBYId(Long id){
+        return organisasiRepository.findById(id);
     }
+
     @Override
     public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
         Optional<Admin> admin = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));
