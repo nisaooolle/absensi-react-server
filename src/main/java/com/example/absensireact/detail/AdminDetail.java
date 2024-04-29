@@ -31,6 +31,7 @@ public class AdminDetail implements UserDetails {
     }
 
 
+
     public static AdminDetail buildAdmin(Admin admin) {
         return new AdminDetail(
                 admin.getId(),

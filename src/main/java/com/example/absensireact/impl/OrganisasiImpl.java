@@ -75,6 +75,7 @@ public class OrganisasiImpl implements OrganisasiService {
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
         organisasi.setAdmin(admin1);
+        admin1.setIdOrganisasi(String.valueOf(admin1));
         String imageUrl = imageConverter(image);
         organisasi.setFotoOrganisasi(imageUrl);
 
