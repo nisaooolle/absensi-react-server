@@ -71,12 +71,15 @@ public class JwtTokenUtil implements Serializable {
     public List<SimpleGrantedAuthority> getRolesFromToken(String token) {
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 
-        return claims.entrySet().stream()
+        List<String> roles = claims.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(true))
-                .map(entry -> new SimpleGrantedAuthority(entry.getKey()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role))
                 .collect(Collectors.toList());
     }
-
     //validate token
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
