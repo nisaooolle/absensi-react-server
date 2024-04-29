@@ -17,8 +17,8 @@ public class Jabatan {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "user_id") // Changed from id_admin to user_id
-    private User admin;
+    @JoinColumn(name = "admin_id") // Changed to reference an admin
+    private Admin admin;
 
     public Long getIdJabatan() {
         return idJabatan;
@@ -36,11 +36,11 @@ public class Jabatan {
         this.namaJabatan = namaJabatan;
     }
 
-    public User getAdmin() {
+    public Admin getAdmin() {
         return admin;
     }
 
-    public void setAdmin(User admin) {
+    public void setAdmin(Admin admin) {
         this.admin = admin;
     }
 }

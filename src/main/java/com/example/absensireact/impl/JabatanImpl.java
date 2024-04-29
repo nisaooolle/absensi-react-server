@@ -1,11 +1,10 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Jabatan;
-import com.example.absensireact.model.User;
+import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.JabatanRepository;
-import com.example.absensireact.repository.UserRepository;
-import com.example.absensireact.role.RoleEnum;
 import com.example.absensireact.service.JabatanService;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +13,11 @@ import java.util.List;
 @Service
 public class JabatanImpl implements JabatanService {
 
-    private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
     private final JabatanRepository jabatanRepository;
 
-    public JabatanImpl(UserRepository userRepository, JabatanRepository jabatanRepository) {
-        this.userRepository = userRepository;
+    public JabatanImpl(AdminRepository adminRepository, JabatanRepository jabatanRepository) {
+        this.adminRepository = adminRepository;
         this.jabatanRepository = jabatanRepository;
     }
 
@@ -28,29 +27,24 @@ public class JabatanImpl implements JabatanService {
     }
 
     @Override
-    public List<Jabatan> getJabatanByAdminUserId(Long userId) {
-        return jabatanRepository.findByUserIdAndAdminRole(userId);
+    public List<Jabatan> getJabatanByAdminId(Long adminId) {
+        return jabatanRepository.findByAdminId(adminId);
     }
 
-        @Override
-        public Jabatan tambahJabatan(Long userId, Jabatan jabatan) {
-            User admin = userRepository.findByIdAndRole(userId, RoleEnum.ADMIN)
-                    .orElseThrow(() -> new NotFoundException("Admin not found with id: " + userId + " or not an ADMIN"));
-            jabatan.setAdmin(admin);
-            return jabatanRepository.save(jabatan);
-        }
-
-        @Override
-        public Jabatan editJabatanByAdminUserId(Long userId, Jabatan jabatan) {
-            User admin = userRepository.findByIdAndRole(userId, RoleEnum.ADMIN)
-                    .orElseThrow(() -> new NotFoundException("Admin not found with id: " + userId + " or not an ADMIN"));
-            jabatan.setAdmin(admin);
-            return jabatanRepository.save(jabatan);
-        }
+    @Override
+    public Jabatan addJabatan(Long adminId, Jabatan jabatan) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new NotFoundException("Admin not found with id: " + adminId));
+        jabatan.setAdmin(admin);
+        return jabatanRepository.save(jabatan);
+    }
 
     @Override
-    public Jabatan editJabatanByAdminId(Long adminId, Jabatan jabatan) {
-        return null;
+    public Jabatan editJabatan(Long adminId, Jabatan jabatan) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new NotFoundException("Admin not found with id: " + adminId));
+        jabatan.setAdmin(admin);
+        return jabatanRepository.save(jabatan);
     }
 
     @Override

@@ -22,20 +22,20 @@ public class JabatanController {
         return ResponseEntity.ok(jabatanService.getAllJabatan());
     }
 
-    @GetMapping("/jabatan/getByAdmin/{userId}")
-    public ResponseEntity<List<Jabatan>> getJabatanByAdminUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(jabatanService.getJabatanByAdminUserId(userId));
+    @GetMapping("/jabatan/getByAdmin/{adminId}")
+    public ResponseEntity<List<Jabatan>> getJabatanByAdminId(@PathVariable Long adminId) {
+        return ResponseEntity.ok(jabatanService.getJabatanByAdminId(adminId));
     }
 
-    @PostMapping("/jabatan/tambah/{userId}")
-    public ResponseEntity<Jabatan> addJabatan(@PathVariable Long userId, @RequestBody Jabatan jabatan) {
-        Jabatan newJabatan = jabatanService.tambahJabatan(userId, jabatan);
+    @PostMapping("/jabatan/add/{adminId}")
+    public ResponseEntity<Jabatan> addJabatan(@PathVariable Long adminId, @RequestBody Jabatan jabatan) {
+        Jabatan newJabatan = jabatanService.addJabatan(adminId, jabatan);
         return ResponseEntity.ok(newJabatan);
     }
 
-    @PutMapping("/jabatan/editByAdmin/{userId}")
-    public ResponseEntity<Jabatan> editJabatanByAdminUserId(@PathVariable Long userId, @RequestBody Jabatan jabatan) {
-        Jabatan updatedJabatan = jabatanService.editJabatanByAdminUserId(userId, jabatan);
+    @PutMapping("/jabatan/edit/{adminId}")
+    public ResponseEntity<Jabatan> editJabatan(@PathVariable Long adminId, @RequestBody Jabatan jabatan) {
+        Jabatan updatedJabatan = jabatanService.editJabatan(adminId, jabatan);
         return ResponseEntity.ok(updatedJabatan);
     }
 
