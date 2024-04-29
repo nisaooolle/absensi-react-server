@@ -66,6 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/cuti/**",
             "/api/jabatan/**",
             "/api/profile/edit/**",
+            "/api/superadmin/**",
             "/api/profile/upload/**"
 
 
@@ -86,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/register-user").hasRole("ADMIN")
-                .antMatchers("/data/", "/data/{id}").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/data/", "/data/{id}" , "/data/").hasAnyRole("USER", "ADMIN" , "SUPERADMIN")
                 .antMatchers("/v2/api-docs", "/swagger-resources", "/swagger-ui.html", "/webjars/**", "/swagger-ui/**", "/api/register-admin","/login").permitAll()
                 .antMatchers(AUTH_WHITELIST).permitAll().
                 anyRequest()
