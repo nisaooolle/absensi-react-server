@@ -1,12 +1,10 @@
 package com.example.absensireact.dto;
 
-import com.example.absensireact.model.User;
-
 public class JabatanDTO {
 
     private Long idJabatan;
     private String namaJabatan;
-    private User admin;
+    private Long adminId; // Only send ID to avoid leaking sensitive data
 
     public Long getIdJabatan() {
         return idJabatan;
@@ -24,11 +22,11 @@ public class JabatanDTO {
         this.namaJabatan = namaJabatan;
     }
 
-    public User getAdmin() {
-        return admin;
+    public Long getAdminId() {
+        return adminId;
     }
 
-    public void setAdmin(User admin) {
-        this.admin = admin;
+    public void setAdminId(Long adminId) {
+        this.adminId = adminId;
     }
 }
