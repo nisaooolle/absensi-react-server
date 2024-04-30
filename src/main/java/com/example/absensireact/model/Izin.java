@@ -20,6 +20,7 @@ public class Izin {
     @Column(name = "keteranganIzin")
     private String keternganIzin;
 
+
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "userId")
