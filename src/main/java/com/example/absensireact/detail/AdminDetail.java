@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.Column;
 import java.io.Serial;
 import java.util.*;
 
@@ -14,23 +15,22 @@ public class AdminDetail implements UserDetails {
     private Long id;
 
     private String email;
+
     private String password;
     private  String username;
     private  String imageAdmin;
     private String role;
     private String idOrganisasi;
 
-    public AdminDetail(Long id, String username,String email ,String password, String imageAdmin, String role, String idOrganisasi) {
+    public AdminDetail(Long id, String email, String password, String username, String imageAdmin, String role, String idOrganisasi) {
         this.id = id;
         this.email = email;
-        this.username = username;
         this.password = password;
+        this.username = username;
         this.imageAdmin = imageAdmin;
         this.role = role;
         this.idOrganisasi = idOrganisasi;
     }
-
-
 
     public static AdminDetail buildAdmin(Admin admin) {
         return new AdminDetail(
@@ -56,12 +56,30 @@ public class AdminDetail implements UserDetails {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getImageAdmin() {
@@ -70,14 +88,6 @@ public class AdminDetail implements UserDetails {
 
     public void setImageAdmin(String imageAdmin) {
         this.imageAdmin = imageAdmin;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getRole() {
@@ -95,17 +105,6 @@ public class AdminDetail implements UserDetails {
     public void setIdOrganisasi(String idOrganisasi) {
         this.idOrganisasi = idOrganisasi;
     }
-
-    @Override
-    public String getPassword() {
-        return   password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
 
     @Override
     public boolean isAccountNonExpired() {
@@ -127,4 +126,5 @@ public class AdminDetail implements UserDetails {
         return true;
     }
 
-    }
+
+}

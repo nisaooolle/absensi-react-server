@@ -25,8 +25,8 @@ public class OrganisasiController {
     }
 
     @GetMapping("/organisasi/all")
-    public ResponseEntity<List<Organisasi>> getAllOrganisasi() {
-        List<Organisasi> organisasiList = (List<Organisasi>) organisasiService.GetAllOrganisasi();
+    public ResponseEntity< Organisasi> getAllOrganisasi() {
+        Organisasi organisasiList =  organisasiService.GetAllOrganisasi();
         return ResponseEntity.ok(organisasiList);
     }
     @GetMapping("/organisasi/getAllByAdmin/{idAdmin}")

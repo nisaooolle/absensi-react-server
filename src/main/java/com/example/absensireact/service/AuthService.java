@@ -37,8 +37,7 @@ public class AuthService  implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserDetails userDetails = customUserDetails.loadUserByUsername(email);
-        return userDetails;
+        return customUserDetails.loadUserByUsername(email);
     }
 
     public Map<String, Object> loadUserByUsernameWithToken(String email) {

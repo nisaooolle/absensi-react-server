@@ -16,28 +16,27 @@ public class UserDetail implements UserDetails {
 
     private String email;
     private String password;
+    private String organisasi;
     private String role;
 
-    private String organisasi;
 
-    public UserDetail(Long id, String username, String email ,String password,  String role, String organisasi) {
+    public UserDetail(Long id, String username, String email, String password, String organisasi, String role) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = role;
         this.organisasi = organisasi;
+        this.role = role;
     }
-
 
     public static UserDetail buidUser(User user) {
         return new UserDetail(
                 user.getId(),
                 user.getUsername(),
-                user.getPassword(),
                 user.getEmail(),
-                "USER",
-                user.getOrganisasi()
+                user.getPassword(),
+                user.getOrganisasi(),
+                "USER"
 
         );
     }
@@ -78,6 +77,14 @@ public class UserDetail implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getOrganisasi() {
+        return organisasi;
+    }
+
+    public void setOrganisasi(String organisasi) {
+        this.organisasi = organisasi;
     }
 
     public String getRole() {
