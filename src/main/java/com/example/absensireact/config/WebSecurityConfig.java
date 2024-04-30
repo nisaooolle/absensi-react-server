@@ -30,6 +30,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtRequestFilter jwtRequestFilter;
 
     @Autowired
+    JwtAuthenticationEntryPoint unauthorizedHandler;
+    @Bean
+    public JwtRequestFilter authenticationJwtTokenFilter() {
+        return new JwtRequestFilter();
+    }
+    @Autowired
     public WebSecurityConfig(PasswordEncoderConfig passwordEncoder, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                              @Qualifier("customUserDetails") UserDetailsService jwtUserDetailsService,
                              JwtRequestFilter jwtRequestFilter) {
@@ -85,17 +91,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/api/register-user").hasRole("ADMIN")
-                .antMatchers("/data/", "/data/{id}" , "/data/").hasAnyRole("USER", "ADMIN" , "SUPERADMIN")
-                .antMatchers("/v2/api-docs", "/swagger-resources", "/swagger-ui.html", "/webjars/**", "/swagger-ui/**", "/api/register-admin","/login").permitAll()
-                .antMatchers(AUTH_WHITELIST).permitAll().
-                anyRequest()
-                .authenticated().and().
-                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers("/api/**").hasAnyAuthority("USER", "ADMIN", "SUPERADMIN")
+                .anyRequest().authenticated();
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
+
 }

@@ -3,6 +3,7 @@ package com.example.absensireact.impl;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Karyawan;
 import com.example.absensireact.model.User;
+import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.KaryawanRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.KaryawanService;
@@ -33,9 +34,12 @@ public class KaryawanImpl implements KaryawanService {
 
       private final KaryawanRepository karyawanRepository;
 
-    public KaryawanImpl(UserRepository userRepository, KaryawanRepository karyawanRepository) {
+      private final AdminRepository adminRepository;
+
+    public KaryawanImpl(UserRepository userRepository, KaryawanRepository karyawanRepository, AdminRepository adminRepository) {
         this.userRepository = userRepository;
         this.karyawanRepository = karyawanRepository;
+        this.adminRepository = adminRepository;
     }
 
     @Override
@@ -53,7 +57,7 @@ public class KaryawanImpl implements KaryawanService {
         return karyawanRepository.findById(id);
     }
 
-//    @Override
+    //    @Override
 //    public Karyawan TambahKaryawan(Long userId , Karyawan karyawan){
 //        // Dapatkan objek User dari UserRepository berdasarkan ID
 //        User user = userRepository.findById(userId).orElse(null);
@@ -137,5 +141,4 @@ public class KaryawanImpl implements KaryawanService {
             throw new NotFoundException("Karyawan not found with id: " + id);
         }
     }
-
 }

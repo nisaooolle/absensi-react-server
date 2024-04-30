@@ -52,7 +52,7 @@ public class KaryawanController {
         Karyawan updatedKaryawan = karyawanService.EditKaryawanByUserId(userId, karyawan , image);
         return ResponseEntity.ok(updatedKaryawan);
     }
-   @PutMapping("/karyawan/editById/{id}")
+    @PutMapping("/karyawan/editById/{id}")
     public ResponseEntity<Karyawan> editById(@PathVariable Long id, @RequestBody Karyawan karyawan , @RequestParam("image") MultipartFile image) throws IOException {
         Karyawan updatedKaryawan = karyawanService.EditByid(id, karyawan , image);
         return ResponseEntity.ok(updatedKaryawan);

@@ -34,7 +34,7 @@ public class JabatanImpl implements JabatanService {
     @Override
     public Jabatan addJabatan(Long adminId, Jabatan jabatan) {
         Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new NotFoundException("Admin not found with id: " + adminId));
+                .orElseThrow(() -> new NotFoundException(  "Admin not found with id: " + adminId));
         jabatan.setAdmin(admin);
         return jabatanRepository.save(jabatan);
     }
