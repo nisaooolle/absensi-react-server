@@ -1,8 +1,8 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Karyawan;
-import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.KaryawanRepository;
 import com.example.absensireact.repository.UserRepository;
@@ -48,8 +48,8 @@ public class KaryawanImpl implements KaryawanService {
     }
 
     @Override
-    public List<Karyawan> getKaryawanByUserId(Long userId){
-        return karyawanRepository.findByUserId(userId);
+    public Optional<Karyawan> getKaryawanByAdminId(Long adminId){
+        return karyawanRepository.findByAdmin(adminId);
     }
 
     @Override
@@ -73,23 +73,23 @@ public class KaryawanImpl implements KaryawanService {
 //        }
 //    }
     @Override
-    public Karyawan TambahKaryawan(Long userId, Karyawan karyawan) {
-        Optional<User> userOptional = userRepository.findByIdAndRole(userId, "ADMIN");
+    public Karyawan TambahKaryawan(Long adminId, Karyawan karyawan) {
+        Optional<Admin> userOptional = adminRepository.findByIdAndRole(adminId, "ADMIN");
 
         if (userOptional.isPresent()) {
-            User adminUser = userOptional.get();
+            Admin adminUser = userOptional.get();
 
-            Optional<Karyawan> existingKaryawanOptional = karyawanRepository.findByUser(adminUser);
+            Optional<Karyawan> existingKaryawanOptional = karyawanRepository.findKaryawanByadmin(adminUser);
             if (existingKaryawanOptional.isPresent()) {
-                throw new EntityExistsException("Pengguna dengan ID " + userId + " sudah memiliki entri karyawan.");
+                throw new EntityExistsException("Pengguna dengan ID " + adminId + " sudah memiliki entri karyawan.");
             }
 
-            karyawan.setUser(adminUser);
+            karyawan.setAdmin(adminUser);
             karyawan.setJabatan(karyawan.getJabatan());
             karyawan.setShift(karyawan.getShift());
             return karyawanRepository.save(karyawan);
         } else {
-            throw new EntityNotFoundException("Pengguna dengan ID " + userId + " dan peran ADMIN tidak ditemukan.");
+            throw new EntityNotFoundException("Pengguna dengan ID " + adminId + " dan peran ADMIN tidak ditemukan.");
         }
     }
     @Override
@@ -107,17 +107,7 @@ public class KaryawanImpl implements KaryawanService {
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
     }
 
-    @Override
-    public Karyawan EditKaryawanByUserId(Long userId, Karyawan karyawan, MultipartFile image) throws IOException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User Id Tidak Ditemukan"));
-        karyawan.setUser(user);
-        karyawan.setShift(karyawan.getShift());
-        karyawan.setJabatan(karyawan.getJabatan());
-        String fotoUrl = uploadFoto(image);
-        karyawan.setFotoKaryawan(fotoUrl);
 
-        return karyawanRepository.save(karyawan);
-    }
 
     @Override
     public Karyawan EditByid(Long id, Karyawan karyawan, MultipartFile image) throws IOException{
