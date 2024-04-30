@@ -41,8 +41,21 @@ public class JabatanImpl implements JabatanService {
 
     @Override
     public Jabatan editJabatan(Long adminId, Jabatan jabatan) {
+        if (jabatan.getIdJabatan() == null || jabatan.getIdJabatan() == 0) {
+            throw new IllegalArgumentException("Jabatan ID must be provided for editing.");
+        }
+
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new NotFoundException("Admin not found with id: " + adminId));
+
+        Jabatan existingJabatan = jabatanRepository.findById(jabatan.getIdJabatan())
+                .orElseThrow(() -> new NotFoundException("Jabatan not found with id: " + jabatan.getIdJabatan()));
+
+        // Check if the provided admin is the same as the admin of the existing jabatan
+        if (!existingJabatan.getAdmin().equals(admin)) {
+            throw new IllegalArgumentException("You are not authorized to edit this Jabatan.");
+        }
+
         jabatan.setAdmin(admin);
         return jabatanRepository.save(jabatan);
     }

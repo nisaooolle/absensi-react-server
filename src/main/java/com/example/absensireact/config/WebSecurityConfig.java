@@ -71,9 +71,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/lembur/**",
             "/api/izin/**",
             "/api/jabatan/**",
-            "/api/profile/edit/**",
+            "/api/admin/profile/editDetail/**",
+            "/api/admin/profile/edit/**",
+            "/api/admin/profile/upload/**",
             "/api/superadmin/**",
-            "/api/profile/upload/**"
+            "/api/profile/upload/"
 
 
     };
