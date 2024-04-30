@@ -18,11 +18,15 @@ import java.util.stream.Collectors;
 public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -2550185165626007488L;
-
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String secret; // Ensure consistent secret key usage
+
+
+    private void printSecretKeyUsage(String methodName) {
+        System.out.println("Secret Key for " + methodName + ": " + this.secret);
+    }
 
     //retrieve username from jwt token
     public String getUsernameFromToken(String token) {

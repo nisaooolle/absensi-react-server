@@ -10,9 +10,11 @@ import com.example.absensireact.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 public class CustomUserDetails  implements UserDetailsService {
@@ -29,19 +31,22 @@ public class CustomUserDetails  implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) {
-        if (adminRepository.findByAdminEmail(username).isPresent()) {
-            Admin admin = adminRepository.findByAdminEmail(username).orElseThrow(() -> new NotFoundException("Username not found"));;
-            return AdminDetail.buildAdmin(admin);
+        Optional<SuperAdmin> superAdmin = superAdminRepository.findByEmailSuperAdmin(username);
+        if (superAdmin.isPresent()) {
+            return SuperAdminDetail.buildSuperAdmin(superAdmin.get());
         }
-        else if (superAdminRepository.existsByEmail(username)) {
-            SuperAdmin superAdmin = superAdminRepository.findByEmailSuperAdmin(username).orElseThrow(() -> new NotFoundException("Username Not found"));
-            return SuperAdminDetail.buildSuperAdmin(superAdmin);
+
+        Optional<Admin> admin = adminRepository.findByAdminEmail(username);
+        if (admin.isPresent()) {
+            return AdminDetail.buildAdmin(admin.get());
         }
-        else if (userRepository.existsByEmail(username)){
-            User user = userRepository.findByEmailUser(username).orElseThrow(() -> new NotFoundException("Username not found"));;
-            return UserDetail.buidUser(user);
+
+        Optional<User> user = userRepository.findByEmailUser(username);
+        if (user.isPresent()) {
+            return UserDetail.buidUser(user.get());
         }
-        throw new NotFoundException("User Not Found with username: " + username);
+
+        throw new UsernameNotFoundException("User Not Found with username: " + username);
     }
 
 

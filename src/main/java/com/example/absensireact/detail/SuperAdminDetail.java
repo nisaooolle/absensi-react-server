@@ -19,6 +19,7 @@ public class SuperAdminDetail implements UserDetails {
     private String email;
     private String password;
     private  String username;
+
     private  String imageAdmin;
     private String role;
 
@@ -31,6 +32,7 @@ public class SuperAdminDetail implements UserDetails {
         this.imageAdmin = imageAdmin;
         this.role = role;
     }
+
     public static SuperAdminDetail buildSuperAdmin(SuperAdmin superAdmin) {
         return new SuperAdminDetail(
                superAdmin.getId(),
@@ -92,6 +94,7 @@ public class SuperAdminDetail implements UserDetails {
     public void setRole(String role) {
         this.role = role;
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("SUPERADMIN"));
