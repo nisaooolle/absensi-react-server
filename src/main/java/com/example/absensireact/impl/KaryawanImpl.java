@@ -1,5 +1,6 @@
 package com.example.absensireact.impl;
 
+import com.example.absensireact.exception.InternalErrorException;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Karyawan;
@@ -18,7 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -73,7 +76,7 @@ public class KaryawanImpl implements KaryawanService {
 //        }
 //    }
     @Override
-    public Karyawan TambahKaryawan(Long adminId, Karyawan karyawan) {
+    public Karyawan TambahKaryawan(Long adminId, Karyawan karyawan, MultipartFile image) {
         Optional<Admin> userOptional = adminRepository.findByIdAndRole(adminId, "ADMIN");
 
         if (userOptional.isPresent()) {
@@ -85,6 +88,7 @@ public class KaryawanImpl implements KaryawanService {
             }
 
             karyawan.setAdmin(adminUser);
+            karyawan.setFotoKaryawan(imageConverter(image));
             karyawan.setJabatan(karyawan.getJabatan());
             karyawan.setShift(karyawan.getShift());
             return karyawanRepository.save(karyawan);
@@ -92,25 +96,45 @@ public class KaryawanImpl implements KaryawanService {
             throw new EntityNotFoundException("Pengguna dengan ID " + adminId + " dan peran ADMIN tidak ditemukan.");
         }
     }
-    @Override
+    private String imageConverter(MultipartFile multipartFile) {
+        try {
+            return uploadFoto(multipartFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InternalErrorException("Error upload file");
+        }
+    }
+
     public String uploadFoto(MultipartFile image) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "karyawan/";
         String fileName = folderPath + timestamp + "_" + image.getOriginalFilename();
         BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType("media")
+                .setContentType(image.getContentType()) // Set content type from image
                 .build();
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, image.getBytes());
+        storage.create(blobInfo, image.getBytes()); // Use image.getBytes() to get file bytes directly
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+    }
+
+    private File convertToFile(MultipartFile multipartFile, String fileName) throws IOException {
+        File file = new File(fileName);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(multipartFile.getBytes());
+            fos.close();
+        }
+        return file;
+    }
+    private String getExtentions(String fileName) {
+        return fileName.split("\\.")[0];
     }
 
 
 
     @Override
-    public Karyawan EditByid(Long id, Karyawan karyawan, MultipartFile image) throws IOException{
+    public Karyawan EditByid(Long id, Karyawan karyawan, MultipartFile image) {
         Optional<Karyawan> karyawan1 = karyawanRepository.findById(id);
 
         if (karyawan1.isEmpty()) {
@@ -118,7 +142,7 @@ public class KaryawanImpl implements KaryawanService {
         }
         karyawan.setJabatan(karyawan.getJabatan());
         karyawan.setShift(karyawan.getShift());
-        String fileFoto = uploadFoto(image);
+        String fileFoto = imageConverter(image);
         karyawan.setFotoKaryawan(fileFoto);
 
         return karyawanRepository.save(karyawan);

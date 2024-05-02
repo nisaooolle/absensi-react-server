@@ -21,10 +21,12 @@ public class AppConfig extends WebMvcConfigurerAdapter {
     }
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")  // Replace with your specific frontend origin
+                .allowedOrigins("http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE" ,"OPTIONS")
                 .allowedHeaders("X-Requested-With", "auth-tgh" ,"Content-Type", "Origin", "Authorization", "Accept", "Client-Security-Token", "Accept-Encoding")
-                .allowCredentials(true);
+                .allowCredentials(true)
+                .maxAge(3600);
+
     }
 
 

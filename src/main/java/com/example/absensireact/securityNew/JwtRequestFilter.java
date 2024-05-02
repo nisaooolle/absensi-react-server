@@ -27,32 +27,34 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
+
     @Autowired
-    CustomUserDetails userDetails;
+    CustomUserDetails customUserDetails;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        try {
-            String token = parseJwt(request);
-            if (token != null) {
-                String username = jwtTokenUtil.getUsernameFromToken(token);
-                UserDetails userDetails = authService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
-        }
-        chain.doFilter(request, response);
-    }
 
-    private String parseJwt(HttpServletRequest request) {
-        String tokenHeader = request.getHeader("Authorization");
-        if (StringUtils.hasText(tokenHeader) && tokenHeader.startsWith("Bearer ")) {
-            return tokenHeader.substring(7);
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        String username = null;
+        String jwt = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
+            username = jwtTokenUtil.getUsernameFromToken(jwt);
         }
-        return null;
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // Validate token and check if it is expired
+            if (jwtTokenUtil.validateToken(jwt, customUserDetails.loadUserByUsername(username))) {
+                UserDetails userDetails = customUserDetails.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        }
+
+        chain.doFilter(request, response);
     }
 }

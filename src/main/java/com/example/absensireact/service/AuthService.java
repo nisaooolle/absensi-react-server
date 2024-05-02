@@ -3,6 +3,7 @@ package com.example.absensireact.service;
 
 
 import com.example.absensireact.detail.CustomUserDetails;
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.repository.AdminRepository;
@@ -35,6 +36,8 @@ public class AuthService  implements UserDetailsService {
     @Autowired
     AdminRepository adminRepository;
 
+
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return customUserDetails.loadUserByUsername(email);
@@ -51,5 +54,14 @@ public class AuthService  implements UserDetailsService {
         return response;
     }
 
+    public UserDetails loadUserDetailsForAttendance(String username) {
+        if (adminRepository.existsByEmail(username)) {
+            Admin admin = adminRepository.findByAdminEmail(username)
+                    .orElseThrow(() -> new NotFoundException("Admin not found"));
+            return customUserDetails.loadUserDetailsForAttendance(admin.getEmail());
+        } else {
+            throw new NotFoundException("User not found for attendance with username: " + username);
+        }
+    }
 
 }

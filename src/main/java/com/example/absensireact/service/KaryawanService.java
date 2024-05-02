@@ -17,7 +17,9 @@ public interface KaryawanService {
     Optional<Karyawan> getKaryawanById(Long id);
 
 
-    Karyawan TambahKaryawan(Long adminId, Karyawan karyawan);
+
+
+    Karyawan TambahKaryawan(Long adminId, Karyawan karyawan, MultipartFile image);
 
     String uploadFoto(MultipartFile image) throws IOException;
 

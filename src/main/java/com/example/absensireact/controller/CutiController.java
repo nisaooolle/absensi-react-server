@@ -73,8 +73,8 @@ public class CutiController {
     }
 
     @PostMapping("/cuti/tambahCuti/{userId}")
-    public ResponseEntity<Cuti> createCuti(@PathVariable Long userId , @RequestBody Cuti cuti) {
-        Cuti createdCuti = cutiService.IzinCuti( userId , cuti);
+    public ResponseEntity<Cuti> createCuti(@PathVariable Long userId, @RequestBody Cuti cuti) {
+        Cuti createdCuti = cutiService.IzinCuti(userId, cuti);
         return new ResponseEntity<>(createdCuti, HttpStatus.CREATED);
     }
 

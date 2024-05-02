@@ -2,6 +2,7 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.model.Karyawan;
 import com.example.absensireact.service.KaryawanService;
+import com.google.common.collect.BiMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +46,8 @@ public class KaryawanController {
     }
 
     @PostMapping("/karyawan/tambah/{adminId}")
-    public ResponseEntity<Karyawan> addKaryawan(@PathVariable Long adminId ,@RequestBody Karyawan karyawan) {
-        Karyawan newKaryawan = karyawanService.TambahKaryawan(adminId , karyawan);
+    public ResponseEntity<Karyawan> addKaryawan(@PathVariable Long adminId ,@RequestBody Karyawan karyawan ,@RequestParam("image") MultipartFile image) throws IOException {
+        Karyawan newKaryawan = karyawanService.TambahKaryawan(adminId , karyawan , image);
         return ResponseEntity.ok(newKaryawan);
     }
 

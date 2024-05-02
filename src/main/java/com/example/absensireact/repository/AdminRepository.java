@@ -17,4 +17,5 @@ public interface AdminRepository extends JpaRepository<Admin , Long> {
     Optional<Admin> findByIdAndRole(Long id, String role);
 
 
+
 }

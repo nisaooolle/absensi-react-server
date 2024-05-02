@@ -7,10 +7,10 @@ import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.SuperAdminRepository;
 import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.securityNew.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,28 +26,44 @@ public class CustomUserDetails  implements UserDetailsService {
     AdminRepository adminRepository;
 
     @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
     SuperAdminRepository superAdminRepository;
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) {
-        Optional<SuperAdmin> superAdmin = superAdminRepository.findByEmailSuperAdmin(username);
-        if (superAdmin.isPresent()) {
-            return SuperAdminDetail.buildSuperAdmin(superAdmin.get());
+        if (adminRepository.existsByEmail(username)) {
+            Admin admin = adminRepository.findByAdminEmail(username)
+                    .orElseThrow(() -> new NotFoundException("Admin not found"));
+            return AdminDetail.buildAdmin(admin);
+        } else if (userRepository.existsByEmail(username)) {
+            User user = userRepository.findByEmailUser(username)
+                    .orElseThrow(() -> new NotFoundException("User not found"));
+            return UserDetail.buidUser(user);
+        } else if (superAdminRepository.findByEmailSuperAdmin(username).isPresent()) {
+            SuperAdmin superAdmin = superAdminRepository.findByEmailSuperAdmin(username)
+                    .orElseThrow(() -> new NotFoundException("Super Admin not found"));
+            return SuperAdminDetail.buildSuperAdmin(superAdmin);
         }
-
-        Optional<Admin> admin = adminRepository.findByAdminEmail(username);
-        if (admin.isPresent()) {
-            return AdminDetail.buildAdmin(admin.get());
-        }
-
-        Optional<User> user = userRepository.findByEmailUser(username);
-        if (user.isPresent()) {
-            return UserDetail.buidUser(user.get());
-        }
-
-        throw new UsernameNotFoundException("User Not Found with username: " + username);
+        throw new NotFoundException("User Not Found with username: " + username);
     }
 
+    public UserDetails loadUserDetailsForAttendance(String username) {
+        if (adminRepository.existsByEmail(username)) {
+            Admin admin = adminRepository.findByAdminEmail(username)
+                    .orElseThrow(() -> new NotFoundException("Admin not found"));
+            return AdminDetail.buildAdmin(admin);
+        } else if (userRepository.existsByEmail(username)) {
+            User user = userRepository.findByEmailUser(username)
+                    .orElseThrow(() -> new NotFoundException("User not found"));
+            return UserDetail.buidUser(user);
+        } else if (superAdminRepository.findByEmailSuperAdmin(username).isPresent()) {
+            SuperAdmin superAdmin = superAdminRepository.findByEmailSuperAdmin(username)
+                    .orElseThrow(() -> new NotFoundException("Super Admin not found"));
+            return SuperAdminDetail.buildSuperAdmin(superAdmin);
+        }
+        throw new NotFoundException("User Not Found with username: " + username);
+    }
 
 }
