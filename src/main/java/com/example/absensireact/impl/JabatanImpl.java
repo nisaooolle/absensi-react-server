@@ -9,6 +9,7 @@ import com.example.absensireact.service.JabatanService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JabatanImpl implements JabatanService {
@@ -29,6 +30,11 @@ public class JabatanImpl implements JabatanService {
     @Override
     public List<Jabatan> getJabatanByAdminId(Long adminId) {
         return jabatanRepository.findByAdminId(adminId);
+    }
+
+    @Override
+    public Optional<Jabatan> getJabatanById(Long id) {
+        return Optional.empty();
     }
 
     @Override
