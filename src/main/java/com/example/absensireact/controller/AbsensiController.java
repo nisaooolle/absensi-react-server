@@ -56,8 +56,7 @@ public class AbsensiController {
 
     @PostMapping("/absensi/absensi-masuk")
     public ResponseEntity<Absensi> postAbsensi(@RequestParam("image") MultipartFile image,
-                                               @RequestParam("userId") Long userId
-                                               ) throws IOException {
+                                               @RequestParam("userId") Long userId) throws IOException {
         Absensi newAbsensi = absensiService.PostAbsensi(userId, image);
         return new ResponseEntity<>(newAbsensi, HttpStatus.CREATED);
     }

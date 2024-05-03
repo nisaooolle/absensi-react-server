@@ -23,8 +23,8 @@ public class Karyawan {
 
     @JsonIgnore
     @OneToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    @JoinColumn(name = "adminId")
+    private Admin admin;
 
 
 
@@ -32,12 +32,12 @@ public class Karyawan {
 
     }
 
-    public Karyawan(Long id, String jabatan, String shift,String fotoKaryawan ,User user) {
+    public Karyawan(Long id, String jabatan, String shift,String fotoKaryawan ,Admin admin) {
         this.id = id;
         this.jabatan = jabatan;
         this.shift = shift;
         this.fotoKaryawan = fotoKaryawan;
-        this.user = user;
+        this.admin =admin;
     }
 
     public Long getId() {
@@ -64,12 +64,12 @@ public class Karyawan {
         this.shift = shift;
     }
 
-    public User getUser() {
-        return user;
+    public Admin getAdmin() {
+        return admin;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
     }
 
     public String getFotoKaryawan() {

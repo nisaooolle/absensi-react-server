@@ -2,6 +2,8 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.model.Karyawan;
 import com.example.absensireact.service.KaryawanService;
+import com.google.common.collect.BiMap;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,32 +28,30 @@ public class KaryawanController {
         return ResponseEntity.ok(karyawanList);
     }
 
-    @GetMapping("/karyawan/getByUser/{userId}")
-    public ResponseEntity<List<Karyawan>> getKaryawanByUserId(@PathVariable Long userId) {
-        List<Karyawan> karyawanList = karyawanService.getKaryawanByUserId(userId);
+    @GetMapping("/karyawan/getByUser/{adminId}")
+    public ResponseEntity<Optional<Karyawan>> getKaryawanByUserId(@PathVariable Long adminId) {
+        Optional<Karyawan> karyawanList = karyawanService.getKaryawanByAdminId(adminId);
         return ResponseEntity.ok(karyawanList);
     }
 
     @GetMapping("/karyawan/getById/{id}")
-    public ResponseEntity<Optional<Karyawan>>getById(@PathVariable Long id){
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         Optional<Karyawan> karyawan = karyawanService.getKaryawanById(id);
+
         if (karyawan.isPresent()) {
-            return ResponseEntity.ok(karyawan);
+            return new ResponseEntity<>(karyawan.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Karyawan tidak ditemukan", HttpStatus.NOT_FOUND);
         }
-        throw new RuntimeException("Gagal mengubah data Karyawan dengan id" + id);
     }
 
-    @PostMapping("/karyawan/tambah/{userId}")
-    public ResponseEntity<Karyawan> addKaryawan(@PathVariable Long userId ,@RequestBody Karyawan karyawan) {
-        Karyawan newKaryawan = karyawanService.TambahKaryawan(userId , karyawan);
+    @PostMapping("/karyawan/tambah/{adminId}")
+    public ResponseEntity<Karyawan> addKaryawan(@PathVariable Long adminId ,@RequestBody Karyawan karyawan ,@RequestParam("image") MultipartFile image) throws IOException {
+        Karyawan newKaryawan = karyawanService.TambahKaryawan(adminId , karyawan , image);
         return ResponseEntity.ok(newKaryawan);
     }
 
-    @PutMapping("/karyawan/editByuser/{userId}")
-    public ResponseEntity<Karyawan> editKaryawanByUserId(@PathVariable Long userId, @RequestBody Karyawan karyawan , @RequestParam("image") MultipartFile image) throws IOException {
-        Karyawan updatedKaryawan = karyawanService.EditKaryawanByUserId(userId, karyawan , image);
-        return ResponseEntity.ok(updatedKaryawan);
-    }
+
     @PutMapping("/karyawan/editById/{id}")
     public ResponseEntity<Karyawan> editById(@PathVariable Long id, @RequestBody Karyawan karyawan , @RequestParam("image") MultipartFile image) throws IOException {
         Karyawan updatedKaryawan = karyawanService.EditByid(id, karyawan , image);

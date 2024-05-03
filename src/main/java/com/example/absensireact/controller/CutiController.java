@@ -31,21 +31,21 @@ public class CutiController {
         this.cutiPDF = cutiPDF;
     }
 
-    @GetMapping(value = "/cuti/{id}/download")
-    public void downloadCutiPDF(@PathVariable Long id, HttpServletResponse response) {
-        Optional<Cuti> cutiOptional = cutiService.GetCutiById(id);
-        if (cutiOptional.isPresent()) {
-            Cuti cuti = cutiOptional.get();
-            try {
-                cutiPDF.downloadPDF(cuti, response);
-            } catch (IOException e) {
-                e.printStackTrace();
-                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            }
-        } else {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-        }
-    }
+//    @GetMapping(value = "/cuti/{id}/download")
+//    public void downloadCutiPDF(@PathVariable Long id, HttpServletResponse response) {
+//        Optional<Cuti> cutiOptional = cutiService.GetCutiById(id);
+//        if (cutiOptional.isPresent()) {
+//            Cuti cuti = cutiOptional.get();
+//            try {
+//                cutiPDF.downloadPDF(cuti, response);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+//            }
+//        } else {
+//            response.setStatus(HttpStatus.NOT_FOUND.value());
+//        }
+//    }
 
     @GetMapping("/cuti/getById/{id}")
     public Optional<Cuti> GetCutiById(@PathVariable Long id ){
@@ -73,8 +73,8 @@ public class CutiController {
     }
 
     @PostMapping("/cuti/tambahCuti/{userId}")
-    public ResponseEntity<Cuti> createCuti(@PathVariable Long userId , @RequestBody Cuti cuti) {
-        Cuti createdCuti = cutiService.IzinCuti( userId , cuti);
+    public ResponseEntity<Cuti> createCuti(@PathVariable Long userId, @RequestBody Cuti cuti) {
+        Cuti createdCuti = cutiService.IzinCuti(userId, cuti);
         return new ResponseEntity<>(createdCuti, HttpStatus.CREATED);
     }
 

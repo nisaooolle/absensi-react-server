@@ -1,8 +1,9 @@
 package com.example.absensireact.impl;
 
+import com.example.absensireact.exception.InternalErrorException;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Karyawan;
-import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.KaryawanRepository;
 import com.example.absensireact.repository.UserRepository;
@@ -18,7 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -48,8 +51,8 @@ public class KaryawanImpl implements KaryawanService {
     }
 
     @Override
-    public List<Karyawan> getKaryawanByUserId(Long userId){
-        return karyawanRepository.findByUserId(userId);
+    public Optional<Karyawan> getKaryawanByAdminId(Long adminId){
+        return karyawanRepository.findByAdmin(adminId);
     }
 
     @Override
@@ -73,54 +76,65 @@ public class KaryawanImpl implements KaryawanService {
 //        }
 //    }
     @Override
-    public Karyawan TambahKaryawan(Long userId, Karyawan karyawan) {
-        Optional<User> userOptional = userRepository.findByIdAndRole(userId, "ADMIN");
+    public Karyawan TambahKaryawan(Long adminId, Karyawan karyawan, MultipartFile image) {
+        Optional<Admin> userOptional = adminRepository.findByIdAndRole(adminId, "ADMIN");
 
         if (userOptional.isPresent()) {
-            User adminUser = userOptional.get();
+            Admin adminUser = userOptional.get();
 
-            Optional<Karyawan> existingKaryawanOptional = karyawanRepository.findByUser(adminUser);
+            Optional<Karyawan> existingKaryawanOptional = karyawanRepository.findKaryawanByadmin(adminUser);
             if (existingKaryawanOptional.isPresent()) {
-                throw new EntityExistsException("Pengguna dengan ID " + userId + " sudah memiliki entri karyawan.");
+                throw new EntityExistsException("Pengguna dengan ID " + adminId + " sudah memiliki entri karyawan.");
             }
 
-            karyawan.setUser(adminUser);
+            karyawan.setAdmin(adminUser);
+            karyawan.setFotoKaryawan(imageConverter(image));
             karyawan.setJabatan(karyawan.getJabatan());
             karyawan.setShift(karyawan.getShift());
             return karyawanRepository.save(karyawan);
         } else {
-            throw new EntityNotFoundException("Pengguna dengan ID " + userId + " dan peran ADMIN tidak ditemukan.");
+            throw new EntityNotFoundException("Pengguna dengan ID " + adminId + " dan peran ADMIN tidak ditemukan.");
         }
     }
-    @Override
+    private String imageConverter(MultipartFile multipartFile) {
+        try {
+            return uploadFoto(multipartFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new InternalErrorException("Error upload file");
+        }
+    }
+
     public String uploadFoto(MultipartFile image) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "karyawan/";
         String fileName = folderPath + timestamp + "_" + image.getOriginalFilename();
         BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType("media")
+                .setContentType(image.getContentType()) // Set content type from image
                 .build();
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, image.getBytes());
+        storage.create(blobInfo, image.getBytes()); // Use image.getBytes() to get file bytes directly
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
     }
 
-    @Override
-    public Karyawan EditKaryawanByUserId(Long userId, Karyawan karyawan, MultipartFile image) throws IOException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User Id Tidak Ditemukan"));
-        karyawan.setUser(user);
-        karyawan.setShift(karyawan.getShift());
-        karyawan.setJabatan(karyawan.getJabatan());
-        String fotoUrl = uploadFoto(image);
-        karyawan.setFotoKaryawan(fotoUrl);
-
-        return karyawanRepository.save(karyawan);
+    private File convertToFile(MultipartFile multipartFile, String fileName) throws IOException {
+        File file = new File(fileName);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(multipartFile.getBytes());
+            fos.close();
+        }
+        return file;
+    }
+    private String getExtentions(String fileName) {
+        return fileName.split("\\.")[0];
     }
 
+
+
     @Override
-    public Karyawan EditByid(Long id, Karyawan karyawan, MultipartFile image) throws IOException{
+    public Karyawan EditByid(Long id, Karyawan karyawan, MultipartFile image) {
         Optional<Karyawan> karyawan1 = karyawanRepository.findById(id);
 
         if (karyawan1.isEmpty()) {
@@ -128,7 +142,7 @@ public class KaryawanImpl implements KaryawanService {
         }
         karyawan.setJabatan(karyawan.getJabatan());
         karyawan.setShift(karyawan.getShift());
-        String fileFoto = uploadFoto(image);
+        String fileFoto = imageConverter(image);
         karyawan.setFotoKaryawan(fileFoto);
 
         return karyawanRepository.save(karyawan);

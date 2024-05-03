@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +32,15 @@ public class IzinImpl implements IzinService {
         Optional<Izin> izinOptional = izinRepository.findById(id);
         return izinOptional.orElse(null);
     }
+
+    @Override
+    public Optional<Izin> getIzinByUserId(Long userId){
+        Optional<Izin> izin = izinRepository.findByUserId(userId);
+        if (izin.isEmpty()) {
+            throw new NotFoundException("Userid tidak ditemukan");
+        }
+        return izin;
+     }
 
     @Override
     public Izin createIzin(Long userId, Izin izin) {

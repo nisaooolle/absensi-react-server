@@ -3,12 +3,14 @@ package com.example.absensireact.service;
 
 
 import com.example.absensireact.detail.CustomUserDetails;
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.securityNew.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,14 +37,15 @@ public class AuthService  implements UserDetailsService {
     @Autowired
     AdminRepository adminRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+
+    public UserDetails loadUserByUsername(String email) {
         return customUserDetails.loadUserByUsername(email);
     }
 
-    public Map<String, Object> loadUserByUsernameWithToken(String email) {
-        UserDetails userDetails = loadUserByUsername(email);
-        String token = jwtTokenUtil.generateToken(userDetails);
+    public Map<String, Object> loadUserByUsernameWithToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String token = jwtTokenUtil.generateToken(authentication);
 
         Map<String, Object> response = new HashMap<>();
         response.put("data", userDetails);
@@ -50,6 +53,7 @@ public class AuthService  implements UserDetailsService {
 
         return response;
     }
+
 
 
 }
