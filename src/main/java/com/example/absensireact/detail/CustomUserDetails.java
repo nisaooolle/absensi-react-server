@@ -34,36 +34,21 @@ public class CustomUserDetails  implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         if (adminRepository.existsByEmail(username)) {
-            Admin admin = adminRepository.findByAdminEmail(username)
+            Admin admin = adminRepository.findByEmail(username)
                     .orElseThrow(() -> new NotFoundException("Admin not found"));
             return AdminDetail.buildAdmin(admin);
         } else if (userRepository.existsByEmail(username)) {
-            User user = userRepository.findByEmailUser(username)
+            User user = userRepository.findByEmail(username)
                     .orElseThrow(() -> new NotFoundException("User not found"));
             return UserDetail.buidUser(user);
-        } else if (superAdminRepository.findByEmailSuperAdmin(username).isPresent()) {
-            SuperAdmin superAdmin = superAdminRepository.findByEmailSuperAdmin(username)
+        } else if (superAdminRepository.existsByEmail(username)) {
+            SuperAdmin superAdmin = superAdminRepository.findByEmail(username)
                     .orElseThrow(() -> new NotFoundException("Super Admin not found"));
             return SuperAdminDetail.buildSuperAdmin(superAdmin);
         }
         throw new NotFoundException("User Not Found with username: " + username);
     }
 
-    public UserDetails loadUserDetailsForAttendance(String username) {
-        if (adminRepository.existsByEmail(username)) {
-            Admin admin = adminRepository.findByAdminEmail(username)
-                    .orElseThrow(() -> new NotFoundException("Admin not found"));
-            return AdminDetail.buildAdmin(admin);
-        } else if (userRepository.existsByEmail(username)) {
-            User user = userRepository.findByEmailUser(username)
-                    .orElseThrow(() -> new NotFoundException("User not found"));
-            return UserDetail.buidUser(user);
-        } else if (superAdminRepository.findByEmailSuperAdmin(username).isPresent()) {
-            SuperAdmin superAdmin = superAdminRepository.findByEmailSuperAdmin(username)
-                    .orElseThrow(() -> new NotFoundException("Super Admin not found"));
-            return SuperAdminDetail.buildSuperAdmin(superAdmin);
-        }
-        throw new NotFoundException("User Not Found with username: " + username);
-    }
+
 
 }

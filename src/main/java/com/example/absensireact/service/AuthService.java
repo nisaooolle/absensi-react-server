@@ -10,6 +10,7 @@ import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.securityNew.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,14 +39,13 @@ public class AuthService  implements UserDetailsService {
 
 
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) {
         return customUserDetails.loadUserByUsername(email);
     }
 
-    public Map<String, Object> loadUserByUsernameWithToken(String email) {
-        UserDetails userDetails = loadUserByUsername(email);
-        String token = jwtTokenUtil.generateToken(userDetails);
+    public Map<String, Object> loadUserByUsernameWithToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String token = jwtTokenUtil.generateToken(authentication);
 
         Map<String, Object> response = new HashMap<>();
         response.put("data", userDetails);
@@ -54,14 +54,6 @@ public class AuthService  implements UserDetailsService {
         return response;
     }
 
-    public UserDetails loadUserDetailsForAttendance(String username) {
-        if (adminRepository.existsByEmail(username)) {
-            Admin admin = adminRepository.findByAdminEmail(username)
-                    .orElseThrow(() -> new NotFoundException("Admin not found"));
-            return customUserDetails.loadUserDetailsForAttendance(admin.getEmail());
-        } else {
-            throw new NotFoundException("User not found for attendance with username: " + username);
-        }
-    }
+
 
 }

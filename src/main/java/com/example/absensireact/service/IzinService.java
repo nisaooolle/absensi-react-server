@@ -4,11 +4,14 @@ import com.example.absensireact.model.Izin;
 import com.example.absensireact.model.Lembur;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IzinService {
     List<Izin> getAllIzin();
 
     Izin getIzinById(Long id);
+
+    Optional<Izin> getIzinByUserId(Long userId);
 
     Izin createIzin(Long userId, Izin izin);
 

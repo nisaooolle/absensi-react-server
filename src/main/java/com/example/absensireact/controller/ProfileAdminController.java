@@ -1,25 +1,22 @@
 package com.example.absensireact.controller;
 
 import com.example.absensireact.dto.ProfileAdminDTO;
-import com.example.absensireact.dto.ProfilePhotoDTO;
-import com.example.absensireact.impl.ProfileAdminImpl;
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.impl.ProfileAdminImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/admin/profile")
 public class ProfileAdminController {
 
     @Autowired
     private ProfileAdminImpl profileAdminImpl;
 
-    @PutMapping("/admin/profile/editDetail/{id}")
+    @PutMapping("/editDetail/{id}")
     public ResponseEntity<Admin> editProfile(@PathVariable Long id,
                                              @RequestBody ProfileAdminDTO adminDTO,
                                              @RequestParam(required = false) String oldPassword,
@@ -29,24 +26,25 @@ public class ProfileAdminController {
         return ResponseEntity.ok(admin);
     }
 
-    @PostMapping("/admin/profile/upload/{id}")
-    public ResponseEntity<String> uploadProfilePhoto(
-            @PathVariable Long id,
-            @ModelAttribute ProfilePhotoDTO photoDTO) {
-        try {
-            MultipartFile picture = photoDTO.getPicture();
-
-            if (picture == null || picture.isEmpty()) {
-                throw new IllegalArgumentException("Please select a picture to upload");
-            }
-
-            String imageUrl = profileAdminImpl.uploadProfilePhoto(id, photoDTO);
-            return ResponseEntity.ok(imageUrl);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload profile photo");
-        }
+    // ProfileAdminController.java
+    @PostMapping("/uploadPhoto/{id}")
+    public ResponseEntity<Admin> uploadProfilePhoto(@PathVariable Long id,
+                                                    @RequestParam("file") MultipartFile file) {
+        Admin admin = profileAdminImpl.uploadProfilePhoto(id, file);
+        return ResponseEntity.ok(admin);
     }
-}
 
+    @PutMapping("/editPhoto/{id}")
+    public ResponseEntity<Admin> updateProfilePhoto(@PathVariable Long id,
+                                                    @RequestParam("file") MultipartFile file) {
+        Admin admin = profileAdminImpl.updateProfilePhoto(id, file);
+        return ResponseEntity.ok(admin);
+    }
+
+    @DeleteMapping("/deletePhoto/{id}")
+    public ResponseEntity<HttpStatus> deleteProfilePhoto(@PathVariable Long id) {
+        profileAdminImpl.deleteProfilePhoto(id);
+        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
+    }
+
+}

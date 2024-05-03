@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -22,6 +23,14 @@ public class IzinController {
         return izinService.getAllIzin();
     }
 
+    @GetMapping("/izin/getByUserId/{userId}")
+    public Optional<Izin> getIzinByUserId(@PathVariable Long userId) {
+        Optional<Izin> izin = izinService.getIzinByUserId(userId);
+        if (izin.isEmpty()) {
+            throw new NotFoundException("User dengan ID " + userId + " tidak ditemukan");
+        }
+        return izin;
+    }
     @GetMapping("/izin/getbyId/{id}")
     public ResponseEntity<Izin> getIzinById(@PathVariable Long id) {
         Izin izin = izinService.getIzinById(id);

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -20,6 +21,13 @@ public class JabatanController {
     @GetMapping("/jabatan/all")
     public ResponseEntity<List<Jabatan>> getAllJabatan() {
         return ResponseEntity.ok(jabatanService.getAllJabatan());
+    }
+
+    @GetMapping("/jabatan/{id}")
+    public ResponseEntity<Jabatan> getJabatanById(@PathVariable Long id) {
+        Optional<Jabatan> jabatan = jabatanService.getJabatanById(id);
+        return jabatan.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/jabatan/getByAdmin/{adminId}")

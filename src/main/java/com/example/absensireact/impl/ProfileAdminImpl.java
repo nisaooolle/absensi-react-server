@@ -1,7 +1,6 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.dto.ProfileAdminDTO;
-import com.example.absensireact.dto.ProfilePhotoDTO;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.repository.AdminRepository;
@@ -10,9 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class ProfileAdminImpl {
@@ -24,52 +24,63 @@ public class ProfileAdminImpl {
     private PasswordEncoder encoder;
 
     public Admin editProfile(Long id, ProfileAdminDTO adminDTO, String oldPassword, String newPassword, String confirmPassword) {
-        Admin admin = adminRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Admin not found"));
-
-        // Update username and email
+        Admin admin = adminRepository.findById(id).orElseThrow(() -> new NotFoundException("Admin not found"));
         admin.setUsername(adminDTO.getUsername());
         admin.setEmail(adminDTO.getEmail());
 
-        // Update password if provided
+        // Password change logic
         if (newPassword != null && !newPassword.isEmpty()) {
-            if (encoder.matches(oldPassword, admin.getPassword()) &&
-                    newPassword.equals(confirmPassword)) {
+            if (encoder.matches(oldPassword, admin.getPassword()) && newPassword.equals(confirmPassword)) {
                 admin.setPassword(encoder.encode(newPassword));
             } else {
                 throw new IllegalArgumentException("Invalid old password or new password mismatch.");
             }
         }
-
         return adminRepository.save(admin);
     }
 
-    public String uploadProfilePhoto(Long id, ProfilePhotoDTO photoDTO) throws IOException {
+    public Admin uploadProfilePhoto(Long id, MultipartFile file) {
         Admin admin = adminRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Admin not found"));
+        try {
+            // Save the file
+            Path directory = Paths.get("foto/admin/");
+            Path targetLocation = directory.resolve(file.getOriginalFilename());
+            Files.copy(file.getInputStream(), targetLocation);
 
-        MultipartFile picture = photoDTO.getPicture();
-
-        if (picture == null || picture.isEmpty()) {
-            throw new IllegalArgumentException("Please select a picture to upload");
+            // Update the image path in the admin entity
+            admin.setImageAdmin(targetLocation.toString());
+            return adminRepository.save(admin);
+        } catch (IOException ex) {
+            throw new RuntimeException("Could not store file " + file.getOriginalFilename(), ex);
         }
-
-        String fileName = id + "_" + picture.getOriginalFilename();
-        String uploadDir = "uploads/";
-
-        // Save the file to the filesystem
-        File file = new File(uploadDir + fileName);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(picture.getBytes());
-        }
-
-        // Update profile photo URL in database
-        String imageUrl = uploadDir + fileName;
-        admin.setImageAdmin(imageUrl);
-        adminRepository.save(admin);
-
-        return imageUrl;
     }
 
+    public Admin updateProfilePhoto(Long id, MultipartFile file) {
+        Admin admin = adminRepository.findById(id).orElseThrow(() -> new NotFoundException("Admin not found"));
+        try {
+            Path targetLocation = Paths.get("foto/admin" + file.getOriginalFilename());
+            Files.copy(file.getInputStream(), targetLocation, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            admin.setImageAdmin(targetLocation.toString());
+            return adminRepository.save(admin);
+        } catch (IOException ex) {
+            throw new RuntimeException("Could not store file " + file.getOriginalFilename(), ex);
+        }
+    }
+
+    public void deleteProfilePhoto(Long id) {
+        Admin admin = adminRepository.findById(id).orElseThrow(() -> new NotFoundException("Admin not found"));
+        if (admin.getImageAdmin() != null) {
+            try {
+                Path path = Paths.get(admin.getImageAdmin());
+                Files.deleteIfExists(path);
+                admin.setImageAdmin(null);
+                adminRepository.save(admin);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to delete profile photo", e);
+            }
+        }
+    }
 
 }
