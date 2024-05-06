@@ -22,6 +22,8 @@ public class AdminDetail implements UserDetails {
     private String role;
     private String idOrganisasi;
 
+
+
     public AdminDetail(Long id, String email, String password, String username, String imageAdmin, String role, String idOrganisasi) {
         this.id = id;
         this.email = email;
@@ -31,6 +33,8 @@ public class AdminDetail implements UserDetails {
         this.role = role;
         this.idOrganisasi = idOrganisasi;
     }
+
+
 
     public static AdminDetail buildAdmin(Admin admin) {
         return new AdminDetail(
@@ -45,7 +49,7 @@ public class AdminDetail implements UserDetails {
      }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ADMIN"));
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 
     public Long getId() {

@@ -1,6 +1,7 @@
 package com.example.absensireact.controller;
 import com.example.absensireact.dto.JwtRequest;
 import com.example.absensireact.dto.JwtResponse;
+import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.securityNew.JwtTokenUtil;
 import com.example.absensireact.service.AuthService;
 import org.slf4j.Logger;
@@ -39,20 +40,12 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody JwtRequest authenticationRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            // Authenticate user
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(), authenticationRequest.getPassword())
-            );
-
-            // Generate JWT token
-            Map<String, Object> response = authService.loadUserByUsernameWithToken(authentication);
-            return ResponseEntity.ok(response);
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found: " + e.getMessage());
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            Map<String, Object> response = authService.authenticate(loginRequest);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
 

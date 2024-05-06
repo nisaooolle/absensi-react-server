@@ -11,6 +11,7 @@ import com.example.absensireact.securityNew.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -31,24 +32,29 @@ public class CustomUserDetails  implements UserDetailsService {
     @Autowired
     SuperAdminRepository superAdminRepository;
 
+
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        if (adminRepository.existsByEmail(username)) {
-            Admin admin = adminRepository.findByEmail(username)
-                    .orElseThrow(() -> new NotFoundException("Admin not found"));
-            return AdminDetail.buildAdmin(admin);
-        } else if (userRepository.existsByEmail(username)) {
-            User user = userRepository.findByEmail(username)
-                    .orElseThrow(() -> new NotFoundException("User not found"));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
             return UserDetail.buidUser(user);
-        } else if (superAdminRepository.existsByEmail(username)) {
-            SuperAdmin superAdmin = superAdminRepository.findByEmail(username)
-                    .orElseThrow(() -> new NotFoundException("Super Admin not found"));
+        }
+
+        Optional<Admin> adminOptional = adminRepository.findByUsername(username);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            return AdminDetail.buildAdmin(admin);
+        }
+
+        Optional<SuperAdmin> superAdminOptional = superAdminRepository.findByUsername(username);
+        if (superAdminOptional.isPresent()) {
+            SuperAdmin superAdmin = superAdminOptional.get();
             return SuperAdminDetail.buildSuperAdmin(superAdmin);
         }
-        throw new NotFoundException("User Not Found with username: " + username);
-    }
 
+        throw new UsernameNotFoundException("User Not Found with username: " + username);
+    }
 
 
 }

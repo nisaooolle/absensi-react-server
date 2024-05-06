@@ -80,14 +80,14 @@ public class KaryawanImpl implements KaryawanService {
         Optional<Admin> userOptional = adminRepository.findByIdAndRole(adminId, "ADMIN");
 
         if (userOptional.isPresent()) {
-            Admin adminUser = userOptional.get();
 
-            Optional<Karyawan> existingKaryawanOptional = karyawanRepository.findKaryawanByadmin(adminUser);
+
+            Optional<Karyawan> existingKaryawanOptional = karyawanRepository.findByAdmin(adminId);
             if (existingKaryawanOptional.isPresent()) {
                 throw new EntityExistsException("Pengguna dengan ID " + adminId + " sudah memiliki entri karyawan.");
             }
-
-            karyawan.setAdmin(adminUser);
+             Admin eciss = userOptional.get();
+            karyawan.setAdmin(eciss);
             karyawan.setFotoKaryawan(imageConverter(image));
             karyawan.setJabatan(karyawan.getJabatan());
             karyawan.setShift(karyawan.getShift());
