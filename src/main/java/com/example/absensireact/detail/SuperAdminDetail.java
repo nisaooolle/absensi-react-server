@@ -33,6 +33,8 @@ public class SuperAdminDetail implements UserDetails {
         this.role = role;
     }
 
+
+
     public static SuperAdminDetail buildSuperAdmin(SuperAdmin superAdmin) {
         return new SuperAdminDetail(
                superAdmin.getId(),
@@ -97,7 +99,7 @@ public class SuperAdminDetail implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("SUPERADMIN"));
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
     @Override
     public boolean isAccountNonExpired() {

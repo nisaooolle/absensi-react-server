@@ -29,6 +29,8 @@ public class UserDetail implements UserDetails {
         this.role = role;
     }
 
+
+
     public static UserDetail buidUser(User user) {
         return new UserDetail(
                 user.getId(),
@@ -42,7 +44,7 @@ public class UserDetail implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("USER"));
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 
     public Long getId() {

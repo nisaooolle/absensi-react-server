@@ -95,10 +95,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers(AUTH_AUTHORIZATION).hasAnyRole("USER" , "ADMIN" , "SUPERADMIN")
-                .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/swagger-ui.html", "/swagger-ui/**", "/v2/api-docs", "/configuration/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers(AUTH_AUTHORIZATION).hasAnyAuthority("USER", "ADMIN", "SUPERADMIN")
+                .antMatchers(AUTH_WHITELIST).permitAll();
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
