@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,8 +43,8 @@ public class OrganisasiImpl implements OrganisasiService {
     }
 
     @Override
-    public Organisasi GetAllOrganisasi(){
-        return (Organisasi) organisasiRepository.findAll();
+    public List<Organisasi> getAllOrganisasi(){
+        return organisasiRepository.findAll();
     }
 
     @Override

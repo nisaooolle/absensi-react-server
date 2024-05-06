@@ -2,7 +2,10 @@ package com.example.absensireact.controller;
 
 
 import com.example.absensireact.config.AppConfig;
+import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
+import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,9 @@ public class UserController {
     @Autowired
     UserService userImpl;
 
+    @Autowired
+    OrganisasiRepository organisasiRepository;
+
 
 
     @Autowired
@@ -30,9 +36,13 @@ public class UserController {
 //    }
 
     @PostMapping("/user/register")
-    public ResponseEntity<User> register(@RequestBody User user){
+    public ResponseEntity<User> registerUser(@RequestBody User user, @RequestParam Long organisasiId) {
+        Organisasi organisasi = organisasiRepository.findById(organisasiId)
+                .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan"));
 
-        return ResponseEntity.ok( userImpl.Register(user));
+        User newUser = userImpl.Register(user, organisasi);
+
+        return ResponseEntity.ok(newUser);
     }
 
     @GetMapping("/user/get-allUser")

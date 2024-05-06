@@ -65,7 +65,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             // API controller
             "/api/login",
             "/api/user/**",
-            "/api/profile/upload/"
+            "/api/profile/upload/",
+            "/api/absensi/**",
+            "/api/karyawan/**",
+            "/api/admin/**",
+            "/api/organisasi/**",
+            "/api/lembur/**",
+            "/api/izin/**",
+            "/api/jabatan/**",
+            "/api/shift/**",
+            "/api/admin/profile/editDetail/**",
+            "/api/admin/profile/edit/**",
+            "/api/admin/profile/upload/**",
+            "/api/superadmin/**"
     };
 
     private static final String[] AUTH_AUTHORIZATION = {
@@ -76,6 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/organisasi/**",
             "/api/lembur/**",
             "/api/izin/**",
+            "/api/shift/**",
             "/api/jabatan/**",
             "/api/admin/profile/editDetail/**",
             "/api/admin/profile/edit/**",

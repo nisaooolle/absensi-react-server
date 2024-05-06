@@ -4,10 +4,12 @@ import com.example.absensireact.model.Organisasi;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public interface OrganisasiService {
-    Organisasi GetAllOrganisasi();
+
+    List<Organisasi> getAllOrganisasi();
 
     Optional<Organisasi> GetOrganisasiById(Long id);
     Optional<Organisasi> GetAllBYId(Long idA);
