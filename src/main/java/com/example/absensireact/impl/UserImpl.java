@@ -2,6 +2,7 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.config.AppConfig;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
@@ -40,7 +41,7 @@ public class UserImpl implements UserService {
 
 
     @Override
-    public User Register(User user) {
+    public User Register(User user, Organisasi organisasi) {
         if (adminRepository.existsByEmail(user.getEmail())) {
             throw new NotFoundException("Email sudah digunakan oleh admin");
         }
@@ -51,7 +52,7 @@ public class UserImpl implements UserService {
 
         user.setUsername(user.getUsername());
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setOrganisasi(user.getOrganisasi());
+        user.setOrganisasi(String.valueOf(organisasi));
         user.setRole("USER");
         return userRepository.save(user);
     }

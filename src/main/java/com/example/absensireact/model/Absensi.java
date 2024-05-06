@@ -27,12 +27,21 @@ public class Absensi {
     @Column(name = "lokasiPulang")
     private String lokasiPulang;
 
+    @Column(name = "keteranganPulang")
+    private String keteranganPulang;
+
+    @Column(name = "keteranganIzin")
+    private String keteranganIzin;
+
+    @Column(name = "keteranganPulangAwal")
+    private String keteranganPulangAwal;
 
     @Column(name = "jamPulang")
     private String jamPulang;
 
     @Column(name = "keterangan")
     private String keterangan;
+
 
     @Column(name = "fotoMasuk")
     private String fotoMasuk;
@@ -42,6 +51,9 @@ public class Absensi {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "statusAbsen")
+    private String statusAbsen;
 
     @JsonIgnore
     @OneToOne
@@ -54,19 +66,22 @@ public class Absensi {
 
     }
 
-    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String jamPulang,String lokasiPulang ,String lokasiMasuk,String keterangan, String status ,String fotoMasuk , String fotoPulang, User user) {
+    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String lokasiMasuk, String lokasiPulang, String keteranganPulang, String keteranganIzin, String keteranganPulangAwal, String jamPulang, String keterangan, String fotoMasuk, String fotoPulang, String status, String statusAbsen, User user) {
         this.id = id;
         this.tanggalAbsen = tanggalAbsen;
         this.jamMasuk = jamMasuk;
-        this.jamPulang = jamPulang;
-        this.fotoPulang = fotoPulang;
-        this.fotoMasuk = fotoMasuk;
         this.lokasiMasuk = lokasiMasuk;
         this.lokasiPulang = lokasiPulang;
+        this.keteranganPulang = keteranganPulang;
+        this.keteranganIzin = keteranganIzin;
+        this.keteranganPulangAwal = keteranganPulangAwal;
+        this.jamPulang = jamPulang;
         this.keterangan = keterangan;
+        this.fotoMasuk = fotoMasuk;
+        this.fotoPulang = fotoPulang;
         this.status = status;
+        this.statusAbsen = statusAbsen;
         this.user = user;
-
     }
 
     public Long getId() {
@@ -93,14 +108,6 @@ public class Absensi {
         this.jamMasuk = jamMasuk;
     }
 
-    public String getJamPulang() {
-        return jamPulang;
-    }
-
-    public void setJamPulang(String jamPulang) {
-        this.jamPulang = jamPulang;
-    }
-
     public String getLokasiMasuk() {
         return lokasiMasuk;
     }
@@ -115,6 +122,38 @@ public class Absensi {
 
     public void setLokasiPulang(String lokasiPulang) {
         this.lokasiPulang = lokasiPulang;
+    }
+
+    public String getKeteranganPulang() {
+        return keteranganPulang;
+    }
+
+    public void setKeteranganPulang(String keteranganPulang) {
+        this.keteranganPulang = keteranganPulang;
+    }
+
+    public String getKeteranganIzin() {
+        return keteranganIzin;
+    }
+
+    public void setKeteranganIzin(String keteranganIzin) {
+        this.keteranganIzin = keteranganIzin;
+    }
+
+    public String getKeteranganPulangAwal() {
+        return keteranganPulangAwal;
+    }
+
+    public void setKeteranganPulangAwal(String keteranganPulangAwal) {
+        this.keteranganPulangAwal = keteranganPulangAwal;
+    }
+
+    public String getJamPulang() {
+        return jamPulang;
+    }
+
+    public void setJamPulang(String jamPulang) {
+        this.jamPulang = jamPulang;
     }
 
     public String getKeterangan() {
@@ -141,14 +180,6 @@ public class Absensi {
         this.fotoPulang = fotoPulang;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -157,5 +188,19 @@ public class Absensi {
         this.status = status;
     }
 
+    public String getStatusAbsen() {
+        return statusAbsen;
+    }
 
+    public void setStatusAbsen(String statusAbsen) {
+        this.statusAbsen = statusAbsen;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

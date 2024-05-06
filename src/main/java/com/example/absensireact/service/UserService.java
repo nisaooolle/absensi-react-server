@@ -1,6 +1,7 @@
 package com.example.absensireact.service;
 
 import com.example.absensireact.model.LoginRequest;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,8 +12,10 @@ public interface UserService {
 
 //    Map<Object, Object> login(LoginRequest loginRequest, HttpServletRequest request);
 
-    User Register(User user);
+//    User Register(User user);
 
+
+    User Register(User user, Organisasi organisasi);
 
     User getById(Long id);
 
