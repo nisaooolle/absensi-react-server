@@ -1,18 +1,16 @@
 package com.example.absensireact.dto;
 
 public class LokasiDTO {
-    private Long idLokasi;
     private String namaLokasi;
     private String alamat;
-    private Long idOrganisasi; // Menggunakan Long
-    private Long idAdmin; // Menggunakan Long
+    private Long idOrganisasi;
+    private Long idAdmin;
 
     // Constructors
     public LokasiDTO() {}
 
     // Typically, you might include a constructor for convenience to transform from entity to DTO
-    public LokasiDTO(Long idLokasi, String namaLokasi, String alamat, Long idOrganisasi, Long idAdmin) {
-        this.idLokasi = idLokasi;
+    public LokasiDTO(String namaLokasi, String alamat, Long idOrganisasi, Long idAdmin) {
         this.namaLokasi = namaLokasi;
         this.alamat = alamat;
         this.idOrganisasi = idOrganisasi;
@@ -20,14 +18,6 @@ public class LokasiDTO {
     }
 
     // Getters and setters
-    public Long getIdLokasi() {
-        return idLokasi;
-    }
-
-    public void setIdLokasi(Long idLokasi) {
-        this.idLokasi = idLokasi;
-    }
-
     public String getNamaLokasi() {
         return namaLokasi;
     }
