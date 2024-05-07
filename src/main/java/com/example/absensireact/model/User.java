@@ -2,6 +2,7 @@ package com.example.absensireact.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -25,8 +26,21 @@ public class User {
    @Column(name = "username")
    private  String username;
 
-   @Column(name = "organisasi"  )
-   private  String organisasi;
+
+   @JsonIgnore
+   @OneToOne
+   @JoinColumn(name = "idOrganisasi")
+   private Organisasi organisasi;
+
+   @JsonIgnore
+   @OneToOne
+   @JoinColumn(name = "idJabatan")
+   private Jabatan jabatan;
+
+   @JsonIgnore
+   @OneToOne
+   @JoinColumn(name = "idShift")
+   private Shift shift;
 
 
    @Column(name = "role")
@@ -36,13 +50,12 @@ public User(){
 
 }
 
-   public User(Long id, String email, String password, String username, String organisasi, String role) {
+   public User(Long id, String email, String password, String username,  String role) {
        this.id = id;
        this.email = email;
        this.password = password;
        this.username = username;
-       this.organisasi = organisasi;
-       this.role = role;
+        this.role = role;
    }
 
    public User(String email, String password, List<SimpleGrantedAuthority> roles) {
@@ -81,13 +94,7 @@ public User(){
        this.username = username;
    }
 
-   public String getOrganisasi() {
-       return organisasi;
-   }
 
-   public void setOrganisasi(String organisasi) {
-       this.organisasi = organisasi;
-   }
 
    public String getRole() {
        return role;
@@ -97,10 +104,27 @@ public User(){
        this.role = role;
    }
 
+    public Organisasi getOrganisasi() {
+        return organisasi;
+    }
 
-   public void setOrganisasiId(Long organisasiId) {
-   }
+    public void setOrganisasi(Organisasi organisasi) {
+        this.organisasi = organisasi;
+    }
 
-   public void setJabatanId(Long jabatanId) {
-   }
+    public Jabatan getJabatan() {
+        return jabatan;
+    }
+
+    public void setJabatan(Jabatan jabatan) {
+        this.jabatan = jabatan;
+    }
+
+    public Shift getShift() {
+        return shift;
+    }
+
+    public void setShift(Shift shift) {
+        this.shift = shift;
+    }
 }

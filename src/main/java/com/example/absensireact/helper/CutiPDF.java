@@ -1,11 +1,8 @@
 package com.example.absensireact.helper;
 
 import com.example.absensireact.model.Cuti;
-import com.example.absensireact.model.Karyawan;
-import com.example.absensireact.repository.CutiRepository;
-import com.example.absensireact.repository.KaryawanRepository;
-import com.itextpdf.html2pdf.ConverterProperties;
-import com.itextpdf.html2pdf.HtmlConverter;
+ import com.example.absensireact.repository.CutiRepository;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -19,11 +16,9 @@ import java.io.IOException;
 @Component
 public class CutiPDF {
 
-    private final KaryawanRepository karyawanRepository;
     private final CutiRepository cutiRepository;
 
-    public CutiPDF(KaryawanRepository karyawanRepository, CutiRepository cutiRepository) {
-        this.karyawanRepository = karyawanRepository;
+    public CutiPDF(CutiRepository cutiRepository) {
         this.cutiRepository = cutiRepository;
     }
 

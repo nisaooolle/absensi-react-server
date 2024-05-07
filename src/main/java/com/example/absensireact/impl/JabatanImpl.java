@@ -3,9 +3,9 @@ package com.example.absensireact.impl;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Jabatan;
-import com.example.absensireact.repository.AdminRepository;
+ import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.JabatanRepository;
-import com.example.absensireact.service.JabatanService;
+ import com.example.absensireact.service.JabatanService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +17,11 @@ public class JabatanImpl implements JabatanService {
     private final AdminRepository adminRepository;
     private final JabatanRepository jabatanRepository;
 
-    public JabatanImpl(AdminRepository adminRepository, JabatanRepository jabatanRepository) {
+
+    public JabatanImpl(AdminRepository adminRepository, JabatanRepository jabatanRepository ) {
         this.adminRepository = adminRepository;
         this.jabatanRepository = jabatanRepository;
-    }
+     }
 
     @Override
     public List<Jabatan> getAllJabatan() {
@@ -41,7 +42,11 @@ public class JabatanImpl implements JabatanService {
     public Jabatan addJabatan(Long adminId, Jabatan jabatan) {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new NotFoundException(  "Admin not found with id: " + adminId));
+
+
         jabatan.setAdmin(admin);
+        jabatan.setNamaJabatan(jabatan.getNamaJabatan());
+//        jabatan.setJumlahKaryawan(karyawan.);
         return jabatanRepository.save(jabatan);
     }
 
