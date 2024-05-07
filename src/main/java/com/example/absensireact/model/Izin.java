@@ -21,8 +21,7 @@ public class Izin {
     private String keternganIzin;
 
 
-    @JsonIgnore
-    @OneToOne
+     @OneToOne
     @JoinColumn(name = "userId")
     private  User user;
 

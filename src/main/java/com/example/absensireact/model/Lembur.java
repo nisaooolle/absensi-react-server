@@ -27,8 +27,7 @@ public class Lembur {
     @Column(name = "keteranganLembur")
     private String keteranganLembur;
 
-    @JsonIgnore
-    @OneToOne
+     @OneToOne
     @JoinColumn(name = "userId")
     private User user;
 

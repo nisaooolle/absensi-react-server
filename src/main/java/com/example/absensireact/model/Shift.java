@@ -24,8 +24,7 @@ public class Shift {
     @Column(name = "jumlahKaryawan")
     private String jumlahKaryawan;
 
-    @JsonIgnore
-    @OneToOne
+     @OneToOne
     @JoinColumn(name = "organisasi")
     private Organisasi organisasi;
 

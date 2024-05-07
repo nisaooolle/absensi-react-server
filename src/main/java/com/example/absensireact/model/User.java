@@ -27,20 +27,21 @@ public class User {
    private  String username;
 
 
-   @JsonIgnore
-   @OneToOne
+    @OneToOne
    @JoinColumn(name = "idOrganisasi")
    private Organisasi organisasi;
 
-   @JsonIgnore
-   @OneToOne
+    @OneToOne
    @JoinColumn(name = "idJabatan")
    private Jabatan jabatan;
 
-   @JsonIgnore
-   @OneToOne
+    @OneToOne
    @JoinColumn(name = "idShift")
    private Shift shift;
+
+    @OneToOne
+   @JoinColumn(name = "idAdmin")
+   private Admin admin;
 
 
    @Column(name = "role")
@@ -50,15 +51,19 @@ public User(){
 
 }
 
-   public User(Long id, String email, String password, String username,  String role) {
-       this.id = id;
-       this.email = email;
-       this.password = password;
-       this.username = username;
+    public User(Long id, String email, String password, String username, Organisasi organisasi, Jabatan jabatan, Shift shift, Admin admin, String role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.organisasi = organisasi;
+        this.jabatan = jabatan;
+        this.shift = shift;
+        this.admin = admin;
         this.role = role;
-   }
+    }
 
-   public User(String email, String password, List<SimpleGrantedAuthority> roles) {
+    public User(String email, String password, List<SimpleGrantedAuthority> roles) {
    }
 
    public Long getId() {
@@ -126,5 +131,13 @@ public User(){
 
     public void setShift(Shift shift) {
         this.shift = shift;
+    }
+
+    public Admin getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
     }
 }

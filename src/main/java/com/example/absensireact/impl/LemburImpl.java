@@ -32,9 +32,9 @@ public class LemburImpl implements LemburService {
         return lemburOptional.orElse(null);
     }
     @Override
-    public Lembur getLemburByUserId(Long userId) {
-        Optional<Lembur> lemburOptional = lemburRepository.findByuserId(userId);
-        return lemburOptional.orElse(null);
+    public List<Lembur> getLemburByUserId(Long userId) {
+        return lemburRepository.findByuserId(userId);
+
     }
 
     @Override

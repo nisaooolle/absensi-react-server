@@ -25,8 +25,8 @@ public class LemburController {
         return lemburService.getLemburById(id);
     }
 
-    @GetMapping("/lembur/getByuserId/{id}")
-    public Lembur getLemburByUserId(@PathVariable Long userId) {
+    @GetMapping("/lembur/getByuserId/{userId}")
+    public List<Lembur> getLemburByUserId(@PathVariable Long userId) {
         return lemburService.getLemburByUserId(userId);
     }
 

@@ -8,7 +8,7 @@ public interface LemburService {
     List<Lembur> getAllLembur();
     Lembur getLemburById(Long id);
 
-    Lembur getLemburByUserId(Long userId);
+    List<Lembur> getLemburByUserId(Long userId);
 
     Lembur IzinLembur(Long userId, Lembur lembur);
 

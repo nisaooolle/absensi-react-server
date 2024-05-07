@@ -11,7 +11,7 @@ public interface IzinService {
 
     Izin getIzinById(Long id);
 
-    Optional<Izin> getIzinByUserId(Long userId);
+    List<Izin> getIzinByUserId(Long userId);
 
     Izin createIzin(Long userId, Izin izin);
 
