@@ -107,18 +107,15 @@ public class LokasiImpl implements LokasiService {
 
     private LokasiDTO convertToDto(Lokasi lokasi) {
         LokasiDTO lokasiDTO = new LokasiDTO();
-        lokasiDTO.setIdLokasi(lokasi.getIdLokasi().longValue()); // Convert Integer to Long
-
         lokasiDTO.setNamaLokasi(lokasi.getNamaLokasi());
         lokasiDTO.setAlamat(lokasi.getAlamat());
         if (lokasi.getOrganisasi() != null) {
-            lokasiDTO.setIdOrganisasi(lokasi.getOrganisasi().getId().longValue()); // Konversi Integer menjadi Long
+            lokasiDTO.setIdOrganisasi(lokasi.getOrganisasi().getId().longValue());
         }
         if (lokasi.getAdmin() != null) {
-            lokasiDTO.setIdAdmin(lokasi.getAdmin().getId().longValue()); // Konversi Integer menjadi Long
+            lokasiDTO.setIdAdmin(lokasi.getAdmin().getId().longValue());
         }
         return lokasiDTO;
     }
-
 
 }
