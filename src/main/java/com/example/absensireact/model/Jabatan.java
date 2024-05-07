@@ -15,10 +15,25 @@ public class Jabatan {
     @Column(name = "nama_jabatan")
     private String namaJabatan;
 
+    @Column(name = "jumlahKaryawan")
+    private String jumlahKaryawan;
+
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "admin_id") // Changed to reference an admin
+    @JoinColumn(name = "adminId") // Changed to reference an admin
     private Admin admin;
+
+
+
+    public Jabatan(){
+
+    }
+    public Jabatan(Long idJabatan, String namaJabatan, String jumlahKaryawan, Admin admin  ) {
+        this.idJabatan = idJabatan;
+        this.namaJabatan = namaJabatan;
+        this.jumlahKaryawan = jumlahKaryawan;
+        this.admin = admin;
+     }
 
     public Long getIdJabatan() {
         return idJabatan;
@@ -40,7 +55,17 @@ public class Jabatan {
         return admin;
     }
 
+    public String getJumlahKaryawan() {
+        return jumlahKaryawan;
+    }
+
+    public void setJumlahKaryawan(String jumlahKaryawan) {
+        this.jumlahKaryawan = jumlahKaryawan;
+    }
+
     public void setAdmin(Admin admin) {
         this.admin = admin;
     }
+
+
 }

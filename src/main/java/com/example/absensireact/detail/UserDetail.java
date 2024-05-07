@@ -1,6 +1,7 @@
 package com.example.absensireact.detail;
 
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,17 +17,15 @@ public class UserDetail implements UserDetails {
 
     private String email;
     private String password;
-    private String organisasi;
-    private String role;
+     private String role;
 
 
-    public UserDetail(Long id, String username, String email, String password, String organisasi, String role) {
+    public UserDetail(Long id, String username, String email, String password,  String role) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.organisasi = organisasi;
-        this.role = role;
+         this.role = role;
     }
 
 
@@ -37,8 +36,7 @@ public class UserDetail implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getOrganisasi(),
-                "USER"
+                 "USER"
 
         );
     }
@@ -81,13 +79,8 @@ public class UserDetail implements UserDetails {
         this.password = password;
     }
 
-    public String getOrganisasi() {
-        return organisasi;
-    }
 
-    public void setOrganisasi(String organisasi) {
-        this.organisasi = organisasi;
-    }
+
 
     public String getRole() {
         return role;

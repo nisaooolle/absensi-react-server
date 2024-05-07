@@ -4,8 +4,7 @@ import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Cuti;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.CutiRepository;
-import com.example.absensireact.repository.KaryawanRepository;
-import com.example.absensireact.repository.UserRepository;
+ import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.CutiService;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +18,11 @@ public class CutiImpl implements CutiService {
 
     private final UserRepository userRepository;
 
-    private final KaryawanRepository karyawanRepository;
 
-    public CutiImpl(CutiRepository cutiRepository, UserRepository userRepository, KaryawanRepository karyawanRepository) {
+    public CutiImpl(CutiRepository cutiRepository, UserRepository userRepository ) {
         this.cutiRepository = cutiRepository;
         this.userRepository = userRepository;
-        this.karyawanRepository = karyawanRepository;
-    }
+     }
 
     @Override
     public List<Cuti> GetCutiAll(){
