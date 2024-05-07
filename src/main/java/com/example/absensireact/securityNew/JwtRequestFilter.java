@@ -65,6 +65,35 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
 
 
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//        final String authorizationHeader = request.getHeader("Authorization");
+//
+//        String username = null;
+//        String jwtToken = null;
+//
+//        if (authorizationHeader != null  ) {
+//            jwtToken = authorizationHeader;
+//            username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+//        }
+//
+//        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//            if (jwtTokenUtil.validateToken(jwtToken)) {
+//                UserDetails user = customUserDetails.loadUserByUsername(username);
+//                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+//                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+////                List<GrantedAuthority> authorities = getRolesFromToken(jwtToken);
+////                UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", authorities);
+////                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+//                SecurityContextHolder.getContext().setAuthentication(auth);
+//            } else {
+//                SecurityContextHolder.clearContext();
+//            }
+//        }
+//
+//        filterChain.doFilter(request, response);
+//    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
@@ -72,15 +101,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
-        if (authorizationHeader != null) {
-            jwtToken = authorizationHeader;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwtToken = authorizationHeader.substring(7);
             username = jwtTokenUtil.getUsernameFromToken(jwtToken);
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtTokenUtil.validateToken(jwtToken)) {
                 UserDetails user = customUserDetails.loadUserByUsername(username);
-                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 //                List<GrantedAuthority> authorities = getRolesFromToken(jwtToken);
 //                UserDetails userDetails = new org.springframework.security.core.userdetails.User(username, "", authorities);

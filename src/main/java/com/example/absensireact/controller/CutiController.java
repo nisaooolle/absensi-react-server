@@ -57,8 +57,8 @@ public class CutiController {
     }
 
     @GetMapping("/cuti/getByUser/{userId}")
-    public Cuti GetCutiByUserId(@PathVariable Long userId){
-        Cuti cuti = (Cuti) cutiService.GetCutiByUserId(userId);
+    public List<Cuti> GetCutiByUserId(@PathVariable Long userId){
+        List<Cuti> cuti =  cutiService.GetCutiByUserId(userId);
         if (cuti == null) {
             throw new NotFoundException("User id tidak ditemukan dengan id : " + userId);
         }
