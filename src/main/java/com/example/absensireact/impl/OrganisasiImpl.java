@@ -62,27 +62,27 @@ public class OrganisasiImpl implements OrganisasiService {
 
     @Override
     public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
-        Optional<Admin> admin = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));
+        Optional<Admin> adminOptional = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));
 
-        if (admin == null) {
+        if (!adminOptional.isPresent()) {
             throw new NotFoundException("Id Admin tidak ditemukan");
         }
-        Admin admin1 = admin.get();
-        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+
+        Admin admin = adminOptional.get();
+
+         organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
         organisasi.setAlamat(organisasi.getAlamat());
         organisasi.setKecamatan(organisasi.getKecamatan());
         organisasi.setKabupaten(organisasi.getKabupaten());
         organisasi.setProvinsi(organisasi.getProvinsi());
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
-        organisasi.setAdmin(admin1);
-        admin1.setIdOrganisasi(String.valueOf(admin1));
-        String imageUrl = imageConverter(image);
-        organisasi.setFotoOrganisasi(imageUrl);
+        organisasi.setAdmin(admin);
+//        admin.setOrganisasi(organisasi.getId());
 
-        return organisasiRepository.save(organisasi);
+        return  organisasiRepository.save(organisasi);
+
     }
-
 
     private String imageConverter(MultipartFile multipartFile) {
         try {

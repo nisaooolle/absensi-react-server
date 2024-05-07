@@ -27,21 +27,23 @@ public class Admin {
     @Column(name = "role")
     private String role;
 
-    @Column(name = "idOrganisasi")
-    private String idOrganisasi;
+    @OneToOne
+    @JoinColumn(name = "idOrganisasi")
+    private Organisasi organisasi;
 
    public Admin(){
 
    }
 
-    public Admin(Long id, String email, String password, String username, String imageAdmin, String role , String idOrganisasi) {
+    public Admin(Long id, String email, String password, String username, String imageAdmin, String role , Organisasi organisasi) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
         this.imageAdmin = imageAdmin;
         this.role = role;
-        this.idOrganisasi = idOrganisasi;
+        this.organisasi = organisasi;
+
     }
 
     public Long getId() {
@@ -92,13 +94,11 @@ public class Admin {
         this.role = role;
     }
 
-    public String getIdOrganisasi() {
-        return idOrganisasi;
+    public Organisasi getOrganisasi() {
+        return organisasi;
     }
 
-    public void setIdOrganisasi(String idOrganisasi) {
-        this.idOrganisasi = idOrganisasi;
+    public void setOrganisasi(Organisasi organisasi) {
+        this.organisasi = organisasi;
     }
-
-
 }

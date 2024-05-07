@@ -18,9 +18,8 @@ public class Jabatan {
     @Column(name = "jumlahKaryawan")
     private String jumlahKaryawan;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "adminId") // Changed to reference an admin
+     @ManyToOne
+    @JoinColumn(name = "adminId")
     private Admin admin;
 
 

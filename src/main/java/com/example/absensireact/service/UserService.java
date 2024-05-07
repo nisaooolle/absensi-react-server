@@ -17,6 +17,8 @@ public interface UserService {
 
     User Register(User user, Organisasi organisasi);
 
+    User Tambahkaryawan(Long idAdmin, User user);
+
     User getById(Long id);
 
     List<User> getAll();

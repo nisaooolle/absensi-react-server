@@ -20,19 +20,17 @@ public class AdminDetail implements UserDetails {
     private  String username;
     private  String imageAdmin;
     private String role;
-    private String idOrganisasi;
 
 
 
-    public AdminDetail(Long id, String email, String password, String username, String imageAdmin, String role, String idOrganisasi) {
+    public AdminDetail(Long id, String email, String password, String username, String imageAdmin, String role ) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
         this.imageAdmin = imageAdmin;
         this.role = role;
-        this.idOrganisasi = idOrganisasi;
-    }
+     }
 
 
 
@@ -43,9 +41,8 @@ public class AdminDetail implements UserDetails {
                 admin.getPassword(),
                 admin.getUsername(),
                 admin.getImageAdmin(),
-                "ADMIN",
-                admin.getIdOrganisasi()
-        );
+                "ADMIN"
+         );
      }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -102,13 +99,7 @@ public class AdminDetail implements UserDetails {
         this.role = role;
     }
 
-    public String getIdOrganisasi() {
-        return idOrganisasi;
-    }
 
-    public void setIdOrganisasi(String idOrganisasi) {
-        this.idOrganisasi = idOrganisasi;
-    }
 
     @Override
     public boolean isAccountNonExpired() {

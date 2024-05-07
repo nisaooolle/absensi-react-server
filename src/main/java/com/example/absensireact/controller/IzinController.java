@@ -24,8 +24,8 @@ public class IzinController {
     }
 
     @GetMapping("/izin/getByUserId/{userId}")
-    public Optional<Izin> getIzinByUserId(@PathVariable Long userId) {
-        Optional<Izin> izin = izinService.getIzinByUserId(userId);
+    public List<Izin> getIzinByUserId(@PathVariable Long userId) {
+        List<Izin> izin = izinService.getIzinByUserId(userId);
         if (izin.isEmpty()) {
             throw new NotFoundException("User dengan ID " + userId + " tidak ditemukan");
         }

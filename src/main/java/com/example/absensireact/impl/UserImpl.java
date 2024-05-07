@@ -2,6 +2,7 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.config.AppConfig;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Service
@@ -57,6 +59,17 @@ public class UserImpl implements UserService {
         return userRepository.save(user);
     }
 
+
+    @Override
+    public User Tambahkaryawan (Long idAdmin , User user){
+        Optional<Admin> adminvalidate = adminRepository.findById(idAdmin);
+
+        if (!adminvalidate.isPresent()) {
+
+        }
+
+        throw new NotFoundException("Id Admin tidak ditemukan");
+    }
 
     @Override
     public User getById(Long id) {

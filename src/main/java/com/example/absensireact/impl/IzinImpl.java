@@ -34,12 +34,8 @@ public class IzinImpl implements IzinService {
     }
 
     @Override
-    public Optional<Izin> getIzinByUserId(Long userId){
-        Optional<Izin> izin = izinRepository.findByUserId(userId);
-        if (izin.isEmpty()) {
-            throw new NotFoundException("Userid tidak ditemukan");
-        }
-        return izin;
+    public List<Izin> getIzinByUserId(Long userId){
+      return izinRepository.findByUserId(userId);
      }
 
     @Override

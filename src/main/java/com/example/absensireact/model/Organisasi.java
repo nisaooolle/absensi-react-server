@@ -41,7 +41,7 @@ public class Organisasi {
     @Column(name = "fotoOrganisasi")
     private String fotoOrganisasi;
 
-    @JsonIgnore
+
     @OneToOne
     @JoinColumn(name = "idAdmin")
     private Admin admin;
