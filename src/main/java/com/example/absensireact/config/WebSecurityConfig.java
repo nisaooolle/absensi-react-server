@@ -74,6 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/izin/**",
             "/api/jabatan/**",
             "/api/shift/**",
+            "/api/lokasi/**",
             "/api/admin/profile/editDetail/**",
             "/api/admin/profile/edit/**",
             "/api/admin/profile/upload/**",
@@ -89,11 +90,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/lembur/**",
             "/api/izin/**",
             "/api/shift/**",
+            "/api/lokasi/**",
             "/api/jabatan/**",
             "/api/admin/profile/editDetail/**",
             "/api/admin/profile/edit/**",
             "/api/admin/profile/upload/**",
             "/api/superadmin/**"
+
     };
 
     @Bean
