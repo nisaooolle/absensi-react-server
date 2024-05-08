@@ -37,9 +37,11 @@ public interface  AbsensiService {
 
 
 
-    Absensi PostAbsensi(Long userId, MultipartFile image) throws IOException;
+    Absensi PostAbsensi(Long userId, MultipartFile image , String keteranganTerlambat) throws IOException;
 
-    Absensi PutPulang( Long id, MultipartFile image) throws IOException;
+    Absensi PulangLebihAwal(Long id, Absensi absensi);
+
+    Absensi PutPulang(Long id, MultipartFile image) throws IOException;
 
 
 

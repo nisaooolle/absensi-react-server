@@ -44,6 +44,10 @@ public class UserController {
 
         return ResponseEntity.ok(newUser);
     }
+    @GetMapping("/user/{idAdmin}/users")
+    public List<User> getAllKaryawanByIdAdmin(@PathVariable Long idAdmin) {
+        return userImpl.GetAllKaryawanByIdAdmin(idAdmin);
+    }
 
     @GetMapping("/user/get-allUser")
     public ResponseEntity<List<User>> getAllUser() {

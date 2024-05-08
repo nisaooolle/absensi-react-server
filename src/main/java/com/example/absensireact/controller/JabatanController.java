@@ -23,7 +23,7 @@ public class JabatanController {
         return ResponseEntity.ok(jabatanService.getAllJabatan());
     }
 
-    @GetMapping("/jabatan/{id}")
+    @GetMapping("/jabatan/getbyid/{id}")
     public ResponseEntity<Jabatan> getJabatanById(@PathVariable Long id) {
         Optional<Jabatan> jabatan = jabatanService.getJabatanById(id);
         return jabatan.map(ResponseEntity::ok)
