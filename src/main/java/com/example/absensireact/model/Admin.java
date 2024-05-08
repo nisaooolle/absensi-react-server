@@ -46,10 +46,6 @@ public class Admin {
 
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -100,5 +96,9 @@ public class Admin {
 
     public void setOrganisasi(Organisasi organisasi) {
         this.organisasi = organisasi;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

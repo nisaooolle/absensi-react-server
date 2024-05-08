@@ -1,6 +1,7 @@
 package com.example.absensireact.repository;
 
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,6 @@ public interface AdminRepository extends JpaRepository<Admin , Long> {
     @Query(value = "SELECT * FROM admin WHERE username = :username", nativeQuery = true)
     Optional<Admin> findByUsername (String username);
     Optional<Admin> findByIdAndRole(Long id, String role);
-
 
     Optional<Admin> findByEmailAndUsername(String email, String username);
 

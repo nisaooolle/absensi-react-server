@@ -1,8 +1,8 @@
 package com.example.absensireact.service;
 
+import com.example.absensireact.dto.AdminDTO;
 import com.example.absensireact.dto.LokasiDTO;
-import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.Organisasi;
+import com.example.absensireact.dto.OrganisasiDTO;
 
 import java.util.List;
 
@@ -18,7 +18,8 @@ public interface LokasiService {
 
     boolean deleteLokasi(Integer id);
 
-    Organisasi getOrganisasiByLokasiId(Integer id);
+    OrganisasiDTO getOrganisasiById(Long id);
 
-    Admin getAdminByLokasiId(Integer id);
+    AdminDTO getAdminById(Long id);
 }
+

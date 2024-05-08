@@ -44,7 +44,7 @@ public class ProfileAdminImpl {
                 .orElseThrow(() -> new NotFoundException("Admin not found"));
         try {
             // Save the file
-            Path directory = Paths.get("foto/admin/");
+            Path directory = Paths.get("image/admin/");
             Path targetLocation = directory.resolve(file.getOriginalFilename());
             Files.copy(file.getInputStream(), targetLocation);
 
@@ -68,19 +68,5 @@ public class ProfileAdminImpl {
             throw new RuntimeException("Could not store file " + file.getOriginalFilename(), ex);
         }
     }
-
-    public void deleteProfilePhoto(Long id) {
-        Admin admin = adminRepository.findById(id).orElseThrow(() -> new NotFoundException("Admin not found"));
-        if (admin.getImageAdmin() != null) {
-            try {
-                Path path = Paths.get(admin.getImageAdmin());
-                Files.deleteIfExists(path);
-                admin.setImageAdmin(null);
-                adminRepository.save(admin);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to delete profile photo", e);
-            }
-        }
     }
 
-}

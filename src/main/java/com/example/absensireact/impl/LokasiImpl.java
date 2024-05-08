@@ -1,6 +1,8 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.dto.LokasiDTO;
+import com.example.absensireact.dto.AdminDTO;
+import com.example.absensireact.dto.OrganisasiDTO;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Lokasi;
 import com.example.absensireact.model.Organisasi;
@@ -64,35 +66,74 @@ public class LokasiImpl implements LokasiService {
         }).orElse(false);
     }
 
-    @Override
-    public Organisasi getOrganisasiByLokasiId(Integer id) {
-        return lokasiRepository.findById(id)
-                .map(Lokasi::getOrganisasi)
-                .orElse(null);
-    }
-
-    @Override
-    public Admin getAdminByLokasiId(Integer id) {
-        return lokasiRepository.findById(id)
-                .map(Lokasi::getAdmin)
-                .orElse(null);
-    }
-
-
-
     private Lokasi convertToEntity(LokasiDTO lokasiDTO) {
         Lokasi lokasi = new Lokasi();
         lokasi.setNamaLokasi(lokasiDTO.getNamaLokasi());
         lokasi.setAlamat(lokasiDTO.getAlamat());
 
-        Optional<Organisasi> organisasiOptional = organisasiRepository.findById(lokasiDTO.getIdOrganisasi());
-        organisasiOptional.ifPresent(lokasi::setOrganisasi);
-
-        Optional<Admin> adminOptional = adminRepository.findById(lokasiDTO.getIdAdmin());
-        adminOptional.ifPresent(lokasi::setAdmin);
-
         return lokasi;
     }
+
+    @Override
+    public OrganisasiDTO getOrganisasiById(Long id) {
+        Optional<Organisasi> lokasi = organisasiRepository.findById(id);
+        return lokasi.map(this::convertOrganisasiToDto).orElse(null);
+    }
+
+    @Override
+    public AdminDTO getAdminById(Long id) {
+        Optional<Admin> adminOptional = adminRepository.findById(id);
+        if (adminOptional.isPresent()) {
+            return convertAdminToDto(adminOptional.get());
+        } else {
+            return null; // atau Anda dapat melemparkan pengecualian jika tidak menemukan admin dengan ID yang diberikan
+        }
+    }
+
+    private OrganisasiDTO convertOrganisasiToDto(Organisasi organisasi) {
+        OrganisasiDTO organisasiDTO = new OrganisasiDTO();
+        organisasiDTO.setId(organisasi.getId());
+        organisasiDTO.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+        organisasiDTO.setAlamat(organisasi.getAlamat());
+        organisasiDTO.setNomerTelepon(organisasi.getNomerTelepon());
+        organisasiDTO.setEmailOrganisasi(organisasi.getEmailOrganisasi());
+        organisasiDTO.setKecamatan(organisasi.getKecamatan());
+        organisasiDTO.setKabupaten(organisasi.getKabupaten());
+        organisasiDTO.setProvinsi(organisasi.getProvinsi());
+        organisasiDTO.setStatus(organisasi.getStatus());
+        organisasiDTO.setFotoOrganisasi(organisasi.getFotoOrganisasi());
+
+        // Set Admin ID jika ada admin terkait
+        Admin admin = organisasi.getAdmin();
+        if (admin != null) {
+            organisasiDTO.setAdmin(String.valueOf(admin.getId()));
+        }
+
+        return organisasiDTO;
+    }
+
+
+
+
+
+    private AdminDTO convertAdminToDto(Admin admin) {
+        AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setId(admin.getId());
+        adminDTO.setEmail(admin.getEmail());
+        adminDTO.setPassword(admin.getPassword());
+        adminDTO.setUsername(admin.getUsername());
+        adminDTO.setImageAdmin(admin.getImageAdmin());
+
+        // Set ID Organisasi
+        Organisasi organisasi = admin.getOrganisasi();
+        if (organisasi != null) {
+            adminDTO.setIdOrganisasi(String.valueOf(organisasi.getId()));
+        }
+
+        return adminDTO;
+    }
+
+
 
     private void updateEntity(Lokasi existingLokasi, LokasiDTO lokasiDTO) {
         existingLokasi.setNamaLokasi(lokasiDTO.getNamaLokasi());
@@ -100,22 +141,24 @@ public class LokasiImpl implements LokasiService {
 
         Optional<Organisasi> organisasiOptional = organisasiRepository.findById(lokasiDTO.getIdOrganisasi());
         organisasiOptional.ifPresent(existingLokasi::setOrganisasi);
-
-        Optional<Admin> adminOptional = adminRepository.findById(lokasiDTO.getIdAdmin());
-        adminOptional.ifPresent(existingLokasi::setAdmin);
     }
 
     private LokasiDTO convertToDto(Lokasi lokasi) {
         LokasiDTO lokasiDTO = new LokasiDTO();
         lokasiDTO.setNamaLokasi(lokasi.getNamaLokasi());
         lokasiDTO.setAlamat(lokasi.getAlamat());
+
+        // Set ID Organisasi
         if (lokasi.getOrganisasi() != null) {
-            lokasiDTO.setIdOrganisasi(lokasi.getOrganisasi().getId().longValue());
+            lokasiDTO.setIdOrganisasi(lokasi.getOrganisasi().getId());
         }
+
+        // Set Admin
         if (lokasi.getAdmin() != null) {
-            lokasiDTO.setIdAdmin(lokasi.getAdmin().getId().longValue());
+            AdminDTO adminDTO = convertAdminToDto(lokasi.getAdmin());
+            lokasiDTO.setAdmin(adminDTO);
         }
+
         return lokasiDTO;
     }
-
 }
