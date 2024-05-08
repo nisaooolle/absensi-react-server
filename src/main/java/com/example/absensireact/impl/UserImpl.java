@@ -61,6 +61,11 @@ public class UserImpl implements UserService {
 
 
     @Override
+    public List<User> GetAllKaryawanByIdAdmin(Long idAdmin){
+        return userRepository.findByIdAdmin(idAdmin);
+    }
+
+    @Override
     public User Tambahkaryawan (Long idAdmin , User user){
         Optional<Admin> adminvalidate = adminRepository.findById(idAdmin);
 

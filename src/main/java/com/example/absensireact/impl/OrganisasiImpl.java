@@ -61,7 +61,7 @@ public class OrganisasiImpl implements OrganisasiService {
     }
 
     @Override
-    public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
+    public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image)   {
         Optional<Admin> adminOptional = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));
 
         if (!adminOptional.isPresent()) {
@@ -78,7 +78,8 @@ public class OrganisasiImpl implements OrganisasiService {
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
         organisasi.setAdmin(admin);
-//        admin.setOrganisasi(organisasi.getId());
+        String file = imageConverter(image);
+        organisasi.setFotoOrganisasi(file);
 
         return  organisasiRepository.save(organisasi);
 
@@ -101,7 +102,7 @@ public class OrganisasiImpl implements OrganisasiService {
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(image.getContentType()) // Set content type from image
                 .build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/FirebaseConfig.json"));
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, image.getBytes()); // Use image.getBytes() to get file bytes directly
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));

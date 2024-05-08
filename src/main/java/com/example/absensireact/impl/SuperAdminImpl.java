@@ -117,7 +117,7 @@ public class SuperAdminImpl implements SuperAdminService {
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(image.getContentType()) // Set content type from image
                 .build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/java/com.example.absensireact/firebase/FirebaseConfig.json"));
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, image.getBytes()); // Use image.getBytes() to get file bytes directly
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));

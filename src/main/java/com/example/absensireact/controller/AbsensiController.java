@@ -56,11 +56,17 @@ public class AbsensiController {
 
     @PostMapping("/absensi/absensi-masuk")
     public ResponseEntity<Absensi> postAbsensi(@RequestParam("image") MultipartFile image,
-                                               @RequestParam("userId") Long userId) throws IOException {
-        Absensi newAbsensi = absensiService.PostAbsensi(userId, image);
+                                               @RequestParam("userId") Long userId,
+                                               @RequestParam("keteranganTerlambat") String keteranganTerlambat) throws IOException {
+        Absensi newAbsensi = absensiService.PostAbsensi(userId, image, keteranganTerlambat);
         return new ResponseEntity<>(newAbsensi, HttpStatus.CREATED);
     }
 
+    @PutMapping("/absensi/pulang-lebih-awal/{id}")
+    public ResponseEntity<Absensi> pulangLebihAwal(@PathVariable Long id, @RequestBody Absensi absensi) throws NotFoundException {
+        Absensi absensi1 = absensiService.PulangLebihAwal(id, absensi);
+        return new ResponseEntity<>(absensi1, HttpStatus.CREATED);
+    }
     @PutMapping("/absensi/absensi-pulang/{id}")
     public ResponseEntity<Absensi> PutPulang(@PathVariable Long id,
                                              @RequestParam("image") MultipartFile image) {

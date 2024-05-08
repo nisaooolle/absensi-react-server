@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface LemburRepository extends JpaRepository<Lembur , Long> {
 
-    @Query(value = "SELECT * FROM user WHERE user_id = :userId" , nativeQuery = true)
+    @Query(value = "SELECT * FROM user WHERE id = :userId" , nativeQuery = true)
     List<Lembur> findByuserId(Long userId);
 }

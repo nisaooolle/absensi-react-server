@@ -39,8 +39,8 @@ public class Absensi {
     @Column(name = "jamPulang")
     private String jamPulang;
 
-    @Column(name = "keterangan")
-    private String keterangan;
+    @Column(name = "keteranganTerlambat")
+    private String keteranganTerlambat;
 
 
     @Column(name = "fotoMasuk")
@@ -65,7 +65,7 @@ public class Absensi {
 
     }
 
-    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String lokasiMasuk, String lokasiPulang, String keteranganPulang, String keteranganIzin, String keteranganPulangAwal, String jamPulang, String keterangan, String fotoMasuk, String fotoPulang, String status, String statusAbsen, User user) {
+    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String lokasiMasuk, String lokasiPulang, String keteranganPulang, String keteranganIzin, String keteranganPulangAwal, String jamPulang, String keteranganTerlambat, String fotoMasuk, String fotoPulang, String status, String statusAbsen, User user) {
         this.id = id;
         this.tanggalAbsen = tanggalAbsen;
         this.jamMasuk = jamMasuk;
@@ -75,7 +75,7 @@ public class Absensi {
         this.keteranganIzin = keteranganIzin;
         this.keteranganPulangAwal = keteranganPulangAwal;
         this.jamPulang = jamPulang;
-        this.keterangan = keterangan;
+        this.keteranganTerlambat = keteranganTerlambat;
         this.fotoMasuk = fotoMasuk;
         this.fotoPulang = fotoPulang;
         this.status = status;
@@ -155,12 +155,12 @@ public class Absensi {
         this.jamPulang = jamPulang;
     }
 
-    public String getKeterangan() {
-        return keterangan;
+    public String getKeteranganTerlambat() {
+        return keteranganTerlambat;
     }
 
-    public void setKeterangan(String keterangan) {
-        this.keterangan = keterangan;
+    public void setKeteranganTerlambat(String keteranganTerlambat) {
+        this.keteranganTerlambat = keteranganTerlambat;
     }
 
     public String getFotoMasuk() {

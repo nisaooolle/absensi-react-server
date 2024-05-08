@@ -46,12 +46,12 @@ public class AbsensiImpl implements AbsensiService {
 
 
 
-    public Absensi PostAbsensi(Long userId, MultipartFile image) throws IOException {
+    public Absensi PostAbsensi(Long userId, MultipartFile image , String keteranganTerlambat) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User dengan ID " + userId + " tidak ditemukan."));
 
         Date masuk = new Date();
-        Date tanggalHariIni = truncateTime(new Date());
+        Date tanggalHariIni = truncateTime(new Date()); // Assuming truncateTime truncates time portion
         String keterangan = (getHourOfDay(masuk) < 7) ? "Tidak Terlambat" : "Terlambat";
 
         Absensi absensi = new Absensi();
@@ -59,7 +59,8 @@ public class AbsensiImpl implements AbsensiService {
         absensi.setTanggalAbsen(tanggalHariIni);
         absensi.setJamMasuk(String.valueOf(masuk));
         absensi.setJamPulang("-");
-        absensi.setKeterangan(keterangan);
+        absensi.setKeteranganTerlambat(keteranganTerlambat);
+        absensi.setStatusAbsen(keterangan);
 
         String fotoUrl = uploadFile(image, "foto_masuk_" + userId);
         absensi.setFotoMasuk(fotoUrl);
@@ -67,9 +68,22 @@ public class AbsensiImpl implements AbsensiService {
         return absensiRepository.save(absensi);
     }
 
-    public Absensi PutPulang(Long id, MultipartFile image) throws IOException {
+    @Override
+    public Absensi PulangLebihAwal(Long id, Absensi absensi){
+        Optional<Absensi> absensivalid = absensiRepository.findById(id);
+        if (!absensivalid.isPresent()) {
+            Date pulangAwal = new Date();
+
+            absensi.setKeteranganPulangAwal(absensi.getKeteranganPulangAwal());
+            absensi.setJamPulang(String.valueOf(pulangAwal));
+            return  absensiRepository.save(absensi);
+        }
+        throw new NotFoundException("Absensi tidak ditemukan");
+
+    }
+    public Absensi PutPulang(Long id, MultipartFile image) throws IOException, NotFoundException {
         Absensi absensi = absensiRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Absensi not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Absensi tidak ditemukan"));
 
         Date pulang = new Date();
         int jamMasuk = getHourOfDay(absensi.getTanggalAbsen());
@@ -106,7 +120,7 @@ public class AbsensiImpl implements AbsensiService {
         String fullPath = folderPath + timestamp + "_" + fileName;
         BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/serviceAccount.json"));
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, multipartFile.getBytes());
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
@@ -126,10 +140,14 @@ public class AbsensiImpl implements AbsensiService {
                     existingAbsensi.setJamPulang(absensi.getJamPulang());
                     existingAbsensi.setLokasiMasuk(absensi.getLokasiMasuk());
                     existingAbsensi.setLokasiPulang(absensi.getLokasiPulang());
-                    existingAbsensi.setKeterangan(absensi.getKeterangan());
+                    existingAbsensi.setKeteranganTerlambat(absensi.getKeteranganTerlambat());
                     existingAbsensi.setFotoMasuk(absensi.getFotoMasuk());
                     existingAbsensi.setFotoPulang(absensi.getFotoPulang());
                     existingAbsensi.setStatus(absensi.getStatus());
+                    existingAbsensi.setStatusAbsen(absensi.getStatusAbsen());
+                    existingAbsensi.setKeteranganIzin(absensi.getKeteranganIzin());
+                    existingAbsensi.setKeteranganPulang(absensi.getKeteranganPulang());
+                    existingAbsensi.setKeteranganPulangAwal(absensi.getKeteranganPulangAwal());
                     return absensiRepository.save(existingAbsensi);
                 })
                 .orElseThrow(() -> new NotFoundException("Absensi not found with id: " + id));

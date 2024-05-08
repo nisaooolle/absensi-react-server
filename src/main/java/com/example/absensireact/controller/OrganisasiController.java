@@ -41,20 +41,32 @@ public class OrganisasiController {
         return organisasi.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/organisasi/getByIdAdmin/{idAdmin}")
-    public ResponseEntity<Organisasi> tambahOrganisasi(@PathVariable Long idAdmin, @RequestBody Organisasi organisasi, @RequestParam("image") MultipartFile image) throws IOException {
+    @PostMapping(path = "/organisasi/tambahByIdAdmin/{idAdmin}", consumes = "multipart/form-data")
+    public ResponseEntity<Organisasi> tambahOrganisasi(
+            @PathVariable Long idAdmin,
+            @RequestBody Organisasi organisasi,
+            @RequestPart("image") MultipartFile image
+    ) throws IOException {
         Organisasi newOrganisasi = organisasiService.TambahOrganisasi(idAdmin, organisasi, image);
         return ResponseEntity.status(HttpStatus.CREATED).body(newOrganisasi);
     }
 
-    @PutMapping("/organisasi/putByIdAdmin/{idAdmin}")
-    public ResponseEntity<Organisasi> ubahDataOrganisasi(@PathVariable Long idAdmin, @RequestBody Organisasi organisasi, @RequestParam("image") MultipartFile image) {
+    @PostMapping(path = "/organisasi/putByIdAdmin/{idAdmin}", consumes = "multipart/form-data")
+    public ResponseEntity<Organisasi> ubahDataOrganisasi(
+            @PathVariable Long idAdmin,
+            @RequestBody Organisasi organisasi,
+            @RequestPart("image") MultipartFile image
+    ) throws IOException {
         Organisasi updatedOrganisasi = organisasiService.UbahDataOrgannisasi(idAdmin, organisasi, image);
         return ResponseEntity.ok(updatedOrganisasi);
     }
 
-    @PutMapping("/organisasi/editById/{id}")
-    public ResponseEntity<Organisasi> editOrganisasi(@PathVariable Long id, @RequestBody Organisasi organisasi, @RequestParam("image") MultipartFile image) throws IOException {
+    @PutMapping(path = "/organisasi/editById/{idAdmin}", consumes = "multipart/form-data")
+    public ResponseEntity<Organisasi> editOrganisasi(
+            @PathVariable Long id,
+            @RequestBody Organisasi organisasi,
+            @RequestPart("image") MultipartFile image
+    ) throws IOException {
         Organisasi updatedOrganisasi = organisasiService.EditByid(id, organisasi, image);
         return ResponseEntity.ok(updatedOrganisasi);
     }

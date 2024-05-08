@@ -13,7 +13,6 @@ public class OrganisasiDTO {
     private String provinsi;
     private String status;
     private String fotoOrganisasi;
-    private Admin admin;
 
     public Long getId() {
         return id;
@@ -95,11 +94,5 @@ public class OrganisasiDTO {
         this.fotoOrganisasi = fotoOrganisasi;
     }
 
-    public Admin getAdmin() {
-        return admin;
-    }
 
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
-    }
 }

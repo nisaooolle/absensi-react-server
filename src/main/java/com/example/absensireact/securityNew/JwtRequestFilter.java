@@ -122,27 +122,27 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-    private List<GrantedAuthority> getRolesFromToken(String role) {
-        List<GrantedAuthority> roles = new ArrayList<>();
-        if (role != null) {
-            String[] rolesArray = role.split(",");
-            for (String roleString : rolesArray) {
-                roles.add(new SimpleGrantedAuthority(roleString));
-            }
-        }
-        return roles;
-    }
-
-
-    private static final String AUTH_HEADER_NAME = "Authorization";
-    private static final String JWT_PREFIX = "Bearer ";
-
-    private String parseJwt(HttpServletRequest request) {
-        String headerAuth = request.getHeader(AUTH_HEADER_NAME);
-        if (headerAuth != null && StringUtils.hasText(headerAuth) && headerAuth.startsWith(JWT_PREFIX)) {
-            return headerAuth.substring(JWT_PREFIX.length());
-        }
-        return "Errororroror";
-    }
+//    private List<GrantedAuthority> getRolesFromToken(String role) {
+//        List<GrantedAuthority> roles = new ArrayList<>();
+//        if (role != null) {
+//            String[] rolesArray = role.split(",");
+//            for (String roleString : rolesArray) {
+//                roles.add(new SimpleGrantedAuthority(roleString));
+//            }
+//        }
+//        return roles;
+//    }
+//
+//
+//    private static final String AUTH_HEADER_NAME = "Authorization";
+//    private static final String JWT_PREFIX = "Bearer ";
+//
+//    private String parseJwt(HttpServletRequest request) {
+//        String headerAuth = request.getHeader(AUTH_HEADER_NAME);
+//        if (headerAuth != null && StringUtils.hasText(headerAuth) && headerAuth.startsWith(JWT_PREFIX)) {
+//            return headerAuth.substring(JWT_PREFIX.length());
+//        }
+//        return "Errororroror";
+//    }
 
 }
