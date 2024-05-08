@@ -4,20 +4,20 @@ public class LokasiDTO {
     private String namaLokasi;
     private String alamat;
     private Long idOrganisasi;
-    private Long idAdmin;
+    private AdminDTO admin;
 
-    // Constructors
-    public LokasiDTO() {}
-
-    // Typically, you might include a constructor for convenience to transform from entity to DTO
-    public LokasiDTO(String namaLokasi, String alamat, Long idOrganisasi, Long idAdmin) {
+    public LokasiDTO(String namaLokasi, String alamat, Long idOrganisasi, AdminDTO admin) {
         this.namaLokasi = namaLokasi;
         this.alamat = alamat;
         this.idOrganisasi = idOrganisasi;
-        this.idAdmin = idAdmin;
+        this.admin = admin;
+
     }
 
-    // Getters and setters
+    public LokasiDTO() {
+
+    }
+
     public String getNamaLokasi() {
         return namaLokasi;
     }
@@ -42,11 +42,11 @@ public class LokasiDTO {
         this.idOrganisasi = idOrganisasi;
     }
 
-    public Long getIdAdmin() {
-        return idAdmin;
+    public AdminDTO getAdmin() {
+        return admin;
     }
 
-    public void setIdAdmin(Long idAdmin) {
-        this.idAdmin = idAdmin;
+    public void setAdmin(AdminDTO admin) {
+        this.admin = admin;
     }
 }

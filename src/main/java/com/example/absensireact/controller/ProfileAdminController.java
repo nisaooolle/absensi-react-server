@@ -41,10 +41,4 @@ public class ProfileAdminController {
         return ResponseEntity.ok(admin);
     }
 
-    @DeleteMapping("/deletePhoto/{id}")
-    public ResponseEntity<HttpStatus> deleteProfilePhoto(@PathVariable Long id) {
-        profileAdminImpl.deleteProfilePhoto(id);
-        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
-    }
-
 }

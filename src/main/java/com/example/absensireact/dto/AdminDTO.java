@@ -1,14 +1,28 @@
 package com.example.absensireact.dto;
 
-import javax.persistence.Column;
+import com.example.absensireact.model.Organisasi;
 
 public class AdminDTO {
     private Long id;
     private String email;
     private String password;
-    private  String username;
-    private  String imageAdmin;
+    private String username;
+    private String imageAdmin;
     private String idOrganisasi;
+
+    public AdminDTO(Long id, String email, String password, String username, String imageAdmin, Organisasi organisasi) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.imageAdmin = imageAdmin;
+        // Ambil ID organisasi dan konversi menjadi String
+        this.idOrganisasi = String.valueOf(organisasi.getId());
+    }
+
+    public AdminDTO() {
+
+    }
 
     public Long getId() {
         return id;
