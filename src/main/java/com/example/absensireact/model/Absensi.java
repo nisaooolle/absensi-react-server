@@ -55,8 +55,7 @@ public class Absensi {
     @Column(name = "statusAbsen")
     private String statusAbsen;
 
-     @OneToOne
-    @MapsId
+    @OneToOne
     @JoinColumn(name = "userId")
     private User  user;
 

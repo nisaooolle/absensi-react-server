@@ -4,6 +4,8 @@ package com.example.absensireact.controller;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.impl.UserImpl;
 import com.example.absensireact.model.Absensi;
+import com.example.absensireact.model.User;
+import com.example.absensireact.repository.AbsensiRepository;
 import com.example.absensireact.service.AbsensiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,12 +27,15 @@ public class AbsensiController {
 
     private final AbsensiService absensiService;
 
+    private final AbsensiRepository absensiRepository;
+
 
 
     @Autowired
-    public AbsensiController(AbsensiService absensiService , UserImpl userImpl) {
+    public AbsensiController(AbsensiService absensiService , AbsensiRepository absensiRepository) {
         this.absensiService = absensiService;
 
+        this.absensiRepository = absensiRepository;
     }
 
     @GetMapping("/absensi/getByUserId/{userId}")
@@ -40,6 +47,14 @@ public class AbsensiController {
         return new ResponseEntity<>(absensi, HttpStatus.OK);
     }
 
+    @GetMapping("/absensi/checkAbsensi/{userId}")
+    public ResponseEntity<String> checkAbsensiToday(@PathVariable Long userId) {
+        if (absensiService.checkUserAlreadyAbsenToday(userId)) {
+            return ResponseEntity.status(HttpStatus.OK).body("Pengguna sudah melakukan absensi hari ini.");
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body("Pengguna belum melakukan absensi hari ini.");
+        }
+    }
     @GetMapping("/absensi/getAll")
     public ResponseEntity<List<Absensi>> getAllAbsensi() {
         List<Absensi> allAbsensi = absensiService.getAllAbsensi();
@@ -54,33 +69,30 @@ public class AbsensiController {
     }
 
 
-    @PostMapping("/absensi/absensi-masuk")
-    public ResponseEntity<Absensi> postAbsensi(@RequestParam("image") MultipartFile image,
-                                               @RequestParam("userId") Long userId,
-                                               @RequestParam("keteranganTerlambat") String keteranganTerlambat) throws IOException {
-        Absensi newAbsensi = absensiService.PostAbsensi(userId, image, keteranganTerlambat);
-        return new ResponseEntity<>(newAbsensi, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/absensi/pulang-lebih-awal/{id}")
-    public ResponseEntity<Absensi> pulangLebihAwal(@PathVariable Long id, @RequestBody Absensi absensi) throws NotFoundException {
-        Absensi absensi1 = absensiService.PulangLebihAwal(id, absensi);
-        return new ResponseEntity<>(absensi1, HttpStatus.CREATED);
-    }
-    @PutMapping("/absensi/absensi-pulang/{id}")
-    public ResponseEntity<Absensi> PutPulang(@PathVariable Long id,
-                                             @RequestParam("image") MultipartFile image) {
+    @PostMapping("/absensi/masuk/{userId}")
+    public ResponseEntity<?> postAbsensiMasuk(@PathVariable Long userId,
+                                              @RequestPart("image") MultipartFile image,
+                                              @RequestParam(value = "keteranganTerlambat", required = false) String keteranganTerlambat) {
         try {
-            Absensi updatedAbsensi = absensiService.PutPulang(id, image);
-            return ResponseEntity.ok(updatedAbsensi);
-        } catch (IOException e) {
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
+            Absensi absensi = absensiService.PostAbsensi(userId, image, keteranganTerlambat);
+            return ResponseEntity.ok().body(absensi);
+        } catch (IOException | EntityNotFoundException | NotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    // Endpoint untuk absensi pulang
+    @PutMapping("/absensi/pulang/{userId}")
+    public ResponseEntity<?> putAbsensiPulang(@PathVariable Long userId,
+
+                                              @RequestPart("image") MultipartFile image) {
+        try {
+            Absensi absensi = absensiService.Pulang(userId,image);
+            return ResponseEntity.ok().body(absensi);
+        } catch (IOException | NotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @PutMapping("/absensi/update/{id}")
     public ResponseEntity<Absensi> updateAbsensi(@PathVariable Long id, @RequestBody Absensi absensi) {
         Absensi updatedAbsensi = absensiService.updateAbsensi(id, absensi);
