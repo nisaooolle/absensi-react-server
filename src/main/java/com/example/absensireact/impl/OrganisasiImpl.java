@@ -61,14 +61,13 @@ public class OrganisasiImpl implements OrganisasiService {
     }
 
     @Override
-    public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image)   {
+    public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
         Optional<Admin> adminOptional = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));
 
         if (!adminOptional.isPresent()) {
             throw new NotFoundException("Id Admin tidak ditemukan");
         }
 
-        Admin admin = adminOptional.get();
 
          organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
         organisasi.setAlamat(organisasi.getAlamat());
@@ -77,51 +76,61 @@ public class OrganisasiImpl implements OrganisasiService {
         organisasi.setProvinsi(organisasi.getProvinsi());
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
-        organisasi.setAdmin(admin);
-        String file = imageConverter(image);
+        organisasi.setAdmin(adminRepository.getReferenceById(organisasi.getAdmin().getId()));
+        String file = uploadFoto(image, "_organisasi_" + idAdmin);
         organisasi.setFotoOrganisasi(file);
 
         return  organisasiRepository.save(organisasi);
 
     }
 
-    private String imageConverter(MultipartFile multipartFile) {
-        try {
-            return uploadFoto(multipartFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new InternalErrorException("Error upload file");
-        }
-    }
+//    private String imageConverter(MultipartFile multipartFile) {
+//        try {
+//            return uploadFoto(multipartFile);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new InternalErrorException("Error upload file");
+//        }
+//    }
 
-    public String uploadFoto(MultipartFile image) throws IOException {
+    private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "organisasi/";
-        String fileName = folderPath + timestamp + "_" + image.getOriginalFilename();
-        BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType(image.getContentType()) // Set content type from image
-                .build();
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, image.getBytes()); // Use image.getBytes() to get file bytes directly
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+        storage.create(blobInfo, multipartFile.getBytes());
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
 
-    private File convertToFile(MultipartFile multipartFile, String fileName) throws IOException {
-        File file = new File(fileName);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(multipartFile.getBytes());
-            fos.close();
-        }
-        return file;
-    }
+
+//    private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
+//        String timestamp = String.valueOf(System.currentTimeMillis());
+//        String folderPath = "organisasi/";
+//        String fullPath = folderPath + timestamp + "organisasi" + fileName;
+//
+//        String contentType = multipartFile.getContentType();
+//        if (contentType == null) {
+//            contentType = "application/octet-stream";
+//        }
+//
+//        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
+//        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+//        storage.create(blobInfo, multipartFile.getBytes());
+//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+//    }
+
+
     private String getExtentions(String fileName) {
         return fileName.split("\\.")[0];
     }
 
     @Override
-    public Organisasi UbahDataOrgannisasi(Long idAdmin, Organisasi organisasi, MultipartFile image){
+    public Organisasi UbahDataOrgannisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
         Admin admmin = adminRepository.findById(idAdmin).orElse(null);
         if (admmin == null) {
             throw new NotFoundException("Id admin tidak ditemukan");
@@ -134,7 +143,7 @@ public class OrganisasiImpl implements OrganisasiService {
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
         organisasi.setAdmin(admmin);
-        String imageUrl = imageConverter(image);
+        String imageUrl = uploadFoto(image, "_organisasi_" + idAdmin);
         organisasi.setFotoOrganisasi(imageUrl);
 
         return organisasiRepository.save(organisasi);
@@ -155,7 +164,7 @@ public class OrganisasiImpl implements OrganisasiService {
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
         organisasi.setAdmin(admin);
-        String imageUrl = imageConverter(image);
+        String imageUrl = uploadFoto(image, "organisasi" + id);
         organisasi.setFotoOrganisasi(imageUrl);
 
         return organisasiRepository.save(organisasi);

@@ -45,7 +45,7 @@ public class AbsensiImpl implements AbsensiService {
 
 
     @Override
-    public Absensi PostAbsensi(Long userId, MultipartFile image, String keteranganTerlambat) throws IOException {
+    public Absensi PostAbsensi(Long userId, MultipartFile image) throws IOException {
         Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
         if (existingAbsensi.isPresent()) {
             throw new NotFoundException("User sudah melakukan absensi masuk pada hari yang sama sebelumnya.");
@@ -64,7 +64,7 @@ public class AbsensiImpl implements AbsensiService {
             absensi.setJamMasuk(jamMasukString);
             absensi.setJamPulang("-");
 
-            absensi.setKeteranganTerlambat(keteranganTerlambat.isEmpty() ? "-" : keteranganTerlambat);
+            absensi.setKeteranganTerlambat(absensi.getKeteranganTerlambat());
             absensi.setStatusAbsen(keterangan);
 
             absensi.setFotoMasuk(uploadFile(image, "foto_masuk_" + userId));

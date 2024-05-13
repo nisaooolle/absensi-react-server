@@ -18,9 +18,8 @@ public interface OrganisasiService {
 
     Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException;
 
-    String uploadFoto(MultipartFile image) throws IOException;
 
-    Organisasi UbahDataOrgannisasi(Long idAdmin, Organisasi organisasi, MultipartFile image);
+    Organisasi UbahDataOrgannisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException;
 
     Organisasi EditByid(Long id, Organisasi organisasi, MultipartFile image) throws IOException;
 
