@@ -41,7 +41,7 @@ public class OrganisasiController {
         return organisasi.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping(path = "/organisasi/tambahByIdAdmin/{idAdmin}", consumes = "multipart/form-data")
+    @PostMapping("/organisasi/tambahByIdAdmin/{idAdmin}")
     public ResponseEntity<Organisasi> tambahOrganisasi(
             @PathVariable Long idAdmin,
             @RequestBody Organisasi organisasi,
@@ -51,7 +51,7 @@ public class OrganisasiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newOrganisasi);
     }
 
-    @PostMapping(path = "/organisasi/putByIdAdmin/{idAdmin}", consumes = "multipart/form-data")
+    @PutMapping("/organisasi/putByIdAdmin/{idAdmin}" )
     public ResponseEntity<Organisasi> ubahDataOrganisasi(
             @PathVariable Long idAdmin,
             @RequestBody Organisasi organisasi,
@@ -61,7 +61,7 @@ public class OrganisasiController {
         return ResponseEntity.ok(updatedOrganisasi);
     }
 
-    @PutMapping(path = "/organisasi/editById/{idAdmin}", consumes = "multipart/form-data")
+    @PutMapping("/organisasi/editById/{id}" )
     public ResponseEntity<Organisasi> editOrganisasi(
             @PathVariable Long id,
             @RequestBody Organisasi organisasi,

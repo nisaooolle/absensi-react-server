@@ -29,7 +29,7 @@ public interface  AbsensiService {
 
 
 
-    Absensi PostAbsensi(Long userId, MultipartFile image , String keteranganTerlambat) throws IOException;
+    Absensi PostAbsensi(Long userId, MultipartFile image ) throws IOException;
 
 
 
