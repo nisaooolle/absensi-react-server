@@ -2,11 +2,8 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.config.AppConfig;
 import com.example.absensireact.exception.NotFoundException;
-import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.Organisasi;
-import com.example.absensireact.model.User;
-import com.example.absensireact.repository.AdminRepository;
-import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.model.*;
+import com.example.absensireact.repository.*;
 import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +25,14 @@ public class UserImpl implements UserService {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Autowired
+    private JabatanRepository jabatanRepository;
+
+    @Autowired
+    private ShiftRepository shiftRepository;
+
+    @Autowired
+    private OrganisasiRepository organisasiRepository;
 
     @Autowired
     private AppConfig appConfig;
@@ -66,11 +71,27 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public User Tambahkaryawan (Long idAdmin , User user){
+    public User Tambahkaryawan(Long idAdmin, User user){
         Optional<Admin> adminvalidate = adminRepository.findById(idAdmin);
 
-        if (!adminvalidate.isPresent()) {
+        if (adminvalidate.isPresent()) {
+            user.setRole("USER");
+            user.setPassword(encoder.encode(user.getPassword()));
+            user.setEmail(user.getEmail());
+            user.setUsername(user.getUsername());
 
+            Organisasi organisasi = organisasiRepository.findById(user.getOrganisasi().getId())
+                    .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan"));
+            Jabatan jabatan = jabatanRepository.findById(user.getJabatan().getIdJabatan())
+                    .orElseThrow(() -> new NotFoundException("Jabatan tidak ditemukan"));
+            Shift shift = shiftRepository.findById(user.getShift().getId())
+                    .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan"));
+
+            user.setOrganisasi(organisasi);
+            user.setJabatan(jabatan);
+            user.setShift(shift);
+
+            return userRepository.save(user);
         }
 
         throw new NotFoundException("Id Admin tidak ditemukan");

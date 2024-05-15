@@ -67,7 +67,7 @@ public class OrganisasiImpl implements OrganisasiService {
         if (!adminOptional.isPresent()) {
             throw new NotFoundException("Id Admin tidak ditemukan");
         }
-
+       Admin admin = adminOptional.get();
 
          organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
         organisasi.setAlamat(organisasi.getAlamat());
@@ -76,7 +76,7 @@ public class OrganisasiImpl implements OrganisasiService {
         organisasi.setProvinsi(organisasi.getProvinsi());
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
-        organisasi.setAdmin(adminRepository.getReferenceById(organisasi.getAdmin().getId()));
+        organisasi.setAdmin(admin);
         String file = uploadFoto(image, "_organisasi_" + idAdmin);
         organisasi.setFotoOrganisasi(file);
 
@@ -84,14 +84,6 @@ public class OrganisasiImpl implements OrganisasiService {
 
     }
 
-//    private String imageConverter(MultipartFile multipartFile) {
-//        try {
-//            return uploadFoto(multipartFile);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new InternalErrorException("Error upload file");
-//        }
-//    }
 
     private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
@@ -106,23 +98,6 @@ public class OrganisasiImpl implements OrganisasiService {
     }
 
 
-//    private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
-//        String timestamp = String.valueOf(System.currentTimeMillis());
-//        String folderPath = "organisasi/";
-//        String fullPath = folderPath + timestamp + "organisasi" + fileName;
-//
-//        String contentType = multipartFile.getContentType();
-//        if (contentType == null) {
-//            contentType = "application/octet-stream";
-//        }
-//
-//        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
-//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
-//        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage.create(blobInfo, multipartFile.getBytes());
-//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
-//    }
 
 
     private String getExtentions(String fileName) {
