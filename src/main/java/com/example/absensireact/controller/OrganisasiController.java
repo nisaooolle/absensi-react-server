@@ -2,6 +2,7 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.service.OrganisasiService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,12 +45,16 @@ public class OrganisasiController {
     @PostMapping("/organisasi/tambahByIdAdmin/{idAdmin}")
     public ResponseEntity<Organisasi> tambahOrganisasi(
             @PathVariable Long idAdmin,
-            @RequestBody Organisasi organisasi,
-            @RequestPart("image") MultipartFile image
-    ) throws IOException {
-        Organisasi newOrganisasi = organisasiService.TambahOrganisasi(idAdmin, organisasi, image);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newOrganisasi);
+            @RequestPart("organisasi") String organisasiJson,
+            @RequestPart("image") MultipartFile image) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Organisasi organisasi = objectMapper.readValue(organisasiJson, Organisasi.class);
+
+        Organisasi savedOrganisasi = organisasiService.TambahOrganisasi(idAdmin, organisasi, image);
+        return ResponseEntity.ok(savedOrganisasi);
     }
+
 
     @PutMapping("/organisasi/putByIdAdmin/{idAdmin}" )
     public ResponseEntity<Organisasi> ubahDataOrganisasi(

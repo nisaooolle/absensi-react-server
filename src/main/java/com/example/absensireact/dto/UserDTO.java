@@ -1,29 +1,32 @@
 package com.example.absensireact.dto;
 
+import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.Jabatan;
+import com.example.absensireact.model.Organisasi;
+import com.example.absensireact.model.Shift;
+
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
 public class UserDTO {
     private Long id;
 
     private String email;
 
-    private String username;
+    private String password;
 
-    private String organisasi;
+    private  String username;
 
-    private String oldPassword;
+    private Organisasi organisasi;
 
-    private String newPassword;
+    private Jabatan jabatan;
 
-    private String confirmPassword;
+    private Shift shift;
+
+    private Admin admin;
 
     private String role;
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     public Long getId() {
         return id;
@@ -41,6 +44,14 @@ public class UserDTO {
         this.email = email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -49,35 +60,43 @@ public class UserDTO {
         this.username = username;
     }
 
-    public String getOrganisasi() {
+    public Organisasi getOrganisasi() {
         return organisasi;
     }
 
-    public void setOrganisasi(String organisasi) {
+    public void setOrganisasi(Organisasi organisasi) {
         this.organisasi = organisasi;
     }
 
-    public String getOldPassword() {
-        return oldPassword;
+    public Jabatan getJabatan() {
+        return jabatan;
     }
 
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
+    public void setJabatan(Jabatan jabatan) {
+        this.jabatan = jabatan;
     }
 
-    public String getNewPassword() {
-        return newPassword;
+    public Shift getShift() {
+        return shift;
     }
 
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
+    public void setShift(Shift shift) {
+        this.shift = shift;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
+    public Admin getAdmin() {
+        return admin;
     }
 
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

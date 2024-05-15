@@ -3,8 +3,10 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.config.AppConfig;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
+import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class UserController {
 
     @Autowired
     OrganisasiRepository organisasiRepository;
+
+    @Autowired
+    private AdminRepository adminRepository;
 
 
 
@@ -49,6 +54,13 @@ public class UserController {
         return userImpl.GetAllKaryawanByIdAdmin(idAdmin);
     }
 
+    @PostMapping("/user/tambahkaryawan/{idAdmin}")
+    public ResponseEntity<User> tambahKaryawan(@RequestBody User user, @PathVariable Long idAdmin) {
+        Admin admin = adminRepository.findById(idAdmin)
+                .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
+        User user1 = userImpl.Tambahkaryawan(idAdmin , user);
+        return ResponseEntity.ok(user1);
+    }
     @GetMapping("/user/get-allUser")
     public ResponseEntity<List<User>> getAllUser() {
         List<User> users = userImpl.getAll();

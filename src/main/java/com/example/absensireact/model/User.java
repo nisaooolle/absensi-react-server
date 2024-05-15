@@ -27,19 +27,19 @@ public class User {
    private  String username;
 
 
-    @OneToOne
+   @ManyToOne
    @JoinColumn(name = "idOrganisasi")
    private Organisasi organisasi;
 
-    @OneToOne
+   @ManyToOne
    @JoinColumn(name = "idJabatan")
    private Jabatan jabatan;
 
-    @OneToOne
+   @ManyToOne
    @JoinColumn(name = "idShift")
    private Shift shift;
 
-    @OneToOne
+   @ManyToOne
    @JoinColumn(name = "idAdmin")
    private Admin admin;
 

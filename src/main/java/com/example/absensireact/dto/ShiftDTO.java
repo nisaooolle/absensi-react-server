@@ -2,15 +2,22 @@ package com.example.absensireact.dto;
 
 import com.example.absensireact.model.Organisasi;
 
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
 
 public class ShiftDTO {
     private Long id;
     private String namaShift;
-    private String waktuMasuk;
-    private String waktuPulang;
-    private String jumlahKaryawan;
-    private Organisasi organisasi;
 
+    private String waktuMasuk;
+
+    private String waktuPulang;
+
+    private String jumlahKaryawan;
+
+    private Organisasi organisasi;
 
     public Long getId() {
         return id;

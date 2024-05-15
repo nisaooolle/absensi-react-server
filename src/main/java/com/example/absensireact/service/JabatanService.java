@@ -12,5 +12,8 @@ public interface JabatanService {
     Optional<Jabatan> getJabatanById(Long id);
     Jabatan addJabatan(Long adminId, Jabatan jabatan);
     Jabatan editJabatan(Long adminId, Jabatan jabatan); // Corrected method signature
+
+    Jabatan editJabatanById(Long id, Jabatan jabatan);
+
     void deleteJabatan(Long idJabatan);
 }
