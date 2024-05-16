@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface ShiftRepository extends JpaRepository<Shift , Long> {
 
-    @Query(value = "SELECT * FROM shift WHERE organisasi = :organisasi" , nativeQuery = true)
-    Optional<Shift> findByOrganisasi (Long organisasi);
+    @Query(value = "SELECT * FROM shift WHERE id_admin = :idAdmin" , nativeQuery = true)
+    Optional<Shift> findByIdAdmin (Long idAdmin);
 }

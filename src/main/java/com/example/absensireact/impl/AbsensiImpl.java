@@ -99,48 +99,49 @@ public class AbsensiImpl implements AbsensiService {
         return absensi.isPresent();
     }
 
-    private static Date truncateTime(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
+    @Override
+    public Absensi izin(Long userId, String keteranganIzin) {
+        Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
+        if (existingAbsensi.isPresent()) {
+            throw new NotFoundException("User sudah melakukan absensi masuk pada hari yang sama sebelumnya.");
+        } else {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User dengan ID " + userId + " tidak ditemukan."));
+
+            Date tanggalHariIni = truncateTime(new Date());
+            Absensi absensi = new Absensi();
+            absensi.setUser(user);
+            absensi.setTanggalAbsen(tanggalHariIni);
+            absensi.setJamMasuk("-");
+            absensi.setJamPulang("-");
+            absensi.setKeteranganIzin(keteranganIzin);
+            absensi.setStatusAbsen("Izin");
+
+            return absensiRepository.save(absensi);
+        }
+    }
+    @Override
+    public Absensi izinTengahHari(Long userId , String keterangaPulangAwal )   {
+        Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
+        if (existingAbsensi.isPresent()) {
+            Absensi absensi = existingAbsensi.get();
+            Date masuk = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+            String jamPulang = formatter.format(masuk);
+            absensi.setJamPulang(jamPulang);
+            absensi.setKeteranganPulangAwal(keterangaPulangAwal);
+            absensi.setStatusAbsen("Izin Tengah Hari");
+            return absensiRepository.save(absensi);
+        } else {
+            throw new NotFoundException("User belum melakukan absensi masuk pada hari ini.");
+        }
     }
 
 
-
-    private int getHourOfDay(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar.get(Calendar.HOUR_OF_DAY);
+    @Override
+    public List<Absensi> getByStatusAbsen(Long userId, String statusAbsen) {
+        return absensiRepository.getByStatusAbsen(userId, statusAbsen);
     }
-
-    private String uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String folderPath = "fotoAbsen/fotoMasuk/";
-        String fullPath = folderPath + timestamp + "_" + fileName;
-        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, multipartFile.getBytes());
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
-    }
-
-    private String uploadFilePulang(MultipartFile multipartFile, String fileName) throws IOException {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String folderPath = "fotoAbsen/fotoPulang/";
-        String fullPath = folderPath + timestamp + "_" + fileName;
-        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, multipartFile.getBytes());
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
-    }
-
     @Override
     public Optional<Absensi> getAbsensiById(Long id) {
         return absensiRepository.findById(id);
@@ -181,4 +182,48 @@ public class AbsensiImpl implements AbsensiService {
     public List<Absensi> getAbsensiByUserId(Long userId) {
         return absensiRepository.findabsensiByUserId(userId);
     }
+
+    private static Date truncateTime(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+
+
+
+    private int getHourOfDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    private String uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String folderPath = "fotoAbsen/fotoMasuk/";
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.create(blobInfo, multipartFile.getBytes());
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+    }
+
+    private String uploadFilePulang(MultipartFile multipartFile, String fileName) throws IOException {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String folderPath = "fotoAbsen/fotoPulang/";
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.create(blobInfo, multipartFile.getBytes());
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+    }
+
 }

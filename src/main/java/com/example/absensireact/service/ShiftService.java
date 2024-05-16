@@ -11,9 +11,9 @@ public interface ShiftService {
 
     Optional<Shift> getshiftById(Long id);
 
-    Optional<Shift>getByOrganisasi(Long organisasi);
+    Optional<Shift>getbyAdmin(Long idAdmin);
 
-    Shift PostShift(Long organisasi, Shift shift);
+    Shift PostShift(Long idAdmin, Shift shift);
 
     Shift editShiftById(Long id, Shift shift);
 

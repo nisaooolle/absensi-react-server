@@ -18,6 +18,12 @@ public interface  AbsensiService {
 
     boolean checkUserAlreadyAbsenToday(Long userId);
 
+    Absensi izin(Long userId, String keteranganIzin)  ;
+
+    Absensi izinTengahHari(Long userId, String keteranganPulangAwal)  ;
+
+    List<Absensi>getByStatusAbsen(Long userId, String statusAbsen);
+
     Optional<Absensi> getAbsensiById(Long id);
 
     Absensi updateAbsensi(Long id, Absensi absensi);
