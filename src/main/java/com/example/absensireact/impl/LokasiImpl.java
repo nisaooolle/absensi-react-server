@@ -32,6 +32,17 @@ public class LokasiImpl implements LokasiService {
     @Override
     public LokasiDTO saveLokasi(LokasiDTO lokasiDTO) {
         Lokasi lokasi = convertToEntity(lokasiDTO);
+
+        // Ambil entitas Organisasi dari basis data berdasarkan ID yang diberikan
+        Optional<Organisasi> organisasiOptional = organisasiRepository.findById(lokasiDTO.getIdOrganisasi());
+        organisasiOptional.ifPresent(lokasi::setOrganisasi);
+
+        // Jika ada adminId yang diberikan, ambil entitas Admin dari basis data
+        if (lokasiDTO.getAdminId() != null) {
+            Optional<Admin> adminOptional = adminRepository.findById(lokasiDTO.getAdminId());
+            adminOptional.ifPresent(lokasi::setAdmin);
+        }
+
         lokasi = lokasiRepository.save(lokasi);
         return convertToDto(lokasi);
     }

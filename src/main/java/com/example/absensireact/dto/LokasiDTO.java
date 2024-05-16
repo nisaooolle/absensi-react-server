@@ -5,13 +5,14 @@ public class LokasiDTO {
     private String alamat;
     private Long idOrganisasi;
     private AdminDTO admin;
+    private Long adminId;
 
-    public LokasiDTO(String namaLokasi, String alamat, Long idOrganisasi, AdminDTO admin) {
+    public LokasiDTO(String namaLokasi, String alamat, Long idOrganisasi, AdminDTO admin, Long adminId) {
         this.namaLokasi = namaLokasi;
         this.alamat = alamat;
         this.idOrganisasi = idOrganisasi;
         this.admin = admin;
-
+        this.adminId = adminId;
     }
 
     public LokasiDTO() {
@@ -48,5 +49,13 @@ public class LokasiDTO {
 
     public void setAdmin(AdminDTO admin) {
         this.admin = admin;
+    }
+
+    public Long getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(Long adminId) {
+        this.adminId = adminId;
     }
 }
