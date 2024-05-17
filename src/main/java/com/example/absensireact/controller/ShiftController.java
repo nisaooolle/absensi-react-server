@@ -32,17 +32,17 @@ public class ShiftController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/getByOrganisasi/{organisasiId}")
-    public ResponseEntity<Shift> getShiftByOrganisasi(@PathVariable("organisasiId") Long organisasiId) {
-        Optional<Shift> shift = shiftService.getByOrganisasi(organisasiId);
+    @GetMapping("/getByOrganisasi/{idAdmin}")
+    public ResponseEntity<Shift> getShiftByOrganisasi(@PathVariable("idAdmin") Long idAdmin) {
+        Optional<Shift> shift = shiftService.getbyAdmin(idAdmin);
         return shift.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping("/tambahShift/{organisasiId}")
-    public ResponseEntity<Shift> postShift(@PathVariable("organisasiId") Long organisasiId,
+    @PostMapping("/tambahShift/{idAdmin}")
+    public ResponseEntity<Shift> postShift(@PathVariable("idAdmin") Long idAdmin,
                                            @RequestBody Shift shift) {
-        Shift createdShift = shiftService.PostShift(organisasiId, shift);
+        Shift createdShift = shiftService.PostShift(idAdmin, shift);
         return new ResponseEntity<>(createdShift, HttpStatus.CREATED);
     }
 

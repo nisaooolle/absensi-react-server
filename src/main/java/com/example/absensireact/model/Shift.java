@@ -21,27 +21,24 @@ public class Shift {
     @Column(name = "waktuPulang")
     private String waktuPulang;
 
-    @Column(name = "jumlahKaryawan")
-    private String jumlahKaryawan;
 
-     @OneToOne
-    @JoinColumn(name = "organisasi")
-    private Organisasi organisasi;
+
+    @OneToOne
+    @JoinColumn(name = "idAdmin")
+    private Admin admin;
 
 
     public Shift(){
 
     }
 
-    public Shift(Long id, String namaShift, String waktuMasuk, String waktuPulang, String jumlahKaryawan, Organisasi organisasi) {
+    public Shift(Long id, String namaShift, String waktuMasuk, String waktuPulang, Admin admin) {
         this.id = id;
         this.namaShift = namaShift;
         this.waktuMasuk = waktuMasuk;
         this.waktuPulang = waktuPulang;
-        this.jumlahKaryawan = jumlahKaryawan;
-        this.organisasi = organisasi;
+        this.admin = admin;
     }
-
 
     public Long getId() {
         return id;
@@ -75,19 +72,11 @@ public class Shift {
         this.waktuPulang = waktuPulang;
     }
 
-    public String getJumlahKaryawan() {
-        return jumlahKaryawan;
+    public Admin getAdmin() {
+        return admin;
     }
 
-    public void setJumlahKaryawan(String jumlahKaryawan) {
-        this.jumlahKaryawan = jumlahKaryawan;
-    }
-
-    public Organisasi getOrganisasi() {
-        return organisasi;
-    }
-
-    public void setOrganisasi(Organisasi organisasi) {
-        this.organisasi = organisasi;
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
     }
 }

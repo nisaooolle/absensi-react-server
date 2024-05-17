@@ -17,6 +17,7 @@ import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -60,12 +61,27 @@ public class AbsensiController {
         List<Absensi> allAbsensi = absensiService.getAllAbsensi();
         return new ResponseEntity<>(allAbsensi, HttpStatus.OK);
     }
-
+    @GetMapping("/absensi/getizin/{userId}")
+    public ResponseEntity<List<Absensi>> getAbsensiByStatusIzin(@PathVariable Long userId) {
+        List<Absensi> absensiList = absensiService.getByStatusAbsen(userId, "Izin");
+        return new ResponseEntity<>(absensiList, HttpStatus.OK);
+    }
     @GetMapping("/absensi/getData/{id}")
     public ResponseEntity<Absensi> getAbsensiById(@PathVariable Long id) {
         Optional<Absensi> absensi = absensiService.getAbsensiById(id);
         return absensi.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PostMapping("/absensi/izin/{userId}")
+    public Absensi izin(@PathVariable Long userId, @RequestBody Map<String, String> body) {
+        String keteranganIzin = body.get("keteranganIzin");
+        return absensiService.izin(userId, keteranganIzin);
+    }
+    @PutMapping("/absensi/izin-tengah-hari/{userId}")
+    public Absensi izinTengahHari(@PathVariable Long userId ,@RequestBody Map<String , String> body)  {
+        String keteranganPulangAwal = body.get("keteranganPulangAwal");
+        return absensiService.izinTengahHari(userId , keteranganPulangAwal );
     }
 
 

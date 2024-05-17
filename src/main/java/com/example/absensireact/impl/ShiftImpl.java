@@ -1,8 +1,10 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.Shift;
+import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.repository.ShiftRepository;
 import com.example.absensireact.service.ShiftService;
@@ -20,7 +22,7 @@ public class ShiftImpl implements ShiftService {
     private ShiftRepository shiftRepository;
 
     @Autowired
-    private OrganisasiRepository organisasiRepository;
+    private AdminRepository adminRepository;
 
     @Override
     public List<Shift> getAllShift(){
@@ -33,20 +35,20 @@ public class ShiftImpl implements ShiftService {
     }
 
     @Override
-    public Optional<Shift>getByOrganisasi(Long organisasi) {
-        return shiftRepository.findByOrganisasi(organisasi);
+    public Optional<Shift>getbyAdmin(Long idAdmin) {
+        return shiftRepository.findByIdAdmin(idAdmin);
 
     }
 
     @Override
-    public Shift PostShift(Long organisasi, Shift shift){
-        Organisasi organisasi1 = organisasiRepository.findById(organisasi).orElse(null);
-        if (organisasi1 != null) {
+    public Shift PostShift(Long idAdmin, Shift shift){
+        Optional<Admin> admin1 = adminRepository.findById(idAdmin);
+        if (admin1.isPresent()) {
+            Admin admin = admin1.get();
             shift.setNamaShift(shift.getNamaShift());
             shift.setWaktuMasuk(shift.getWaktuMasuk());
             shift.setWaktuPulang(shift.getWaktuPulang());
-            shift.setJumlahKaryawan(shift.getJumlahKaryawan());
-            shift.setOrganisasi(organisasi1);
+            shift.setAdmin(admin);
             return shiftRepository.save(shift);
         }
        throw new NotFoundException("Organisasi tidak ditemukan ");
@@ -61,7 +63,6 @@ public class ShiftImpl implements ShiftService {
         shift.setNamaShift(shift.getNamaShift());
         shift.setWaktuMasuk(shift.getWaktuMasuk());
         shift.setWaktuPulang(shift.getWaktuPulang());
-        shift.setJumlahKaryawan(shift.getJumlahKaryawan());
         return shiftRepository.save(shift);
     }
     @Override
