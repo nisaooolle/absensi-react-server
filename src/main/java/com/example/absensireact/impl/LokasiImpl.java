@@ -85,47 +85,6 @@ public class LokasiImpl implements LokasiService {
         return lokasi;
     }
 
-    @Override
-    public OrganisasiDTO getOrganisasiById(Long id) {
-        Optional<Organisasi> lokasi = organisasiRepository.findById(id);
-        return lokasi.map(this::convertOrganisasiToDto).orElse(null);
-    }
-
-    @Override
-    public AdminDTO getAdminById(Long id) {
-        Optional<Admin> adminOptional = adminRepository.findById(id);
-        if (adminOptional.isPresent()) {
-            return convertAdminToDto(adminOptional.get());
-        } else {
-            return null; // atau Anda dapat melemparkan pengecualian jika tidak menemukan admin dengan ID yang diberikan
-        }
-    }
-
-    private OrganisasiDTO convertOrganisasiToDto(Organisasi organisasi) {
-        OrganisasiDTO organisasiDTO = new OrganisasiDTO();
-        organisasiDTO.setId(organisasi.getId());
-        organisasiDTO.setNamaOrganisasi(organisasi.getNamaOrganisasi());
-        organisasiDTO.setAlamat(organisasi.getAlamat());
-        organisasiDTO.setNomerTelepon(organisasi.getNomerTelepon());
-        organisasiDTO.setEmailOrganisasi(organisasi.getEmailOrganisasi());
-        organisasiDTO.setKecamatan(organisasi.getKecamatan());
-        organisasiDTO.setKabupaten(organisasi.getKabupaten());
-        organisasiDTO.setProvinsi(organisasi.getProvinsi());
-        organisasiDTO.setStatus(organisasi.getStatus());
-        organisasiDTO.setFotoOrganisasi(organisasi.getFotoOrganisasi());
-
-        // Set Admin ID jika ada admin terkait
-        Admin admin = organisasi.getAdmin();
-        if (admin != null) {
-            organisasiDTO.setAdmin(String.valueOf(admin.getId()));
-        }
-
-        return organisasiDTO;
-    }
-
-
-
-
 
     private AdminDTO convertAdminToDto(Admin admin) {
         AdminDTO adminDTO = new AdminDTO();
@@ -168,8 +127,14 @@ public class LokasiImpl implements LokasiService {
         if (lokasi.getAdmin() != null) {
             AdminDTO adminDTO = convertAdminToDto(lokasi.getAdmin());
             lokasiDTO.setAdmin(adminDTO);
+
+            // Set Admin ID
+            lokasiDTO.setAdminId(lokasi.getAdmin().getId());
         }
 
         return lokasiDTO;
     }
+
+
+
 }
