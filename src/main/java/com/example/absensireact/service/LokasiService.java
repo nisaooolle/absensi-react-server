@@ -17,9 +17,5 @@ public interface LokasiService {
     LokasiDTO updateLokasi(Integer id, LokasiDTO lokasiDTO);
 
     boolean deleteLokasi(Integer id);
-
-    OrganisasiDTO getOrganisasiById(Long id);
-
-    AdminDTO getAdminById(Long id);
 }
 

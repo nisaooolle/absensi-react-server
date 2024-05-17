@@ -19,6 +19,8 @@ public class Lokasi {
     @JoinColumn(name = "id_admin", nullable = false)
     private Admin admin;
 
+    private Long adminId;
+
     public Integer getIdLokasi() {
         return idLokasi;
     }
@@ -57,5 +59,13 @@ public class Lokasi {
 
     public void setAdmin(Admin admin) {
         this.admin = admin;
+    }
+
+    public Long getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(Long adminId) {
+        this.adminId = adminId;
     }
 }
