@@ -2,6 +2,7 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Absensi;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AbsensiRepository;
 import com.example.absensireact.repository.UserRepository;
@@ -32,9 +33,11 @@ public class AbsensiImpl implements AbsensiService {
     private final UserRepository userRepository;
 
 
-    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository) {
+
+    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository) throws IOException {
         this.absensiRepository = absensiRepository;
         this.userRepository = userRepository;
+
     }
 
     @Override
@@ -170,14 +173,29 @@ public class AbsensiImpl implements AbsensiService {
     }
 
     @Override
-    public void deleteAbsensi(Long id) {
-        if (absensiRepository.existsById(id)) {
+    public void deleteAbsensi(Long id) throws IOException {
+        Optional<Absensi> absensiOptional = absensiRepository.findById(id);
+        if (absensiOptional.isPresent()) {
+            Absensi absensi = absensiOptional.get();
+
+            String fotoMasukUrl = absensi.getFotoMasuk();
+            if (fotoMasukUrl != null) {
+                String fileNameMasuk = fotoMasukUrl.substring(fotoMasukUrl.indexOf("/o/") + 3, fotoMasukUrl.indexOf("?alt=media"));
+                deleteFoto(fileNameMasuk);
+            }
+
+            String fotoPulangUrl = absensi.getFotoPulang();
+            if (fotoPulangUrl != null && !fotoPulangUrl.isEmpty()) {
+                String fileNamePulang = fotoPulangUrl.substring(fotoPulangUrl.indexOf("/o/") + 3, fotoPulangUrl.indexOf("?alt=media"));
+                deleteFoto(fileNamePulang);
+            }
+
             absensiRepository.deleteById(id);
+
         } else {
             throw new NotFoundException("Absensi not found with id: " + id);
         }
     }
-
     @Override
     public List<Absensi> getAbsensiByUserId(Long userId) {
         return absensiRepository.findabsensiByUserId(userId);
@@ -193,13 +211,18 @@ public class AbsensiImpl implements AbsensiService {
         return calendar.getTime();
     }
 
-
-
-
     private int getHourOfDay(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    private boolean deleteFoto(String fileName) throws IOException {
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.delete(blobId);
+        return true;
     }
 
     private String uploadFile(MultipartFile multipartFile, String fileName) throws IOException {

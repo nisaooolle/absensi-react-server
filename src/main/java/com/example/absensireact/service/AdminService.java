@@ -9,6 +9,8 @@ import java.util.Map;
 
 public interface AdminService {
 
+    Admin RegisterBySuperAdmin(Long idSuperAdmin, Admin admin);
+
     Admin RegisterAdmin(Admin admin);
 
     Admin getById(Long id);

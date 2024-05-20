@@ -3,6 +3,7 @@ package com.example.absensireact.impl;
 import com.example.absensireact.dto.LokasiDTO;
 import com.example.absensireact.dto.AdminDTO;
 import com.example.absensireact.dto.OrganisasiDTO;
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Lokasi;
 import com.example.absensireact.model.Organisasi;
@@ -47,6 +48,32 @@ public class LokasiImpl implements LokasiService {
         return convertToDto(lokasi);
     }
 
+
+    @Override
+    public List<Lokasi>getAllByAdmin(Long idAdmin){
+        return lokasiRepository.findbyAdmin(idAdmin);
+    }
+    @Override
+    public Lokasi tambahLokasi(Long idAdmin, Lokasi lokasi, Long idOrganisasi) {
+        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            Optional<Organisasi> organisasiOptional = organisasiRepository.findById(idOrganisasi);
+            if (organisasiOptional.isPresent()) {
+                Organisasi organisasi = organisasiOptional.get();
+                lokasi.setNamaLokasi(lokasi.getNamaLokasi());
+                lokasi.setAlamat(lokasi.getAlamat());
+                lokasi.setAdmin(admin);
+                lokasi.setOrganisasi(organisasi);
+                return lokasiRepository.save(lokasi);
+            } else {
+                throw new NotFoundException("Organisasi dengan ID " + idOrganisasi + " tidak ditemukan.");
+            }
+        } else {
+            throw new NotFoundException("Admin dengan ID " + idAdmin + " tidak ditemukan.");
+        }
+    }
+
     @Override
     public List<LokasiDTO> getAllLokasi() {
         return lokasiRepository.findAll().stream()
@@ -55,13 +82,13 @@ public class LokasiImpl implements LokasiService {
     }
 
     @Override
-    public LokasiDTO getLokasiById(Integer id) {
+    public LokasiDTO getLokasiById(Long id) {
         Optional<Lokasi> lokasi = lokasiRepository.findById(id);
         return lokasi.map(this::convertToDto).orElse(null);
     }
 
     @Override
-    public LokasiDTO updateLokasi(Integer id, LokasiDTO lokasiDTO) {
+    public LokasiDTO updateLokasi(Long id, LokasiDTO lokasiDTO) {
         return lokasiRepository.findById(id).map(existingLokasi -> {
             updateEntity(existingLokasi, lokasiDTO);
             lokasiRepository.save(existingLokasi);
@@ -70,7 +97,7 @@ public class LokasiImpl implements LokasiService {
     }
 
     @Override
-    public boolean deleteLokasi(Integer id) {
+    public boolean deleteLokasi(Long id) {
         return lokasiRepository.findById(id).map(lokasi -> {
             lokasiRepository.delete(lokasi);
             return true;
@@ -85,7 +112,49 @@ public class LokasiImpl implements LokasiService {
         return lokasi;
     }
 
+     @Override
+    public OrganisasiDTO getOrganisasiById(Long id) {
+        Optional<Organisasi> lokasi = organisasiRepository.findById(id);
+        return lokasi.map(this::convertOrganisasiToDto).orElse(null);
+    }
 
+    @Override
+    public AdminDTO getAdminById(Long id) {
+        Optional<Admin> adminOptional = adminRepository.findById(id);
+        if (adminOptional.isPresent()) {
+            return convertAdminToDto(adminOptional.get());
+        } else {
+            return null;
+        }
+    }
+
+    private OrganisasiDTO convertOrganisasiToDto(Organisasi organisasi) {
+        OrganisasiDTO organisasiDTO = new OrganisasiDTO();
+        organisasiDTO.setId(organisasi.getId());
+        organisasiDTO.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+        organisasiDTO.setAlamat(organisasi.getAlamat());
+        organisasiDTO.setNomerTelepon(organisasi.getNomerTelepon());
+        organisasiDTO.setEmailOrganisasi(organisasi.getEmailOrganisasi());
+        organisasiDTO.setKecamatan(organisasi.getKecamatan());
+        organisasiDTO.setKabupaten(organisasi.getKabupaten());
+        organisasiDTO.setProvinsi(organisasi.getProvinsi());
+        organisasiDTO.setStatus(organisasi.getStatus());
+        organisasiDTO.setFotoOrganisasi(organisasi.getFotoOrganisasi());
+
+        // Set Admin ID jika ada admin terkait
+        Admin admin = organisasi.getAdmin();
+        if (admin != null) {
+            organisasiDTO.setAdmin(String.valueOf(admin.getId()));
+        }
+
+        return organisasiDTO;
+    }
+
+
+
+
+ 
+ 
     private AdminDTO convertAdminToDto(Admin admin) {
         AdminDTO adminDTO = new AdminDTO();
         adminDTO.setId(admin.getId());

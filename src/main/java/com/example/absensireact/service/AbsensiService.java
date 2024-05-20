@@ -29,7 +29,7 @@ public interface  AbsensiService {
     Absensi updateAbsensi(Long id, Absensi absensi);
 
 
-    void deleteAbsensi(Long id);
+    void deleteAbsensi(Long id) throws IOException;
 
     List<Absensi> getAbsensiByUserId(Long userId);
 

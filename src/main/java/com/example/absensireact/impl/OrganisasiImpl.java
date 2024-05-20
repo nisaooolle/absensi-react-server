@@ -31,17 +31,15 @@ public class OrganisasiImpl implements OrganisasiService {
     static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
 
     private final OrganisasiRepository organisasiRepository;
-
     private final UserRepository userRepository;
-
     private final AdminRepository adminRepository;
 
-    public OrganisasiImpl(OrganisasiRepository organisasiRepository, UserRepository userRepository, AdminRepository adminRepository) {
+    public OrganisasiImpl(OrganisasiRepository organisasiRepository, UserRepository userRepository, AdminRepository adminRepository) throws IOException {
         this.organisasiRepository = organisasiRepository;
         this.userRepository = userRepository;
         this.adminRepository = adminRepository;
-    }
 
+    }
     @Override
     public List<Organisasi> getAllOrganisasi(){
         return organisasiRepository.findAll();
@@ -52,9 +50,11 @@ public class OrganisasiImpl implements OrganisasiService {
         return organisasiRepository.findById(id);
     }
 
+
+
     @Override
-    public Optional<Organisasi> GetAllByIdAdmin(Long idAdmin){
-        return  organisasiRepository.findById(idAdmin);}
+    public Optional<Organisasi> GetByIdAdmin(Long idAdmin){
+        return  organisasiRepository.findOrganisasiByIdAdmin(idAdmin);}
     @Override
     public Optional<Organisasi> GetAllBYId(Long id){
         return organisasiRepository.findById(id);
@@ -67,9 +67,14 @@ public class OrganisasiImpl implements OrganisasiService {
         if (!adminOptional.isPresent()) {
             throw new NotFoundException("Id Admin tidak ditemukan");
         }
-       Admin admin = adminOptional.get();
+        Admin admin = adminOptional.get();
 
-         organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+        Optional<Organisasi> existingOrganisasi = organisasiRepository.findOrganisasiByIdAdmin(idAdmin);
+        if (existingOrganisasi.isPresent()) {
+            throw new IllegalStateException("Admin sudah memiliki organisasi");
+        }
+
+        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
         organisasi.setAlamat(organisasi.getAlamat());
         organisasi.setKecamatan(organisasi.getKecamatan());
         organisasi.setKabupaten(organisasi.getKabupaten());
@@ -80,10 +85,8 @@ public class OrganisasiImpl implements OrganisasiService {
         String file = uploadFoto(image, "_organisasi_" + idAdmin);
         organisasi.setFotoOrganisasi(file);
 
-        return  organisasiRepository.save(organisasi);
-
+        return organisasiRepository.save(organisasi);
     }
-
 
     private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
@@ -99,9 +102,21 @@ public class OrganisasiImpl implements OrganisasiService {
 
 
 
+//    private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
+//        String timestamp = String.valueOf(System.currentTimeMillis());
+//        String folderPath = "organisasi/";
+//        String fullPath = folderPath + timestamp + "_" + fileName;
+//        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+//        storage.create(blobInfo, multipartFile.getBytes());
+//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+//    }
 
-    private String getExtentions(String fileName) {
-        return fileName.split("\\.")[0];
+    private void deleteFoto(String fileName) throws IOException {
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.delete(blobId);
     }
 
     @Override
@@ -145,13 +160,17 @@ public class OrganisasiImpl implements OrganisasiService {
         return organisasiRepository.save(organisasi);
     }
     @Override
-    public void deleteKaryawan(Long id) {
-        if (organisasiRepository.existsById(id)) {
-            organisasiRepository.deleteById(id);
+    public void deleteOrganisasi(Long id) throws IOException {
+        Optional<Organisasi> organisasiOptional = organisasiRepository.findById(id);
+        if (organisasiOptional.isPresent()) {
+            Organisasi organisasi = organisasiOptional.get();
+            String fotoUrl = organisasi.getFotoOrganisasi();
+            String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
+             deleteFoto(fileName);
+             organisasiRepository.deleteById(id);
         } else {
             throw new NotFoundException("Organisasi not found with id: " + id);
         }
     }
-
 
 }

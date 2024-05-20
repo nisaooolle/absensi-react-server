@@ -24,6 +24,11 @@ public class AdminController {
         Admin registeredAdmin = adminService.RegisterAdmin(admin);
         return new ResponseEntity<>(registeredAdmin, HttpStatus.CREATED);
     }
+    @PostMapping("/admin/register-by-superadmin/{idSuperAdmin}")
+    public ResponseEntity<Admin> registerbySuperAdmin(@PathVariable Long idSuperAdmin ,@RequestBody Admin admin) {
+        Admin registeredAdmin = adminService.RegisterBySuperAdmin(idSuperAdmin,admin);
+        return new ResponseEntity<>(registeredAdmin, HttpStatus.CREATED);
+    }
 
     @GetMapping("/admin/getById/{id}")
     public ResponseEntity<Admin> getAdminById(@PathVariable Long id) {

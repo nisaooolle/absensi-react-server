@@ -4,6 +4,7 @@ import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public interface SuperAdminService {
@@ -14,9 +15,9 @@ public interface SuperAdminService {
 
     SuperAdmin RegisterSuperAdmin(SuperAdmin superAdmin);
 
-    SuperAdmin tambahSuperAdmin(Long id, SuperAdmin superAdmin, MultipartFile image);
+    SuperAdmin tambahSuperAdmin(Long id, SuperAdmin superAdmin, MultipartFile image) throws IOException;
 
-    SuperAdmin EditSuperAdmin(Long id, MultipartFile image, SuperAdmin superAdmin);
+    SuperAdmin EditSuperAdmin(Long id, MultipartFile image, SuperAdmin superAdmin) throws IOException;
 
-    void deleteSuperAdmin(Long id);
+    void deleteSuperAdmin(Long id)throws IOException ;
 }

@@ -28,7 +28,7 @@ public class Cuti {
     @Column(name = "status")
     private String status;
 
-    @JsonIgnore
+
     @OneToOne
     @JoinColumn(name = "userId")
     private User user;
