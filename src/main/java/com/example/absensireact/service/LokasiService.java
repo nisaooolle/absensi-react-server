@@ -22,10 +22,12 @@ public interface LokasiService {
 
     LokasiDTO updateLokasi(Long id, LokasiDTO lokasiDTO);
 
-    boolean deleteLokasi(Long id);
+     boolean deleteLokasi(Long id);
 
     OrganisasiDTO getOrganisasiById(Long id);
 
     AdminDTO getAdminById(Long id);
-}
+ 
+    boolean deleteLokasi(Integer id);
+ }
 

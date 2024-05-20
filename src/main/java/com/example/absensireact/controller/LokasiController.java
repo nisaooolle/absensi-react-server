@@ -1,11 +1,6 @@
 package com.example.absensireact.controller;
 
-import com.example.absensireact.dto.AdminDTO;
 import com.example.absensireact.dto.LokasiDTO;
-import com.example.absensireact.dto.OrganisasiDTO;
-import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.Lokasi;
-import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.service.LokasiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +35,7 @@ public class LokasiController {
         LokasiDTO lokasiDTO = lokasiService.getLokasiById(id);
         return ResponseEntity.ok(lokasiDTO);
     }
-    @GetMapping("/get-admin/{idAdmin}")
+     @GetMapping("/get-admin/{idAdmin}")
     public ResponseEntity<List<Lokasi>>getLokasiByAdmin (@PathVariable Long idAdmin){
         List<Lokasi> lokasi = lokasiService.getAllByAdmin(idAdmin);
         return ResponseEntity.ok(lokasi);
@@ -68,7 +63,7 @@ public class LokasiController {
     }
 
 
-    @PutMapping("/Update/{id}")
+      @PutMapping("/Update/{id}")
     public ResponseEntity<LokasiDTO> updateLokasi(@PathVariable Long id, @RequestBody LokasiDTO lokasiDTO) {
         LokasiDTO updatedLokasi = lokasiService.updateLokasi(id, lokasiDTO);
         return ResponseEntity.ok(updatedLokasi);

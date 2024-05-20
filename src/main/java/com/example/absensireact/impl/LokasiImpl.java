@@ -112,7 +112,7 @@ public class LokasiImpl implements LokasiService {
         return lokasi;
     }
 
-    @Override
+     @Override
     public OrganisasiDTO getOrganisasiById(Long id) {
         Optional<Organisasi> lokasi = organisasiRepository.findById(id);
         return lokasi.map(this::convertOrganisasiToDto).orElse(null);
@@ -153,7 +153,8 @@ public class LokasiImpl implements LokasiService {
 
 
 
-
+ 
+ 
     private AdminDTO convertAdminToDto(Admin admin) {
         AdminDTO adminDTO = new AdminDTO();
         adminDTO.setId(admin.getId());
@@ -195,8 +196,14 @@ public class LokasiImpl implements LokasiService {
         if (lokasi.getAdmin() != null) {
             AdminDTO adminDTO = convertAdminToDto(lokasi.getAdmin());
             lokasiDTO.setAdmin(adminDTO);
+
+            // Set Admin ID
+            lokasiDTO.setAdminId(lokasi.getAdmin().getId());
         }
 
         return lokasiDTO;
     }
+
+
+
 }
