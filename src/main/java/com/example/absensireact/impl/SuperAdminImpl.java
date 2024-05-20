@@ -2,6 +2,7 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.InternalErrorException;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.SuperAdminRepository;
@@ -12,7 +13,8 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
- import org.springframework.beans.factory.annotation.Autowired;
+import net.bytebuddy.implementation.bind.annotation.Super;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,12 +64,12 @@ public class SuperAdminImpl implements SuperAdminService {
     }
 
     @Override
-    public SuperAdmin tambahSuperAdmin(Long id, SuperAdmin superAdmin, MultipartFile image){
+    public SuperAdmin tambahSuperAdmin(Long id, SuperAdmin superAdmin, MultipartFile image) throws IOException {
        Optional<SuperAdmin> ExistingSuperAdmin = Optional.ofNullable(superAdminRepository.findById(id).orElse(null));
         if (ExistingSuperAdmin == null) {
             superAdmin.setEmail(superAdmin.getEmail());
             superAdmin.setUsername(superAdmin.getUsername());
-            superAdmin.setImageAdmin(imageConverter(image));
+            superAdmin.setImageAdmin(uploadFoto(image , "SuperAdmin"));
 
             return superAdminRepository.save(superAdmin);
 
@@ -77,12 +79,12 @@ public class SuperAdminImpl implements SuperAdminService {
     }
 
     @Override
-    public SuperAdmin EditSuperAdmin(Long id, MultipartFile image, SuperAdmin superAdmin){
+    public SuperAdmin EditSuperAdmin(Long id, MultipartFile image, SuperAdmin superAdmin) throws IOException {
         Optional<SuperAdmin> ifSuperAdmin = Optional.ofNullable(superAdminRepository.findById(id).orElse(null));
         if (ifSuperAdmin == null) {
             superAdmin.setEmail(superAdmin.getEmail());
             superAdmin.setUsername(superAdmin.getUsername());
-            superAdmin.setImageAdmin(imageConverter(image));
+            superAdmin.setImageAdmin(uploadFoto(image , "SuperAdmin"));
 
             return superAdminRepository.save(superAdmin);
         }
@@ -90,49 +92,41 @@ public class SuperAdminImpl implements SuperAdminService {
     }
 
     @Override
-    public void deleteSuperAdmin(Long id) {
-        if (superAdminRepository.existsById(id)) {
+    public void deleteSuperAdmin(Long id) throws IOException {
+        Optional<SuperAdmin> superAdminOptional = superAdminRepository.findById(id);
+        if (superAdminOptional.isPresent()) {
+            SuperAdmin superAdmin = superAdminOptional.get();
+            String fotoUrl = superAdmin.getImageAdmin();
+            String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
+            deleteFoto(fileName);
             superAdminRepository.deleteById(id);
         } else {
-            throw new NotFoundException("Super Admin not found with id: " + id);
+            throw new NotFoundException("Organisasi not found with id: " + id);
         }
     }
 
 
-
-    private String imageConverter(MultipartFile multipartFile) {
-        try {
-            return uploadFoto(multipartFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new InternalErrorException("Error upload file");
-        }
-    }
-
-    public String uploadFoto(MultipartFile image) throws IOException {
+    private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "superAdmin/";
-        String fileName = folderPath + timestamp + "_" + image.getOriginalFilename();
-        BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType(image.getContentType()) // Set content type from image
-                .build();
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, image.getBytes()); // Use image.getBytes() to get file bytes directly
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+        storage.create(blobInfo, multipartFile.getBytes());
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
 
-    private File convertToFile(MultipartFile multipartFile, String fileName) throws IOException {
-        File file = new File(fileName);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(multipartFile.getBytes());
-            fos.close();
-        }
-        return file;
-    }
-    private String getExtentions(String fileName) {
-        return fileName.split("\\.")[0];
+
+
+
+
+    private void deleteFoto(String fileName) throws IOException {
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.delete(blobId);
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,21 +45,21 @@ public class SuperAdminController {
     @PostMapping("/superadmin/tambahdata/{id} ")
     public ResponseEntity<SuperAdmin> tambahSuperAdmin(@PathVariable Long id,
                                                        @RequestBody SuperAdmin superAdmin,
-                                                       @RequestParam("image") MultipartFile image) {
+                                                       @RequestPart("image") MultipartFile image) throws IOException {
         SuperAdmin newSuperAdmin = superAdminService.tambahSuperAdmin(id, superAdmin, image);
         return ResponseEntity.ok(newSuperAdmin);
     }
 
     @PutMapping("/superadmin/edit/{id}")
     public ResponseEntity<SuperAdmin> editSuperAdmin(@PathVariable Long id,
-                                                     @RequestParam("image") MultipartFile image,
-                                                     @RequestBody SuperAdmin superAdmin) {
+                                                     @RequestPart("image") MultipartFile image,
+                                                     @RequestBody SuperAdmin superAdmin) throws IOException {
         SuperAdmin editedSuperAdmin = superAdminService.EditSuperAdmin(id, image, superAdmin);
         return ResponseEntity.ok(editedSuperAdmin);
     }
 
     @DeleteMapping("/superadmin/delete/{id}")
-    public ResponseEntity<Void> deleteSuperAdmin(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSuperAdmin(@PathVariable Long id) throws IOException {
         superAdminService.deleteSuperAdmin(id);
         return ResponseEntity.ok().build();
     }

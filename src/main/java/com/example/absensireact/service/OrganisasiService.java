@@ -14,7 +14,7 @@ public interface OrganisasiService {
     Optional<Organisasi> GetOrganisasiById(Long id);
     Optional<Organisasi> GetAllBYId(Long idA);
 
-    Optional<Organisasi> GetAllByIdAdmin(Long idAdmin);
+    Optional<Organisasi> GetByIdAdmin(Long idAdmin);
 
     Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException;
 
@@ -23,5 +23,5 @@ public interface OrganisasiService {
 
     Organisasi EditByid(Long id, Organisasi organisasi, MultipartFile image) throws IOException;
 
-    void deleteKaryawan(Long id);
+    void deleteOrganisasi(Long id) throws IOException;
 }

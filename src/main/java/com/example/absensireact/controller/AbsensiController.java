@@ -114,7 +114,7 @@ public class AbsensiController {
     }
 
     @DeleteMapping("/absensi/delete/{id}")
-    public ResponseEntity<?> deleteAbsensi(@PathVariable Long id) {
+    public ResponseEntity<?> deleteAbsensi(@PathVariable Long id) throws IOException {
         absensiService.deleteAbsensi(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -30,9 +30,9 @@ public class OrganisasiController {
         List<Organisasi> organisasiList =  organisasiService.getAllOrganisasi();
         return ResponseEntity.ok(organisasiList);
     }
-    @GetMapping("/organisasi/getAllByAdmin/{idAdmin}")
+    @GetMapping("/organisasi/getByAdmin/{idAdmin}")
     public ResponseEntity<Organisasi> getAllByadmin(@PathVariable Long idAdmin){
-        Optional<Organisasi> organisasiList = organisasiService.GetAllByIdAdmin(idAdmin);
+        Optional<Organisasi> organisasiList = organisasiService.GetByIdAdmin(idAdmin);
         return organisasiList.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -55,7 +55,6 @@ public class OrganisasiController {
         return ResponseEntity.ok(savedOrganisasi);
     }
 
-
     @PutMapping("/organisasi/putByIdAdmin/{idAdmin}" )
     public ResponseEntity<Organisasi> ubahDataOrganisasi(
             @PathVariable Long idAdmin,
@@ -77,8 +76,8 @@ public class OrganisasiController {
     }
 
     @DeleteMapping("/organisasi/delete/{id}")
-    public ResponseEntity<Void> deleteOrganisasi(@PathVariable Long id) {
-        organisasiService.deleteKaryawan(id);
+    public ResponseEntity<Void> deleteOrganisasi(@PathVariable Long id) throws IOException {
+        organisasiService.deleteOrganisasi(id);
         return ResponseEntity.noContent().build();
     }
 }

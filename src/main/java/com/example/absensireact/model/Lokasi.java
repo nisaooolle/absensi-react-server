@@ -7,23 +7,23 @@ import javax.persistence.*;
 public class Lokasi {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idLokasi;
+    private Long idLokasi;
     private String namaLokasi;
     private String alamat;
 
     @ManyToOne
-    @JoinColumn(name = "id_organisasi", nullable = false)
+    @JoinColumn(name = "idOrganisasi" )
     private Organisasi organisasi;
 
     @ManyToOne
-    @JoinColumn(name = "id_admin", nullable = false)
+    @JoinColumn(name = "idAdmin" )
     private Admin admin;
 
-    public Integer getIdLokasi() {
+    public Long getIdLokasi() {
         return idLokasi;
     }
 
-    public void setIdLokasi(Integer idLokasi) {
+    public void setIdLokasi(Long idLokasi) {
         this.idLokasi = idLokasi;
     }
 
