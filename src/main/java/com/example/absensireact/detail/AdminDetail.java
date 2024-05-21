@@ -1,6 +1,7 @@
 package com.example.absensireact.detail;
 
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.SuperAdmin;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,16 +20,20 @@ public class AdminDetail implements UserDetails {
     private String password;
     private  String username;
     private  String imageAdmin;
+
+    private SuperAdmin superAdmin;
+
     private String role;
 
 
 
-    public AdminDetail(Long id, String email, String password, String username, String imageAdmin, String role ) {
+    public AdminDetail(Long id, String email, String password, String username, String imageAdmin, SuperAdmin superAdmin, String role ) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
         this.imageAdmin = imageAdmin;
+        this.superAdmin = superAdmin;
         this.role = role;
      }
 
@@ -41,6 +46,7 @@ public class AdminDetail implements UserDetails {
                 admin.getPassword(),
                 admin.getUsername(),
                 admin.getImageAdmin(),
+                admin.getSuperAdmin(),
                 "ADMIN"
          );
      }
@@ -100,6 +106,13 @@ public class AdminDetail implements UserDetails {
     }
 
 
+    public SuperAdmin getSuperAdmin() {
+        return superAdmin;
+    }
+
+    public void setSuperAdmin(SuperAdmin superAdmin) {
+        this.superAdmin = superAdmin;
+    }
 
     @Override
     public boolean isAccountNonExpired() {

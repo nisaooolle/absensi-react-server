@@ -14,4 +14,7 @@ public interface OrganisasiRepository extends JpaRepository<Organisasi,Long> {
 
        @Query(value = "SELECT * FROM organisasi WHERE id_admin = :idAdmin" , nativeQuery = true)
        Optional<Organisasi>findOrganisasiByIdAdmin(Long idAdmin);
+
+       @Query(value = "SELECT * FROM organisasi WHERE id_admin = :idAdmin" , nativeQuery = true)
+       List<Organisasi>getOrganisasiByIdAdmin(Long idAdmin);
 }

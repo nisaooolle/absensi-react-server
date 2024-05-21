@@ -30,23 +30,23 @@ public class LokasiImpl implements LokasiService {
     @Autowired
     private AdminRepository adminRepository;
 
-    @Override
-    public LokasiDTO saveLokasi(LokasiDTO lokasiDTO) {
-        Lokasi lokasi = convertToEntity(lokasiDTO);
-
-        // Ambil entitas Organisasi dari basis data berdasarkan ID yang diberikan
-        Optional<Organisasi> organisasiOptional = organisasiRepository.findById(lokasiDTO.getIdOrganisasi());
-        organisasiOptional.ifPresent(lokasi::setOrganisasi);
-
-        // Jika ada adminId yang diberikan, ambil entitas Admin dari basis data
-        if (lokasiDTO.getAdminId() != null) {
-            Optional<Admin> adminOptional = adminRepository.findById(lokasiDTO.getAdminId());
-            adminOptional.ifPresent(lokasi::setAdmin);
-        }
-
-        lokasi = lokasiRepository.save(lokasi);
-        return convertToDto(lokasi);
-    }
+//    @Override
+//    public LokasiDTO saveLokasi(LokasiDTO lokasiDTO) {
+//        Lokasi lokasi = convertToEntity(lokasiDTO);
+//
+//        // Ambil entitas Organisasi dari basis data berdasarkan ID yang diberikan
+//        Optional<Organisasi> organisasiOptional = organisasiRepository.findById(lokasiDTO.getIdOrganisasi());
+//        organisasiOptional.ifPresent(lokasi::setOrganisasi);
+//
+//        // Jika ada adminId yang diberikan, ambil entitas Admin dari basis data
+//        if (lokasiDTO.getAdminId() != null) {
+//            Optional<Admin> adminOptional = adminRepository.findById(lokasiDTO.getAdminId());
+//            adminOptional.ifPresent(lokasi::setAdmin);
+//        }
+//
+//        lokasi = lokasiRepository.save(lokasi);
+//        return convertToDto(lokasi);
+//    }
 
 
     @Override
@@ -97,22 +97,12 @@ public class LokasiImpl implements LokasiService {
     }
 
     @Override
-    public boolean deleteLokasi(Long id) {
-        return lokasiRepository.findById(id).map(lokasi -> {
-            lokasiRepository.delete(lokasi);
-            return true;
-        }).orElse(false);
+    public void deleteLokasi(Long id) {
+        lokasiRepository.deleteById(id);
     }
 
-    private Lokasi convertToEntity(LokasiDTO lokasiDTO) {
-        Lokasi lokasi = new Lokasi();
-        lokasi.setNamaLokasi(lokasiDTO.getNamaLokasi());
-        lokasi.setAlamat(lokasiDTO.getAlamat());
 
-        return lokasi;
-    }
-
-     @Override
+    @Override
     public OrganisasiDTO getOrganisasiById(Long id) {
         Optional<Organisasi> lokasi = organisasiRepository.findById(id);
         return lokasi.map(this::convertOrganisasiToDto).orElse(null);
@@ -163,11 +153,6 @@ public class LokasiImpl implements LokasiService {
         adminDTO.setUsername(admin.getUsername());
         adminDTO.setImageAdmin(admin.getImageAdmin());
 
-        // Set ID Organisasi
-        Organisasi organisasi = admin.getOrganisasi();
-        if (organisasi != null) {
-            adminDTO.setIdOrganisasi(String.valueOf(organisasi.getId()));
-        }
 
         return adminDTO;
     }

@@ -10,7 +10,7 @@ import java.util.List;
 public interface LokasiService {
 
 
-    LokasiDTO saveLokasi(LokasiDTO lokasiDTO);
+//    LokasiDTO saveLokasi(LokasiDTO lokasiDTO);
 
     List<Lokasi>getAllByAdmin(Long idAdmin);
 
@@ -22,12 +22,12 @@ public interface LokasiService {
 
     LokasiDTO updateLokasi(Long id, LokasiDTO lokasiDTO);
 
-     boolean deleteLokasi(Long id);
+
+    void deleteLokasi(Long id);
 
     OrganisasiDTO getOrganisasiById(Long id);
 
     AdminDTO getAdminById(Long id);
  
-    boolean deleteLokasi(Integer id);
  }
 

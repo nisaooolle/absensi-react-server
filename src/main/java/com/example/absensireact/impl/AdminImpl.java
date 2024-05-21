@@ -47,6 +47,9 @@ public class AdminImpl implements AdminService {
             if (adminRepository.existsByEmail(admin.getEmail())) {
                 throw new NotFoundException("Email sudah digunakan");
             }
+            SuperAdmin superAdmin = superAdminOptional.get();
+
+            admin.setSuperAdmin(superAdmin);
             admin.setUsername(admin.getUsername());
             admin.setPassword(encoder.encode(admin.getPassword()));
             admin.setRole("ADMIN");

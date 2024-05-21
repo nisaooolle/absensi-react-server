@@ -32,8 +32,8 @@ public class ShiftController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/getByOrganisasi/{idAdmin}")
-    public ResponseEntity<Shift> getShiftByOrganisasi(@PathVariable("idAdmin") Long idAdmin) {
+    @GetMapping("/getShiftbyadmin/{idAdmin}")
+    public ResponseEntity<Shift> getShiftByAdmin(@PathVariable("idAdmin") Long idAdmin) {
         Optional<Shift> shift = shiftService.getbyAdmin(idAdmin);
         return shift.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));

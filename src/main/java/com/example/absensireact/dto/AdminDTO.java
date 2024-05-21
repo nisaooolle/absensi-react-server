@@ -8,16 +8,13 @@ public class AdminDTO {
     private String password;
     private String username;
     private String imageAdmin;
-    private String idOrganisasi;
 
-    public AdminDTO(Long id, String email, String password, String username, String imageAdmin, Organisasi organisasi) {
+    public AdminDTO(Long id, String email, String password, String username, String imageAdmin) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
         this.imageAdmin = imageAdmin;
-        // Ambil ID organisasi dan konversi menjadi String
-        this.idOrganisasi = String.valueOf(organisasi.getId());
     }
 
     public AdminDTO() {
@@ -64,11 +61,6 @@ public class AdminDTO {
         this.imageAdmin = imageAdmin;
     }
 
-    public String getIdOrganisasi() {
-        return idOrganisasi;
-    }
 
-    public void setIdOrganisasi(String idOrganisasi) {
-        this.idOrganisasi = idOrganisasi;
-    }
+
 }

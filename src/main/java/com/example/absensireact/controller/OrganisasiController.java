@@ -30,6 +30,12 @@ public class OrganisasiController {
         List<Organisasi> organisasiList =  organisasiService.getAllOrganisasi();
         return ResponseEntity.ok(organisasiList);
     }
+
+    @GetMapping("/organisasi/all-by-admin/{idAdmin}")
+    public ResponseEntity<List<Organisasi>> getAllOrganisasiByAdmin(@PathVariable Long idAdmin) {
+        List<Organisasi> organisasiList =  organisasiService.getAllByAdmin(idAdmin);
+        return ResponseEntity.ok(organisasiList);
+    }
     @GetMapping("/organisasi/getByAdmin/{idAdmin}")
     public ResponseEntity<Organisasi> getAllByadmin(@PathVariable Long idAdmin){
         Optional<Organisasi> organisasiList = organisasiService.GetByIdAdmin(idAdmin);

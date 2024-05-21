@@ -1,6 +1,5 @@
 package com.example.absensireact.impl;
 
-import com.example.absensireact.exception.InternalErrorException;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
@@ -17,9 +16,7 @@ import com.google.cloud.storage.StorageOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +42,10 @@ public class OrganisasiImpl implements OrganisasiService {
         return organisasiRepository.findAll();
     }
 
+    @Override
+    public List<Organisasi>getAllByAdmin(Long idAdmin){
+        return organisasiRepository.getOrganisasiByIdAdmin(idAdmin);
+    }
     @Override
     public Optional<Organisasi>GetOrganisasiById(Long id){
         return organisasiRepository.findById(id);
