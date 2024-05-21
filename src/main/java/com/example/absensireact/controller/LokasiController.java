@@ -1,6 +1,9 @@
 package com.example.absensireact.controller;
 
+import com.example.absensireact.dto.AdminDTO;
 import com.example.absensireact.dto.LokasiDTO;
+import com.example.absensireact.dto.OrganisasiDTO;
+import com.example.absensireact.model.Lokasi;
 import com.example.absensireact.service.LokasiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +18,10 @@ public class LokasiController {
     @Autowired
     private LokasiService lokasiService;
 
-    @PostMapping("/lokasi/add/{adminId}")
-    public ResponseEntity<LokasiDTO> createLokasi(@RequestBody LokasiDTO lokasiDTO) {
-        return ResponseEntity.ok(lokasiService.saveLokasi(lokasiDTO));
-    }
+//    @PostMapping("/lokasi/add/{adminId}")
+//    public ResponseEntity<LokasiDTO> createLokasi(@RequestBody LokasiDTO lokasiDTO) {
+//        return ResponseEntity.ok(lokasiService.saveLokasi(lokasiDTO));
+//    }
     @PostMapping("/tambah/{idAdmin}")
     public ResponseEntity<Lokasi> tambahLokasi(@PathVariable("idAdmin") Long idAdmin, @RequestBody Lokasi lokasi , @RequestParam Long idOrganisasi) {
         Lokasi lokasiBaru = lokasiService.tambahLokasi(idAdmin, lokasi , idOrganisasi);
@@ -69,14 +72,8 @@ public class LokasiController {
         return ResponseEntity.ok(updatedLokasi);
     }
 
-    @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<Void> deleteLokasi(@PathVariable Long id) {
-        boolean deleted = lokasiService.deleteLokasi(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/delete/{id}")
+    public void deleteLembur(@PathVariable Long id) {
+        lokasiService.deleteLokasi(id);
     }
-
 }

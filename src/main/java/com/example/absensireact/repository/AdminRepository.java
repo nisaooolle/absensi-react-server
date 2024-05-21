@@ -21,9 +21,6 @@ public interface AdminRepository extends JpaRepository<Admin , Long> {
 
     @Query(value = "SELECT * FROM admin WHERE username = :username", nativeQuery = true)
     Optional<Admin> findByUsername (String username);
-    Optional<Admin> findByIdAndRole(Long id, String role);
 
-    Optional<Admin> findByEmailAndUsername(String email, String username);
 
-    Admin getReferenceById(Admin admin);
 }

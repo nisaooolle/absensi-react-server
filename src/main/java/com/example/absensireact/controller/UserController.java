@@ -10,9 +10,12 @@ import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -35,17 +38,14 @@ public class UserController {
     @Autowired
     private AppConfig appConfig;
 
-//    @PostMapping("/login")
-//    public Map<Object, Object> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
-//        return userImpl.login(loginRequest, request);
-//    }
+
 
     @PostMapping("/user/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user, @RequestParam Long organisasiId) {
-        Organisasi organisasi = organisasiRepository.findById(organisasiId)
+    public ResponseEntity<User> registerUser(@RequestBody User user, @RequestParam Long idOrganisasi) {
+        Organisasi organisasi = organisasiRepository.findById(idOrganisasi)
                 .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan"));
 
-        User newUser = userImpl.Register(user, organisasi);
+        User newUser = userImpl.Register(user, idOrganisasi);
 
         return ResponseEntity.ok(newUser);
     }
@@ -73,9 +73,47 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("/user/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id")  Long id) {
-        return ResponseEntity.ok( userImpl.delete(id));
+    @PutMapping("/user/editBY/{id}")
+    public ResponseEntity<User> editUser(@PathVariable Long id, @RequestPart("user") User user ) {
+        try {
+            User updatedUser = userImpl.edit(id, user );
+            return ResponseEntity.ok(updatedUser);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @PutMapping("/user/editFotoBY/{id}")
+    public ResponseEntity<User> editFotoUser(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
+        try {
+            User updatedUser = userImpl.fotoUser(id,image );
+            return ResponseEntity.ok(updatedUser);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @DeleteMapping("/user/delete-foto/{id}")
+    public ResponseEntity<String> deleteFoto(@PathVariable Long id) {
+        try {
+            userImpl.delete(id);
+            return ResponseEntity.ok("User berhasil dihapus");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User tidak ditemukan dengan id: " + id);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Gagal menghapus user");
+        }
+    }
+    @DeleteMapping("/user/delete-user/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        try {
+            userImpl.deleteUser(id);
+            return ResponseEntity.ok("User berhasil dihapus");
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User tidak ditemukan dengan id: " + id);
+        }
     }
 
 }

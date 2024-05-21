@@ -11,6 +11,8 @@ public interface OrganisasiService {
 
     List<Organisasi> getAllOrganisasi();
 
+    List<Organisasi>getAllByAdmin(Long idAdmin);
+
     Optional<Organisasi> GetOrganisasiById(Long id);
     Optional<Organisasi> GetAllBYId(Long idA);
 
