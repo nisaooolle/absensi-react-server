@@ -75,6 +75,10 @@ public class AdminImpl implements AdminService {
     }
 
     @Override
+    public List<Admin>getAllBySuperAdmin (Long idSuperAdmin){
+        return adminRepository.getallBySuperAdmin(idSuperAdmin);
+    }
+    @Override
     public List<Admin> getAll() {
         return adminRepository.findAll();
     }

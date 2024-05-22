@@ -15,6 +15,8 @@ public interface AdminService {
 
     Admin getById(Long id);
 
+    List<Admin>getAllBySuperAdmin(Long idSuperAdmin);
+
     List<Admin> getAll();
 
     Admin edit(Long id, Admin admin);
