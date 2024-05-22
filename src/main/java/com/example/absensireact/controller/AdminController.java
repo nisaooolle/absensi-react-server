@@ -42,6 +42,12 @@ public class AdminController {
         return new ResponseEntity<>(admins, HttpStatus.OK);
     }
 
+    @GetMapping("/admin/get-all-by-super/{idSuperAdmin}")
+    public ResponseEntity<List<Admin>> getAllAdminsbysuperadmin(@PathVariable Long idSuperAdmin) {
+        List<Admin> admins = adminService.getAllBySuperAdmin(idSuperAdmin);
+        return new ResponseEntity<>(admins, HttpStatus.OK);
+    }
+
     @PutMapping("/admin/edit/{id}")
     public ResponseEntity<Admin> updateAdmin(@PathVariable Long id, @RequestBody Admin admin) {
         Admin updatedAdmin = adminService.edit(id, admin);

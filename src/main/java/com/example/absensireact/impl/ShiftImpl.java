@@ -2,10 +2,8 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.Shift;
 import com.example.absensireact.repository.AdminRepository;
-import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.repository.ShiftRepository;
 import com.example.absensireact.service.ShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,12 @@ public class ShiftImpl implements ShiftService {
     public List<Shift> getAllShift(){
         return shiftRepository.findAll();
     }
+
+    @Override
+    public List<Shift> getAllShiftByAdmin(Long idAdmin){
+        return shiftRepository.getByIdAdmin(idAdmin);
+    }
+
 
     @Override
     public Optional<Shift>getshiftById(Long id){

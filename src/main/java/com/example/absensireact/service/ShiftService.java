@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface ShiftService {
     List<Shift> getAllShift();
 
+    List<Shift> getAllShiftByAdmin(Long idAdmin);
+
     Optional<Shift> getshiftById(Long id);
 
     Optional<Shift>getbyAdmin(Long idAdmin);

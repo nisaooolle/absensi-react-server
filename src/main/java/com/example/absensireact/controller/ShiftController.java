@@ -24,6 +24,11 @@ public class ShiftController {
         List<Shift> shifts = shiftService.getAllShift();
         return new ResponseEntity<>(shifts, HttpStatus.OK);
     }
+    @GetMapping("/getall-byadmin/{idAdmin}")
+    public ResponseEntity<List<Shift>> getAllShiftsByAdmin(@PathVariable Long idAdmin) {
+        List<Shift> shifts = shiftService.getAllShiftByAdmin(idAdmin);
+        return new ResponseEntity<>(shifts, HttpStatus.OK);
+    }
 
     @GetMapping("/getbyId/{id}")
     public ResponseEntity<Shift> getShiftById(@PathVariable("id") Long id) {
@@ -32,12 +37,7 @@ public class ShiftController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/getShiftbyadmin/{idAdmin}")
-    public ResponseEntity<Shift> getShiftByAdmin(@PathVariable("idAdmin") Long idAdmin) {
-        Optional<Shift> shift = shiftService.getbyAdmin(idAdmin);
-        return shift.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+
 
     @PostMapping("/tambahShift/{idAdmin}")
     public ResponseEntity<Shift> postShift(@PathVariable("idAdmin") Long idAdmin,
