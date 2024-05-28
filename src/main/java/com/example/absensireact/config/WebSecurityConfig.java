@@ -74,10 +74,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
              "/api/jabatan/**",
             "/api/shift/**",
             "/api/lokasi/**",
+            "/api/notifications/**",
             "/api/admin/profile/editDetail/**",
             "/api/admin/profile/edit/**",
             "/api/admin/profile/upload/**",
-            "/api/superadmin/**"
+            "/api/superadmin/**",
+            "/api/tokens/**"
     };
 
     private static final String[] AUTH_AUTHORIZATION = {
@@ -91,6 +93,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/shift/**",
             "/api/lokasi/**",
             "/api/jabatan/**",
+            "/api/notifications/**",
+            "/api/tokens/**",
             "/api/admin/profile/editDetail/**",
             "/api/admin/profile/edit/**",
             "/api/admin/profile/upload/**",

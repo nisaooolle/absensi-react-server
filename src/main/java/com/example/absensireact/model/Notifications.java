@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "notifications")
-public class Notifcations {
+public class Notifications {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +24,11 @@ public class Notifcations {
     @Column(name = "cretedAT")
     private Date createdAt;
 
-    public Notifcations (){
+    public Notifications(){
 
     }
 
-    public Notifcations(Long id, User user, String message, Date createdAt) {
+    public Notifications(Long id, User user, String message, Date createdAt) {
         this.id = id;
         this.user = user;
         this.message = message;

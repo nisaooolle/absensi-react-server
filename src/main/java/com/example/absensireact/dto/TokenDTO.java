@@ -1,39 +1,16 @@
-package com.example.absensireact.model;
+package com.example.absensireact.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.absensireact.model.User;
 
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity
-@Table(name = "tokens")
-public class Token {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class TokenDTO {
     private Long id;
-
-    @Column(name = "token")
     private String token;
 
-    @OneToOne
-    @JoinColumn(name = "userId")
     private User user;
-
-    @Column(name = "created")
     private Date created;
-
-
-    public Token (){
-
-    }
-
-    public Token(Long id, String token, User user, Date created) {
-        this.id = id;
-        this.token = token;
-        this.user = user;
-        this.created = created;
-    }
 
     public Long getId() {
         return id;
