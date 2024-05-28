@@ -87,10 +87,12 @@ public class AbsensiController {
 
     @PostMapping("/absensi/masuk/{userId}")
     public ResponseEntity<?> postAbsensiMasuk(@PathVariable Long userId,
-                                              @RequestPart("image") MultipartFile image
+                                              @RequestPart("image") MultipartFile image ,
+                                              @RequestParam("lokasiMasuk") String lokasiMasuk,
+                                              @RequestParam("keteranganTerlambat") String keteranganTerlambat
                                              ) {
         try {
-            Absensi absensi = absensiService.PostAbsensi(userId, image );
+            Absensi absensi = absensiService.PostAbsensi(userId, image , lokasiMasuk , keteranganTerlambat);
             return ResponseEntity.ok().body(absensi);
         } catch (IOException | EntityNotFoundException | NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -98,10 +100,12 @@ public class AbsensiController {
     }
      @PutMapping("/absensi/pulang/{userId}")
     public ResponseEntity<?> putAbsensiPulang(@PathVariable Long userId,
-
-                                              @RequestPart("image") MultipartFile image) {
+                                              @RequestPart("image") MultipartFile image,
+                                              @RequestParam("lokasiPulang") String lokasiPulang,
+                                              @RequestParam("keteranganPulangAwal") String keteranganPulangAwal
+     ) {
         try {
-            Absensi absensi = absensiService.Pulang(userId,image);
+            Absensi absensi = absensiService.Pulang(userId ,image , lokasiPulang , keteranganPulangAwal );
             return ResponseEntity.ok().body(absensi);
         } catch (IOException | NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

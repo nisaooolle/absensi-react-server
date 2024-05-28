@@ -14,7 +14,11 @@ public interface  AbsensiService {
     List<Absensi> getAllAbsensi();
 
 
-    Absensi Pulang(Long userId, MultipartFile image) throws IOException;
+    Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk , String keteranganTerlambat) throws IOException;
+
+
+
+    Absensi Pulang(Long userId, MultipartFile image, String lokasiPulang, String keteranganPulangAwal) throws IOException;
 
     boolean checkUserAlreadyAbsenToday(Long userId);
 
@@ -35,7 +39,6 @@ public interface  AbsensiService {
 
 
 
-    Absensi PostAbsensi(Long userId, MultipartFile image ) throws IOException;
 
 
 
