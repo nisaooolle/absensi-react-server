@@ -2,7 +2,6 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Absensi;
-import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AbsensiRepository;
 import com.example.absensireact.repository.UserRepository;
@@ -48,7 +47,7 @@ public class AbsensiImpl implements AbsensiService {
 
 
     @Override
-    public Absensi PostAbsensi(Long userId, MultipartFile image) throws IOException {
+    public Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException {
         Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
         if (existingAbsensi.isPresent()) {
             throw new NotFoundException("User sudah melakukan absensi masuk pada hari yang sama sebelumnya.");
@@ -66,8 +65,9 @@ public class AbsensiImpl implements AbsensiService {
             absensi.setTanggalAbsen(tanggalHariIni);
             absensi.setJamMasuk(jamMasukString);
             absensi.setJamPulang("-");
-
-            absensi.setKeteranganTerlambat(absensi.getKeteranganTerlambat());
+            absensi.setLokasiMasuk(lokasiMasuk);
+            absensi.setLokasiPulang("-");
+            absensi.setKeteranganTerlambat(keteranganTerlambat != null ? keteranganTerlambat : "-");
             absensi.setStatusAbsen(keterangan);
 
             absensi.setFotoMasuk(uploadFile(image, "foto_masuk_" + userId));
@@ -76,24 +76,24 @@ public class AbsensiImpl implements AbsensiService {
         }
     }
 
-
     @Override
-    public Absensi Pulang(Long userId, MultipartFile image) throws IOException {
-        Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
-        if (existingAbsensi.isPresent()) {
-            Absensi absensi = existingAbsensi.get();
-            if (!absensi.getJamPulang().equals("-")) {
-                throw new NotFoundException("User sudah melakukan absensi pulang pada hari yang sama sebelumnya.");
-            }
-            Date masuk = new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-            String jamPulang = formatter.format(masuk);
-            absensi.setJamPulang(jamPulang);
-            absensi.setFotoPulang(uploadFilePulang(image, "foto_pulang_" + userId));
-            return absensiRepository.save(absensi);
-        } else {
-            throw new NotFoundException("User belum melakukan absensi masuk pada hari ini.");
+    public Absensi Pulang(Long userId, MultipartFile image, String lokasiPulang , String keteranganPulangAwal) throws IOException {
+        Absensi absensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()))
+                .orElseThrow(() -> new NotFoundException("User belum melakukan absensi masuk hari ini."));
+
+        if (!absensi.getJamPulang().equals("-")) {
+            throw new NotFoundException("User sudah melakukan absensi pulang hari ini.");
         }
+
+        Date pulang = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        String jamPulangString = formatter.format(pulang);
+        absensi.setKeteranganPulangAwal(keteranganPulangAwal != null ? keteranganPulangAwal : "-");
+        absensi.setJamPulang(jamPulangString);
+        absensi.setLokasiPulang(lokasiPulang);
+        absensi.setFotoPulang(uploadFile(image, "foto_pulang_" + userId));
+
+        return absensiRepository.save(absensi);
     }
 
     @Override
