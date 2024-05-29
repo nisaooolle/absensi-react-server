@@ -69,7 +69,7 @@ public class SuperAdminImpl implements SuperAdminService {
         if (ExistingSuperAdmin == null) {
             superAdmin.setEmail(superAdmin.getEmail());
             superAdmin.setUsername(superAdmin.getUsername());
-            superAdmin.setImageAdmin(uploadFoto(image , "SuperAdmin"));
+            superAdmin.setImageSuperAdmin(uploadFoto(image , "SuperAdmin"));
 
             return superAdminRepository.save(superAdmin);
 
@@ -84,7 +84,7 @@ public class SuperAdminImpl implements SuperAdminService {
         if (ifSuperAdmin == null) {
             superAdmin.setEmail(superAdmin.getEmail());
             superAdmin.setUsername(superAdmin.getUsername());
-            superAdmin.setImageAdmin(uploadFoto(image , "SuperAdmin"));
+            superAdmin.setImageSuperAdmin(uploadFoto(image , "SuperAdmin"));
 
             return superAdminRepository.save(superAdmin);
         }
@@ -96,7 +96,7 @@ public class SuperAdminImpl implements SuperAdminService {
         Optional<SuperAdmin> superAdminOptional = superAdminRepository.findById(id);
         if (superAdminOptional.isPresent()) {
             SuperAdmin superAdmin = superAdminOptional.get();
-            String fotoUrl = superAdmin.getImageAdmin();
+            String fotoUrl = superAdmin.getImageSuperAdmin();
             String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
             deleteFoto(fileName);
             superAdminRepository.deleteById(id);

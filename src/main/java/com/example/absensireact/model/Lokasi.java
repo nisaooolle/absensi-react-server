@@ -11,11 +11,11 @@ public class Lokasi {
     private String namaLokasi;
     private String alamat;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "idOrganisasi" )
     private Organisasi organisasi;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "idAdmin" )
     private Admin admin;
 

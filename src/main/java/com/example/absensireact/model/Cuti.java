@@ -33,11 +33,15 @@ public class Cuti {
     @JoinColumn(name = "userId")
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "idOrganisasi")
+    private Organisasi organisasi;
+
     public Cuti(){
 
     }
 
-    public Cuti(Long id, String awalCuti, String akhirCuti, String masukKerja, String keperluan, String status, User user   ) {
+    public Cuti(Long id, String awalCuti, String akhirCuti, String masukKerja, String keperluan, String status, User user, Organisasi organisasi) {
         this.id = id;
         this.awalCuti = awalCuti;
         this.akhirCuti = akhirCuti;
@@ -45,6 +49,7 @@ public class Cuti {
         this.keperluan = keperluan;
         this.status = status;
         this.user = user;
+        this.organisasi = organisasi;
     }
 
     public Long getId() {
@@ -104,4 +109,11 @@ public class Cuti {
     }
 
 
+    public Organisasi getOrganisasi() {
+        return organisasi;
+    }
+
+    public void setOrganisasi(Organisasi organisasi) {
+        this.organisasi = organisasi;
+    }
 }

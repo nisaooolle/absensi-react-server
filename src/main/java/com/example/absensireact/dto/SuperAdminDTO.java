@@ -1,44 +1,19 @@
-package com.example.absensireact.model;
+package com.example.absensireact.dto;
 
+import javax.persistence.Column;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "superAdmin")
-public class SuperAdmin {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class SuperAdminDTO {
     private Long id;
 
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "password" , unique = true)
     private String password;
 
-    @Column(name = "username")
     private  String username;
 
-    @Column(name = "imageSuperAdmin"  )
-    private String imageSuperAdmin;
+    private  String imageSuperAdmin;
 
-
-    @Column(name = "role")
     private String role;
-
-    public SuperAdmin(){
-
-    }
-
-    public SuperAdmin(Long id, String email, String password, String username, String imageSuperAdmin, String role) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.username = username;
-        this.imageSuperAdmin = imageSuperAdmin;
-        this.role = role;
-    }
 
     public Long getId() {
         return id;
