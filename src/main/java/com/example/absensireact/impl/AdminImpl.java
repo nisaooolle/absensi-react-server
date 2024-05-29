@@ -8,11 +8,22 @@ import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.SuperAdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.AdminService;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +31,8 @@ import java.util.Optional;
 
 @Service
 public class AdminImpl implements AdminService {
+    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
+
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
 
@@ -94,7 +107,40 @@ public class AdminImpl implements AdminService {
         return adminRepository.save(existingUser);
     }
 
+    @Override
+    public Admin uploadImage(Long id, MultipartFile image , Admin admin) throws IOException {
+        Optional<Admin> adminOptional = adminRepository.findById(id);
+        if (adminOptional.isEmpty()) {
+            throw new NotFoundException("Id admin tidak ditemukan");
+        }
+        String fileUrl = uploadFoto(image , "admin" + id);
+        admin.setImageAdmin(fileUrl);
+        return adminRepository.save(admin);
+    }
 
+
+    @Override
+    public Admin ubahUsernamedanemail(Long id, Admin admin){
+        Optional<Admin> adminOptional = adminRepository.findById(id);
+        if (adminOptional.isEmpty()) {
+            throw new NotFoundException("Id admin tidak ditemukan :" + id);
+        }
+        admin.setUsername(admin.getUsername());
+        admin.setEmail(admin.getEmail());
+        return  adminRepository.save(admin);
+    }
+
+    private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String folderPath = "admin/";
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.create(blobInfo, multipartFile.getBytes());
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+    }
 
     @Override
     public Map<String, Boolean> delete(Long id) {

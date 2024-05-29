@@ -1,5 +1,6 @@
 package com.example.absensireact.controller;
 
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +45,17 @@ public class AdminController {
         return new ResponseEntity<>(admins, HttpStatus.OK);
     }
 
+    @PutMapping("/admin/ubah-foto/{id}")
+    public ResponseEntity<?>EditFotoAdmin(@PathVariable Long id , @RequestPart MultipartFile image , @RequestBody Admin admin ){
+        try {
+            Admin updatedAdmin = adminService.uploadImage(id, image , admin);
+            return new ResponseEntity<>(updatedAdmin, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
     @GetMapping("/admin/get-all-by-super/{idSuperAdmin}")
     public ResponseEntity<List<Admin>> getAllAdminsbysuperadmin(@PathVariable Long idSuperAdmin) {
         List<Admin> admins = adminService.getAllBySuperAdmin(idSuperAdmin);
@@ -54,6 +68,11 @@ public class AdminController {
         return new ResponseEntity<>(updatedAdmin, HttpStatus.OK);
     }
 
+    @PutMapping("/admin/edit-email-username/{id}")
+    public ResponseEntity<Admin> editemailusername(@PathVariable Long id, @RequestBody Admin admin) {
+        Admin updatedAdmin = adminService.ubahUsernamedanemail(id, admin);
+        return new ResponseEntity<>(updatedAdmin, HttpStatus.OK);
+    }
     @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<Map<String, Boolean>> deleteAdmin(@PathVariable Long id) {
         Map<String, Boolean> response = adminService.delete(id);

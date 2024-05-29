@@ -56,10 +56,10 @@ public class UserController {
 
     @PostMapping("/user/tambahkaryawan/{idAdmin}")
     public ResponseEntity<User> tambahKaryawan(@RequestBody User user, @PathVariable Long idAdmin) {
-        Admin admin = adminRepository.findById(idAdmin)
+        adminRepository.findById(idAdmin)
                 .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
-        User user1 = userImpl.Tambahkaryawan(idAdmin , user);
-        return ResponseEntity.ok(user1);
+        User savedUser = userImpl.Tambahkaryawan(idAdmin, user);
+        return ResponseEntity.ok(savedUser);
     }
     @GetMapping("/user/get-allUser")
     public ResponseEntity<List<User>> getAllUser() {

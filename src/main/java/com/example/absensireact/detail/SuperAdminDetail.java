@@ -20,20 +20,17 @@ public class SuperAdminDetail implements UserDetails {
     private String password;
     private  String username;
 
-    private  String imageAdmin;
+    private  String imageSuperAdmin;
     private String role;
 
-
-    public SuperAdminDetail(Long id, String email, String password, String username, String imageAdmin, String role) {
+    public SuperAdminDetail(Long id, String email, String password, String username, String imageSuperAdmin, String role) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
-        this.imageAdmin = imageAdmin;
+        this.imageSuperAdmin = imageSuperAdmin;
         this.role = role;
     }
-
-
 
     public static SuperAdminDetail buildSuperAdmin(SuperAdmin superAdmin) {
         return new SuperAdminDetail(
@@ -41,7 +38,7 @@ public class SuperAdminDetail implements UserDetails {
                 superAdmin.getEmail(),
                 superAdmin.getPassword(),
                 superAdmin.getUsername(),
-                superAdmin.getImageAdmin(),
+                superAdmin.getImageSuperAdmin(),
                 "SUPERADMIN"
 
         );
@@ -81,12 +78,12 @@ public class SuperAdminDetail implements UserDetails {
         this.username = username;
     }
 
-    public String getImageAdmin() {
-        return imageAdmin;
+    public String getImageSuperAdmin() {
+        return imageSuperAdmin;
     }
 
-    public void setImageAdmin(String imageAdmin) {
-        this.imageAdmin = imageAdmin;
+    public void setImageSuperAdmin(String imageSuperAdmin) {
+        this.imageSuperAdmin = imageSuperAdmin;
     }
 
     public String getRole() {
