@@ -23,8 +23,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 @Service
@@ -59,7 +60,7 @@ public class UserImpl implements UserService {
     @Autowired
     AuthenticationManager authenticationManager;
 
-
+    @Override
     public User Register(User user, Long idOrganisasi) {
         if (adminRepository.existsByEmail(user.getEmail())) {
             throw new BadRequestException("Email sudah digunakan oleh admin");
@@ -77,6 +78,13 @@ public class UserImpl implements UserService {
             throw new NotFoundException("Admin tidak ditemukan untuk organisasi tersebut");
         }
 
+        Date date = new Date();
+
+        SimpleDateFormat indonesianDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
+        String tanggalKerja = indonesianDateFormat.format(date);
+
+        user.setStartKerja(tanggalKerja);
+        user.setStatusKerja("aktif");
         user.setJabatan(null);
         user.setShift(null);
         user.setAdmin(admin);
@@ -85,16 +93,15 @@ public class UserImpl implements UserService {
         user.setOrganisasi(organisasi);
         user.setRole("USER");
 
+        // Hitung lama kerja
+        user.calculateLamaKerja();
+
+        // Simpan user ke dalam database
         return userRepository.save(user);
     }
 
     @Override
-    public List<User> GetAllKaryawanByIdAdmin(Long idAdmin){
-        return userRepository.findByIdAdmin(idAdmin);
-    }
-
-    @Override
-    public User Tambahkaryawan(Long idAdmin, User user){
+    public User Tambahkaryawan(Long idAdmin, User user) {
         Optional<Admin> adminvalidate = adminRepository.findById(idAdmin);
 
         if (adminvalidate.isPresent()) {
@@ -113,12 +120,26 @@ public class UserImpl implements UserService {
             user.setOrganisasi(organisasi);
             user.setJabatan(jabatan);
             user.setShift(shift);
+            Date date = truncateTime(new Date());
+            SimpleDateFormat indonesianDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
+            String tanggalKerja = indonesianDateFormat.format(date);
+            user.calculateLamaKerja();
+            user.setStartKerja(tanggalKerja);
+            user.setStatusKerja("aktif");
 
             return userRepository.save(user);
         }
 
         throw new NotFoundException("Id Admin tidak ditemukan");
     }
+
+
+
+    @Override
+    public List<User> GetAllKaryawanByIdAdmin(Long idAdmin){
+        return userRepository.findByIdAdmin(idAdmin);
+    }
+
 
     @Override
     public User getById(Long id) {
@@ -191,5 +212,13 @@ public class UserImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-
+    private Date truncateTime(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
 }
