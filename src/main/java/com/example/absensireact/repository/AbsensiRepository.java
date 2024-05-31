@@ -15,6 +15,10 @@ public interface AbsensiRepository extends JpaRepository<Absensi , Long> {
 
     List<Absensi> findByUser_Id(Long userId);
 
+    List<Absensi> findByTanggalAbsen(Date tanggalAbsen);
+
+
+
     @Query(value = "SELECT * FROM absensi WHERE user_id = :userId" , nativeQuery = true)
     Optional<Absensi>findByUserId (Long userId);
     @Query(value = "SELECT * FROM absensi WHERE user_id = :userId" , nativeQuery = true)

@@ -44,7 +44,10 @@ public class AbsensiImpl implements AbsensiService {
         return  absensiRepository.findAll();
     }
 
-
+    @Override
+    public List<Absensi> getAbsensiByTanggal(Date tanggalAbsen) {
+        return absensiRepository.findByTanggalAbsen(tanggalAbsen);
+    }
 
     @Override
     public Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException {
