@@ -16,6 +16,8 @@ public interface  AbsensiService {
 
     List<Absensi> getAbsensiByTanggal(Date tanggalAbsen);
 
+    List<Absensi> getAbsensiByBulan(Date tanggalAbsen);
+
     Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk , String keteranganTerlambat) throws IOException;
 
 

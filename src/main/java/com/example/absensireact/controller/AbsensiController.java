@@ -2,7 +2,8 @@ package com.example.absensireact.controller;
 
 
 import com.example.absensireact.exception.NotFoundException;
-import com.example.absensireact.helper.AbsensiExportService;
+import com.example.absensireact.exel.AbsensiExportService;
+import com.example.absensireact.exel.ExcelAbsnesiBulanan;
 import com.example.absensireact.model.Absensi;
 import com.example.absensireact.repository.AbsensiRepository;
 import com.example.absensireact.service.AbsensiService;
@@ -16,12 +17,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Logger;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -35,6 +37,7 @@ public class AbsensiController {
 
     private final AbsensiRepository absensiRepository;
 
+    private static final Logger logger = Logger.getLogger(AbsensiController.class.getName());
 
 
     @Autowired
@@ -44,6 +47,19 @@ public class AbsensiController {
         this.absensiRepository = absensiRepository;
     }
 
+    @Autowired
+    private ExcelAbsnesiBulanan excelAbsensiBulanan;
+
+
+    @GetMapping("/absensi/export/absensi-bulanan")
+    public void exportAbsensiBulanan(@RequestParam("bulan") @DateTimeFormat(pattern = "yyyy-MM") Date bulan, HttpServletResponse response) throws IOException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(bulan);
+        int month = calendar.get(Calendar.MONTH) + 1; // Months are 0-based in Calendar
+        int year = calendar.get(Calendar.YEAR);
+
+        excelAbsensiBulanan.excelAbsensiBulanan(month, year, response);
+    }
     @GetMapping("/absensi/rekap-perkaryawan/export")
     public ResponseEntity<?> exportAbsensiToExcel() {
         try {
@@ -76,12 +92,36 @@ public class AbsensiController {
         }
     }
 
-    @GetMapping("/getByTanggal/{tanggal}")
-    public ResponseEntity<List<Absensi>> getAbsensiByTanggal(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date tanggalAbsen) {
-        List<Absensi> absensiList = absensiService.getAbsensiByTanggal(tanggalAbsen);
-        return ResponseEntity.ok(absensiList);
+
+    @GetMapping("/absensi/get-absensi-bulan")
+    public List<Absensi> getAbsensiByBulan(@RequestParam("tanggalAbsen") String tanggalAbsenStr) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date tanggalAbsen = null;
+        try {
+            tanggalAbsen = formatter.parse(tanggalAbsenStr);
+            logger.info("Parsed date: " + tanggalAbsen);
+        } catch (ParseException e) {
+            logger.severe("Failed to parse date: " + e.getMessage());
+            // handle exception, possibly return an error response
+        }
+
+        return absensiService.getAbsensiByBulan(tanggalAbsen);
     }
 
+    @GetMapping("/absensi/by-tanggal")
+    public List<Absensi> getAbsensiByTanggal(@RequestParam("tanggalAbsen") String tanggalAbsenStr) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date tanggalAbsen = null;
+        try {
+            tanggalAbsen = formatter.parse(tanggalAbsenStr);
+            logger.info("Parsed date: " + tanggalAbsen);
+        } catch (ParseException e) {
+            logger.severe("Failed to parse date: " + e.getMessage());
+            // handle exception, possibly return an error response
+        }
+
+        return absensiService.getAbsensiByTanggal(tanggalAbsen);
+    }
 //    @GetMapping("/rekap/export/{tanggal}")
 //    public ResponseEntity<?> exportAbsensiByTanggal(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date tanggalAbsen) {
 //        try {

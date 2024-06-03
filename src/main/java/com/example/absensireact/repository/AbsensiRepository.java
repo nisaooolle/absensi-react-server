@@ -4,6 +4,7 @@ import com.example.absensireact.model.Absensi;
 import com.example.absensireact.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -15,9 +16,11 @@ public interface AbsensiRepository extends JpaRepository<Absensi , Long> {
 
     List<Absensi> findByUser_Id(Long userId);
 
-    List<Absensi> findByTanggalAbsen(Date tanggalAbsen);
+    @Query("SELECT a FROM Absensi a WHERE FUNCTION('DAY', a.tanggalAbsen) = :day AND FUNCTION('MONTH', a.tanggalAbsen) = :month AND FUNCTION('YEAR', a.tanggalAbsen) = :year")
+    List<Absensi> findByTanggalAbsen(@Param("day") int day, @Param("month") int month, @Param("year") int year);
 
-
+    @Query("SELECT a FROM Absensi a WHERE FUNCTION('MONTH', a.tanggalAbsen) = :month AND FUNCTION('YEAR', a.tanggalAbsen) = :year")
+    List<Absensi> findByMonthAndYear(@Param("month") int month, @Param("year") int year);
 
     @Query(value = "SELECT * FROM absensi WHERE user_id = :userId" , nativeQuery = true)
     Optional<Absensi>findByUserId (Long userId);

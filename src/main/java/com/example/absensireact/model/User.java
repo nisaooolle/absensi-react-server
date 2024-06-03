@@ -1,13 +1,13 @@
 package com.example.absensireact.model;
 
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import javax.persistence.*;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 @Entity
 @Table
@@ -28,6 +28,15 @@ public class User {
 
    @Column(name = "fotoUser")
    private String fotoUser;
+
+   @Column(name = "startKerja")
+   private String startKerja;
+
+   @Column(name = "lamaKerja")
+   private String lamaKerja;
+
+   @Column(name = "statusKerja")
+   private String statusKerja;
 
    @ManyToOne
    @JoinColumn(name = "idOrganisasi")
@@ -53,12 +62,15 @@ public User(){
 
 }
 
-    public User(Long id, String email, String password, String username, String fotoUser, Organisasi organisasi, Jabatan jabatan, Shift shift, Admin admin, String role) {
+    public User(Long id, String email, String password, String username, String fotoUser, String startKerja, String lamaKerja, String statusKerja, Organisasi organisasi, Jabatan jabatan, Shift shift, Admin admin, String role) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
         this.fotoUser = fotoUser;
+        this.startKerja = startKerja;
+        this.lamaKerja = lamaKerja;
+        this.statusKerja = statusKerja;
         this.organisasi = organisasi;
         this.jabatan = jabatan;
         this.shift = shift;
@@ -106,6 +118,30 @@ public User(){
         this.fotoUser = fotoUser;
     }
 
+    public String getStartKerja() {
+        return startKerja;
+    }
+
+    public void setStartKerja(String startKerja) {
+        this.startKerja = startKerja;
+    }
+
+    public String getLamaKerja() {
+        return lamaKerja;
+    }
+
+    public void setLamaKerja(String lamaKerja) {
+        this.lamaKerja = lamaKerja;
+    }
+
+    public String getStatusKerja() {
+        return statusKerja;
+    }
+
+    public void setStatusKerja(String statusKerja) {
+        this.statusKerja = statusKerja;
+    }
+
     public Organisasi getOrganisasi() {
         return organisasi;
     }
@@ -144,5 +180,20 @@ public User(){
 
     public void setRole(String role) {
         this.role = role;
+    }
+    public void calculateLamaKerja() {
+        if (startKerja != null && statusKerja.equals("aktif")) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
+                Date startDate = dateFormat.parse(startKerja);
+                Date currentDate = new Date();
+
+                long diffInMillies = Math.abs(currentDate.getTime() - startDate.getTime());
+                long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+                lamaKerja = String.valueOf(diffInDays);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

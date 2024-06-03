@@ -21,11 +21,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 
 @Service
 public class AbsensiImpl implements AbsensiService {
     static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
+
+    private static final Logger logger = Logger.getLogger(AbsensiService.class.getName());
 
     private final AbsensiRepository absensiRepository;
 
@@ -44,9 +47,35 @@ public class AbsensiImpl implements AbsensiService {
         return  absensiRepository.findAll();
     }
 
-    @Override
     public List<Absensi> getAbsensiByTanggal(Date tanggalAbsen) {
-        return absensiRepository.findByTanggalAbsen(tanggalAbsen);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(tanggalAbsen);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is zero-based
+        int year = calendar.get(Calendar.YEAR);
+
+        logger.info("Fetching absensi for day: " + day + ", month: " + month + ", year: " + year);
+
+        List<Absensi> absensiList = absensiRepository.findByTanggalAbsen(day, month, year);
+
+        logger.info("Number of records found: " + absensiList.size());
+
+        return absensiList;
+    }
+
+    public List<Absensi> getAbsensiByBulan(Date tanggalAbsen) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(tanggalAbsen);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+
+        logger.info("Fetching absensi for month: " + month + ", year: " + year);
+
+        List<Absensi> absensiList = absensiRepository.findByMonthAndYear(month, year);
+
+        logger.info("Number of records found: " + absensiList.size());
+
+        return absensiList;
     }
 
     @Override
@@ -60,12 +89,13 @@ public class AbsensiImpl implements AbsensiService {
 
             Date tanggalHariIni = truncateTime(new Date());
             Date masuk = new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
             String jamMasukString = formatter.format(masuk);
             String keterangan = (getHourOfDay(masuk) < 7) ? "Tidak Terlambat" : "Terlambat";
+
             Absensi absensi = new Absensi();
             absensi.setUser(user);
-            absensi.setTanggalAbsen(tanggalHariIni);
+            absensi.setTanggalAbsen(tanggalHariIni); // Store the Date object
             absensi.setJamMasuk(jamMasukString);
             absensi.setJamPulang("-");
             absensi.setLokasiMasuk(lokasiMasuk);
@@ -79,6 +109,7 @@ public class AbsensiImpl implements AbsensiService {
         }
     }
 
+
     @Override
     public Absensi Pulang(Long userId, MultipartFile image, String lokasiPulang , String keteranganPulangAwal) throws IOException {
         Absensi absensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()))
@@ -89,8 +120,9 @@ public class AbsensiImpl implements AbsensiService {
         }
 
         Date pulang = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         String jamPulangString = formatter.format(pulang);
+
         absensi.setKeteranganPulangAwal(keteranganPulangAwal != null ? keteranganPulangAwal : "-");
         absensi.setJamPulang(jamPulangString);
         absensi.setLokasiPulang(lokasiPulang);
@@ -204,7 +236,7 @@ public class AbsensiImpl implements AbsensiService {
         return absensiRepository.findabsensiByUserId(userId);
     }
 
-    private static Date truncateTime(Date date) {
+    private Date truncateTime(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -219,7 +251,6 @@ public class AbsensiImpl implements AbsensiService {
         calendar.setTime(date);
         return calendar.get(Calendar.HOUR_OF_DAY);
     }
-
     private boolean deleteFoto(String fileName) throws IOException {
         BlobId blobId = BlobId.of("absensireact.appspot.com", fileName);
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
