@@ -1,14 +1,25 @@
 package com.example.absensireact.impl;
 
+import com.example.absensireact.detail.AdminDetail;
+import com.example.absensireact.detail.SuperAdminDetail;
+import com.example.absensireact.detail.UserDetail;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.model.Token;
 import com.example.absensireact.model.User;
+import com.example.absensireact.repository.AdminRepository;
+import com.example.absensireact.repository.SuperAdminRepository;
 import com.example.absensireact.repository.TokenRepository;
 import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.securityNew.JwtTokenUtil;
 import com.example.absensireact.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -27,6 +38,47 @@ public class TokenImpl implements TokenService {
 
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private AdminRepository adminRepository;
+
+    @Autowired
+    private SuperAdminRepository superAdminRepository;
+
+    @Value("${security.oauth2.authorization.jwt.expires-in}")
+    private long tokenValidityInSeconds;
+
+    @Override
+    public long getTokenExpirationTime(String token) {
+        String username = jwtTokenUtil.getUsernameFromToken(token);
+        UserDetails userDetails = loadUserByUsername(username);
+        long expiresIn = tokenValidityInSeconds;
+        long issuedAt = jwtTokenUtil.extractIssuedAt(token);
+        long now = System.currentTimeMillis() / 1000;
+        long remainingValidity = issuedAt + expiresIn - now;
+        return remainingValidity > 0 ? remainingValidity : 0;
+    }
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> userOptional = userRepository.findByEmail(username);
+        if (userOptional.isPresent()) {
+            return UserDetail.buidUser(userOptional.get());
+        }
+
+        Optional<Admin> adminOptional = adminRepository.findByEmail(username);
+        if (adminOptional.isPresent()) {
+            return AdminDetail.buildAdmin(adminOptional.get());
+        }
+
+        Optional<SuperAdmin> superAdminOptional = superAdminRepository.findByEmail(username);
+        if (superAdminOptional.isPresent()) {
+            return SuperAdminDetail.buildSuperAdmin(superAdminOptional.get());
+        }
+
+        throw new UsernameNotFoundException("User not found with username: " + username);
+    }
 
 
     @Override

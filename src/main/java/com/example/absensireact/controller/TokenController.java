@@ -1,6 +1,7 @@
 package com.example.absensireact.controller;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Token;
+import com.example.absensireact.securityNew.JwtTokenUtil;
 import com.example.absensireact.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,13 @@ public class TokenController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @GetMapping("/expiration")
+    public long getTokenExpirationTime(@RequestParam  String token) {
+        return tokenService.getTokenExpirationTime(token);
+    }
 
     @PostMapping("/forgot")
     public ResponseEntity<?> forgotPassword(@RequestParam Long userId, @RequestParam String email) {
