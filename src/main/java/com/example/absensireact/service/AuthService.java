@@ -16,6 +16,7 @@ import com.example.absensireact.repository.SuperAdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.securityNew.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,7 +42,6 @@ public class AuthService  {
 
     @Autowired
     SuperAdminRepository superAdminRepository;
-
 
 
 
