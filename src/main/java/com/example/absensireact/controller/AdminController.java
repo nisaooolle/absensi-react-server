@@ -46,9 +46,9 @@ public class AdminController {
     }
 
     @PutMapping("/admin/ubah-foto/{id}")
-    public ResponseEntity<?>EditFotoAdmin(@PathVariable Long id , @RequestPart MultipartFile image , @RequestBody Admin admin ){
+    public ResponseEntity<?>EditFotoAdmin(@PathVariable Long id , @RequestPart MultipartFile image  ){
         try {
-            Admin updatedAdmin = adminService.uploadImage(id, image , admin);
+            Admin updatedAdmin = adminService.uploadImage(id, image );
             return new ResponseEntity<>(updatedAdmin, HttpStatus.OK);
         } catch (IOException e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -69,8 +69,8 @@ public class AdminController {
     }
 
     @PutMapping("/admin/edit-email-username/{id}")
-    public ResponseEntity<Admin> editemailusername(@PathVariable Long id, @RequestBody Admin admin) {
-        Admin updatedAdmin = adminService.ubahUsernamedanemail(id, admin);
+    public ResponseEntity<Admin> editemailusername(@PathVariable Long id, @RequestParam("email") String email , @RequestParam("username")String username) {
+        Admin updatedAdmin = adminService.ubahUsernamedanemail(id, email , username);
         return new ResponseEntity<>(updatedAdmin, HttpStatus.OK);
     }
     @DeleteMapping("/admin/delete/{id}")

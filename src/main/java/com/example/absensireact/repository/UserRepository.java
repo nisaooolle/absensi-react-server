@@ -1,6 +1,7 @@
 package com.example.absensireact.repository;
 
 
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,12 @@ public interface UserRepository extends JpaRepository<User , Long> {
     @Query(value = "SELECT * FROM user WHERE id_jabatan = :idJabatan" , nativeQuery = true)
     List<User> findByIdJabatan(Long idJabatan);
 
+    @Query(value = "SELECT * FROM user WHERE id_admin = :adminId" , nativeQuery = true)
+    List<User> findByadminIdAbsensi (Long adminId);
+
+    List<User> findByAdmin(Admin admin);
+
+
     Optional<User> findByEmailAndUsername(String email, String username);
     @Query(value = "SELECT * FROM user WHERE email = :email", nativeQuery = true)
     Optional<User> findByEmail(String email);
@@ -24,6 +31,8 @@ public interface UserRepository extends JpaRepository<User , Long> {
     @Query(value = "SELECT * FROM user WHERE username = :username", nativeQuery = true)
     Optional<User> findByUsername (String username);
 
+    @Query(value = "SELECT * FROM user WHERE id_admin = :idAdmin", nativeQuery = true)
+    Optional<User> findByIdAdminAbsensi (Long idAdmin);
 
 
 }

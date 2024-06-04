@@ -2,8 +2,10 @@ package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Absensi;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AbsensiRepository;
+import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.AbsensiService;
 import com.google.auth.Credentials;
@@ -34,14 +36,91 @@ public class AbsensiImpl implements AbsensiService {
 
     private final UserRepository userRepository;
 
+    private final AdminRepository adminRepository;
 
 
-    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository) throws IOException {
+
+    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository, AdminRepository adminRepository) throws IOException {
         this.absensiRepository = absensiRepository;
         this.userRepository = userRepository;
 
+        this.adminRepository = adminRepository;
     }
 
+
+    @Override
+    public List<Absensi> getAllByAdmin(Long adminId) {
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+
+        if (adminOptional.isPresent()) {
+            Long admin = adminOptional.get().getId();
+            List<User> users = userRepository.findByadminIdAbsensi(admin);
+
+            if (users.isEmpty()) {
+                throw new NotFoundException("Tidak ada pengguna yang terkait dengan admin dengan id: " + adminId);
+            }
+
+            List<Absensi> absensiList = new ArrayList<>();
+            for (User user : users) {
+                List<Absensi> userAbsensi = absensiRepository.findByUser(user);
+                absensiList.addAll(userAbsensi);
+            }
+
+            return absensiList;
+        } else {
+            throw new NotFoundException("Id Admin tidak ditemukan dengan id: " + adminId);
+        }
+    }
+
+
+//    @Override
+//    public List<Absensi> getByAdminAndDate(Long adminId, String date) {
+//        String[] dateParts = date.split("-");
+//        int year = Integer.parseInt(dateParts[0]);
+//        int month = dateParts.length > 1 ? Integer.parseInt(dateParts[1]) : 0;
+//        int day = dateParts.length > 2 ? Integer.parseInt(dateParts[2]) : 0;
+//
+//        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+//        if (adminOptional.isPresent()) {
+//            Admin admin = adminOptional.get();
+//            Optional<User> adminUser = userRepository.findByIdAdminAbsensi(admin.getId());
+//
+//            if (adminUser.isPresent()) {
+//                User user = adminUser.get();
+//
+//                List<Absensi> absensiList = absensiRepository.findByUserAndDate(user, year, month, day);
+//                return absensiList;
+//            } else {
+//                throw new NotFoundException("User not found for admin with id: " + adminId);
+//            }
+//        } else {
+//            throw new NotFoundException("Admin not found with id: " + adminId);
+//        }
+//    }
+
+//    @Override
+//    public List<Absensi> getByAdminAndDate(Long adminId, String date) {
+//        String[] dateParts = date.split("-");
+//        int year = Integer.parseInt(dateParts[0]);
+//        int month = dateParts.length > 1 ? Integer.parseInt(dateParts[1]) : 0;
+//        int day = dateParts.length > 2 ? Integer.parseInt(dateParts[2]) : 0;
+//
+//        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+//        if (adminOptional.isPresent()) {
+//            Admin admin = adminOptional.get();
+//            Optional<User> adminUser = userRepository.findByIdAdminAbsensi(admin.getId());
+//
+//            if (adminUser.isPresent()) {
+//                User user = adminUser.get();
+//
+//                return absensiRepository.findByUserAndDate(user, year, month, day);
+//            } else {
+//                throw new NotFoundException("User not found for admin with id: " + adminId);
+//            }
+//        } else {
+//            throw new NotFoundException("Admin not found with id: " + adminId);
+//        }
+//    }
     @Override
     public List<Absensi> getAllAbsensi(){
         return  absensiRepository.findAll();
@@ -91,7 +170,7 @@ public class AbsensiImpl implements AbsensiService {
             Date masuk = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
             String jamMasukString = formatter.format(masuk);
-            String keterangan = (getHourOfDay(masuk) < 7) ? "Tidak Terlambat" : "Terlambat";
+            String keterangan = (getHourOfDay(masuk) < 7) ? "Lebih Awal" : "Terlambat";
 
             Absensi absensi = new Absensi();
             absensi.setUser(user);

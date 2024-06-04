@@ -14,7 +14,11 @@ public interface AbsensiRepository extends JpaRepository<Absensi , Long> {
 
     Optional<Absensi> findByUserAndTanggalAbsen(User user, Date tanggalAbsen);
 
-    List<Absensi> findByUser_Id(Long userId);
+
+
+    List<Absensi> findByUser(User user);
+    @Query("SELECT a FROM Absensi a WHERE YEAR(a.tanggalAbsen) = :year AND MONTH(a.tanggalAbsen) = :month AND DAY(a.tanggalAbsen) = :day AND a.user = :user")
+    List<Absensi> findByUserAndDate(@Param("user") User user, @Param("year") int year, @Param("month") int month, @Param("day") int day);
 
     @Query("SELECT a FROM Absensi a WHERE FUNCTION('DAY', a.tanggalAbsen) = :day AND FUNCTION('MONTH', a.tanggalAbsen) = :month AND FUNCTION('YEAR', a.tanggalAbsen) = :year")
     List<Absensi> findByTanggalAbsen(@Param("day") int day, @Param("month") int month, @Param("year") int year);

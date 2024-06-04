@@ -59,12 +59,13 @@ public class Absensi {
     @JoinColumn(name = "userId")
     private User  user;
 
+    private Date attendanceDate;
 
     public Absensi() {
 
     }
 
-    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String lokasiMasuk, String lokasiPulang, String keteranganPulang, String keteranganIzin, String keteranganPulangAwal, String jamPulang, String keteranganTerlambat, String fotoMasuk, String fotoPulang, String status, String statusAbsen, User user) {
+    public Absensi(Long id, Date tanggalAbsen, String jamMasuk, String lokasiMasuk, String lokasiPulang, String keteranganPulang, String keteranganIzin, String keteranganPulangAwal, String jamPulang, String keteranganTerlambat, String fotoMasuk, String fotoPulang, String status, String statusAbsen, User user, Date attendanceDate) {
         this.id = id;
         this.tanggalAbsen = tanggalAbsen;
         this.jamMasuk = jamMasuk;
@@ -80,6 +81,7 @@ public class Absensi {
         this.status = status;
         this.statusAbsen = statusAbsen;
         this.user = user;
+        this.attendanceDate = attendanceDate;
     }
 
     public Long getId() {
@@ -200,5 +202,13 @@ public class Absensi {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Date getAttendanceDate() {
+        return attendanceDate;
+    }
+
+    public void setAttendanceDate(Date attendanceDate) {
+        this.attendanceDate = attendanceDate;
     }
 }

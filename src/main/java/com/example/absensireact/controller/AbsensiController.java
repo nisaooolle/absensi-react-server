@@ -147,6 +147,45 @@ public class AbsensiController {
     }
 
 
+//    @GetMapping("/absensi/admin/{adminId}/search")
+//    public ResponseEntity<List<Absensi>> getAllByAdminAndDate(
+//            @PathVariable Long adminId,
+//            @RequestParam(required = false) String year,
+//            @RequestParam(required = false) String month,
+//            @RequestParam(required = false) String day) {
+//        try {
+//            String date = (year != null ? year : "") +
+//                    (month != null ? "-" + month : "") +
+//                    (day != null ? "-" + day : "");
+//
+//            if (date.isEmpty()) {
+//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//            }
+//
+//            List<Absensi> absensiList = absensiService.getByAdminAndDate(adminId, date);
+//            if (absensiList.isEmpty()) {
+//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//            }
+//            return new ResponseEntity<>(absensiList, HttpStatus.OK);
+//        } catch (NumberFormatException e) {
+//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+//        } catch (NotFoundException e) {
+//            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+    @GetMapping("/absensi/admin/{adminId}")
+    public ResponseEntity<List<Absensi>> getAllByAdmin(@PathVariable Long adminId) {
+        try {
+            List<Absensi> absensiList = absensiService.getAllByAdmin(adminId);
+            return new ResponseEntity<>(absensiList, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/absensi/checkAbsensi/{userId}")
     public ResponseEntity<String> checkAbsensiToday(@PathVariable Long userId) {
