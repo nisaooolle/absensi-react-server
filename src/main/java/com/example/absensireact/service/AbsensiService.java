@@ -11,8 +11,14 @@ import java.util.Optional;
 public interface  AbsensiService {
 
 
-    List<Absensi> getAllAbsensi();
+    List<Absensi> getAllByAdmin(Long adminId);
 
+
+//    List<Absensi> getByAdminAndDate(Long adminId, String date);
+//
+//    List<Absensi> getByAdminAndDate(Long adminId, int year, int month, int day);
+
+    List<Absensi> getAllAbsensi();
 
     List<Absensi> getAbsensiByTanggal(Date tanggalAbsen);
 

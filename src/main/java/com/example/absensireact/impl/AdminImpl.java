@@ -108,25 +108,27 @@ public class AdminImpl implements AdminService {
     }
 
     @Override
-    public Admin uploadImage(Long id, MultipartFile image , Admin admin) throws IOException {
+    public Admin uploadImage(Long id, MultipartFile image) throws IOException {
         Optional<Admin> adminOptional = adminRepository.findById(id);
         if (adminOptional.isEmpty()) {
             throw new NotFoundException("Id admin tidak ditemukan");
         }
         String fileUrl = uploadFoto(image , "admin" + id);
+        Admin admin = adminOptional.get();
         admin.setImageAdmin(fileUrl);
         return adminRepository.save(admin);
     }
 
 
     @Override
-    public Admin ubahUsernamedanemail(Long id, Admin admin){
+    public Admin ubahUsernamedanemail(Long id , String email , String username){
         Optional<Admin> adminOptional = adminRepository.findById(id);
         if (adminOptional.isEmpty()) {
             throw new NotFoundException("Id admin tidak ditemukan :" + id);
         }
-        admin.setUsername(admin.getUsername());
-        admin.setEmail(admin.getEmail());
+        Admin admin = adminOptional.get();
+        admin.setEmail(email);
+        admin.setUsername(username);
         return  adminRepository.save(admin);
     }
 
