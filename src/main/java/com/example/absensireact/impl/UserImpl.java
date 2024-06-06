@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -73,10 +72,15 @@ public class UserImpl implements UserService {
         Organisasi organisasi = organisasiRepository.findById(idOrganisasi)
                 .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan"));
 
-        Admin admin = organisasi.getAdmin();
-        if (admin == null) {
-            throw new NotFoundException("Admin tidak ditemukan untuk organisasi tersebut");
+        Long adminId = organisasi.getAdmin().getId();
+
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+
+        if (adminOptional.isEmpty()) {
+            throw new NotFoundException("id Admin tidak ditemukan : " + adminId);
         }
+
+        Admin admin = adminOptional.get();
 
         Date date = new Date();
 
@@ -88,10 +92,10 @@ public class UserImpl implements UserService {
         user.setJabatan(null);
         user.setShift(null);
         user.setAdmin(admin);
-        user.setUsername(user.getUsername());
-        user.setPassword(encoder.encode(user.getPassword()));
         user.setOrganisasi(organisasi);
         user.setRole("USER");
+        user.setUsername(user.getUsername());
+        user.setPassword(encoder.encode(user.getPassword()));
 
         // Hitung lama kerja
         user.calculateLamaKerja();
@@ -101,37 +105,31 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public User Tambahkaryawan(Long idAdmin, User user) {
-        Optional<Admin> adminvalidate = adminRepository.findById(idAdmin);
-
-        if (adminvalidate.isPresent()) {
-            user.setRole("USER");
+    public User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift) {
+        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
             user.setPassword(encoder.encode(user.getPassword()));
+            user.setRole("USER");
+
             user.setEmail(user.getEmail());
             user.setUsername(user.getUsername());
-
-            Organisasi organisasi = organisasiRepository.findById(user.getOrganisasi().getId())
-                    .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan"));
-            Jabatan jabatan = jabatanRepository.findById(user.getJabatan().getIdJabatan())
-                    .orElseThrow(() -> new NotFoundException("Jabatan tidak ditemukan"));
-            Shift shift = shiftRepository.findById(user.getShift().getId())
-                    .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan"));
-
-            user.setOrganisasi(organisasi);
-            user.setJabatan(jabatan);
-            user.setShift(shift);
-            Date date = truncateTime(new Date());
-            SimpleDateFormat indonesianDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
-            String tanggalKerja = indonesianDateFormat.format(date);
+            user.setOrganisasi(organisasiRepository.findById(idOrganisasi)
+                    .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan")));
+            user.setJabatan(jabatanRepository.findById(idJabatan)
+                    .orElseThrow(() -> new NotFoundException("Jabatan tidak ditemukan")));
+            user.setShift(shiftRepository.findById(idShift)
+                    .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan")));
             user.calculateLamaKerja();
-            user.setStartKerja(tanggalKerja);
+            user.setStartKerja(new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
             user.setStatusKerja("aktif");
+            user.setAdmin(admin);
 
             return userRepository.save(user);
+        } else {
+            throw new NotFoundException("Id Admin tidak ditemukan");
         }
-
-        throw new NotFoundException("Id Admin tidak ditemukan");
-    }
+}
 
 
 

@@ -1,5 +1,6 @@
 package com.example.absensireact.repository;
 
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,7 @@ import java.util.Optional;
 public interface OrganisasiRepository extends JpaRepository<Organisasi,Long> {
 
 
+       List<Organisasi>findByAdmin (Admin admin);
        @Query(value = "SELECT * FROM organisasi WHERE id_admin = :idAdmin" , nativeQuery = true)
        Optional<Organisasi>findOrganisasiByIdAdmin(Long idAdmin);
 
