@@ -16,10 +16,14 @@ public interface OrganisasiService {
     Optional<Organisasi> GetOrganisasiById(Long id);
     Optional<Organisasi> GetAllBYId(Long idA);
 
+    List<Organisasi> getAllBySuperAdmin(Long idSuperAdmin);
+
     Optional<Organisasi> GetByIdAdmin(Long idAdmin);
 
     Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException;
 
+
+    Organisasi TambahOrganisasiBySuperAdmin(Long idSuperAdmin, Long idAdmin, Organisasi organisasi) throws IOException;
 
     Organisasi UbahDataOrgannisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException;
 

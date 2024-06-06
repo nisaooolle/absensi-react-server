@@ -27,7 +27,11 @@ public class Admin {
     @Column(name = "role")
     private String role;
 
-    @OneToOne
+//    @ManyToMany
+//    @JoinColumn(name = "idOrganisasi")
+//    private Organisasi organisasi;
+
+    @ManyToOne
     @JoinColumn(name = "idSuperAdmin")
     private SuperAdmin superAdmin;
 
@@ -35,13 +39,14 @@ public class Admin {
 
    }
 
-    public Admin(Long id, String email, String password, String username, String imageAdmin, String role , SuperAdmin superAdmin) {
+    public Admin(Long id, String email, String password, String username, String imageAdmin, String role,  SuperAdmin superAdmin) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
         this.imageAdmin = imageAdmin;
         this.role = role;
+//        this.organisasi = organisasi;
         this.superAdmin = superAdmin;
     }
 

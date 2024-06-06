@@ -55,11 +55,13 @@ public class UserController {
     }
 
     @PostMapping("/user/tambahkaryawan/{idAdmin}")
-    public ResponseEntity<User> tambahKaryawan(@RequestBody User user, @PathVariable Long idAdmin) {
-        adminRepository.findById(idAdmin)
-                .orElseThrow(() -> new NotFoundException("Id Admin tidak ditemukan"));
-        User savedUser = userImpl.Tambahkaryawan(idAdmin, user);
-        return ResponseEntity.ok(savedUser);
+    public ResponseEntity<User> tambahKaryawan(@RequestBody User user, @PathVariable Long idAdmin, @RequestParam Long idOrganisasi, @RequestParam Long idJabatan, @RequestParam Long idShift) {
+        try {
+            User savedUser = userImpl.Tambahkaryawan(user, idAdmin, idOrganisasi, idJabatan, idShift);
+            return ResponseEntity.ok(savedUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
     @GetMapping("/user/get-allUser")
     public ResponseEntity<List<User>> getAllUser() {

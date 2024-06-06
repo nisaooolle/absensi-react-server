@@ -1,5 +1,6 @@
 package com.example.absensireact.controller;
 
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.service.OrganisasiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,16 +49,37 @@ public class OrganisasiController {
         return organisasi.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/organisasi/superadmin/{idSuperAdmin}")
+    public ResponseEntity<List<Organisasi>> getAllOrganisasiBySuperAdmin(@PathVariable Long idSuperAdmin) {
+        try {
+            List<Organisasi> organisasiList = organisasiService.getAllBySuperAdmin(idSuperAdmin);
+            return ResponseEntity.ok().body(organisasiList);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/organisasi/tambahByIdAdmin/{idAdmin}")
     public ResponseEntity<Organisasi> tambahOrganisasi(
             @PathVariable Long idAdmin,
-            @RequestPart("organisasi") String organisasiJson,
-            @RequestPart("image") MultipartFile image) throws IOException {
+            @RequestPart("image") MultipartFile image,
+            @RequestBody Organisasi organisasi) throws IOException {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Organisasi organisasi = objectMapper.readValue(organisasiJson, Organisasi.class);
+
 
         Organisasi savedOrganisasi = organisasiService.TambahOrganisasi(idAdmin, organisasi, image);
+        return ResponseEntity.ok(savedOrganisasi);
+    }
+
+    @PostMapping("/organisasi/tambahByIdSuperAdmin/{idSuperAdmin}")
+    public ResponseEntity<Organisasi> tambahOrganisasi(
+            @PathVariable Long idSuperAdmin,
+             @RequestParam Long idAdmin,
+             @RequestBody Organisasi organisasi) throws IOException {
+
+
+
+        Organisasi savedOrganisasi = organisasiService.TambahOrganisasiBySuperAdmin( idSuperAdmin , idAdmin, organisasi);
         return ResponseEntity.ok(savedOrganisasi);
     }
 

@@ -3,8 +3,10 @@ package com.example.absensireact.impl;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
+import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
+import com.example.absensireact.repository.SuperAdminRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.OrganisasiService;
 import com.google.auth.Credentials;
@@ -20,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,11 +32,13 @@ public class OrganisasiImpl implements OrganisasiService {
 
     private final OrganisasiRepository organisasiRepository;
     private final UserRepository userRepository;
+    private final SuperAdminRepository superAdminRepository;
     private final AdminRepository adminRepository;
 
-    public OrganisasiImpl(OrganisasiRepository organisasiRepository, UserRepository userRepository, AdminRepository adminRepository) throws IOException {
+    public OrganisasiImpl(OrganisasiRepository organisasiRepository, UserRepository userRepository, SuperAdminRepository superAdminRepository, AdminRepository adminRepository) throws IOException {
         this.organisasiRepository = organisasiRepository;
         this.userRepository = userRepository;
+        this.superAdminRepository = superAdminRepository;
         this.adminRepository = adminRepository;
 
     }
@@ -51,6 +56,25 @@ public class OrganisasiImpl implements OrganisasiService {
         return organisasiRepository.findById(id);
     }
 
+
+    @Override
+    public List<Organisasi> getAllBySuperAdmin(Long idSuperAdmin) {
+        Optional<SuperAdmin> superAdminOptional = superAdminRepository.findById(idSuperAdmin);
+        if (superAdminOptional.isPresent()) {
+            SuperAdmin superAdmin = superAdminOptional.get();
+
+            List<Admin> adminList = adminRepository.findBySuperAdmin(superAdmin);
+            List<Organisasi> organisasiList = new ArrayList<>();
+
+            for (Admin admin : adminList) {
+                List<Organisasi> organisasiListByAdmin = organisasiRepository.findByAdmin(admin);
+                organisasiList.addAll(organisasiListByAdmin);
+            }
+
+            return organisasiList;
+        }
+        throw new NotFoundException("Id Super admin tidak ditemukan");
+    }
 
 
     @Override
@@ -89,6 +113,38 @@ public class OrganisasiImpl implements OrganisasiService {
         return organisasiRepository.save(organisasi);
     }
 
+    @Override
+    public Organisasi TambahOrganisasiBySuperAdmin(Long idSuperAdmin, Long idAdmin, Organisasi organisasi) throws IOException {
+        Optional<SuperAdmin> superAdminOptional = superAdminRepository.findById(idSuperAdmin);
+
+        if (superAdminOptional.isEmpty()) {
+            throw new NotFoundException("id super admin tidak ditemukan : " + idSuperAdmin);
+        }
+
+        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
+
+        if (!adminOptional.isPresent()) {
+            throw new NotFoundException("Id Admin tidak ditemukan");
+        }
+        Admin admin = adminOptional.get();
+
+        Optional<Organisasi> existingOrganisasi = organisasiRepository.findOrganisasiByIdAdmin(idAdmin);
+        if (existingOrganisasi.isPresent()) {
+            throw new IllegalStateException("Admin sudah memiliki organisasi");
+        }
+
+        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+        organisasi.setAlamat(organisasi.getAlamat());
+        organisasi.setKecamatan(organisasi.getKecamatan());
+        organisasi.setKabupaten(organisasi.getKabupaten());
+        organisasi.setProvinsi(organisasi.getProvinsi());
+        organisasi.setNomerTelepon(organisasi.getNomerTelepon());
+        organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
+        organisasi.setAdmin(admin);
+
+        return organisasiRepository.save(organisasi);
+
+    }
     private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "organisasi/";
