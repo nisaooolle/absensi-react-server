@@ -23,9 +23,9 @@ public class JabatanController {
         return ResponseEntity.ok(jabatanService.getAllJabatan());
     }
 
-    @GetMapping("/jabatan/getbyid/{id}")
-    public ResponseEntity<Jabatan> getJabatanById(@PathVariable Long id) {
-        Optional<Jabatan> jabatan = jabatanService.getJabatanById(id);
+    @GetMapping("/jabatan/getbyid/{idJabatan}")
+    public ResponseEntity<Jabatan> getJabatanById(@PathVariable Long idJabatan) {
+        Optional<Jabatan> jabatan = jabatanService.getJabatanById(idJabatan);
         return jabatan.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

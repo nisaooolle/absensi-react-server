@@ -178,31 +178,31 @@ public class OrganisasiImpl implements OrganisasiService {
 
     @Override
     public Organisasi UbahDataOrgannisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
-        Admin admmin = adminRepository.findById(idAdmin).orElse(null);
-        if (admmin == null) {
+        Admin admin = adminRepository.findById(idAdmin).orElse(null);
+        if (admin == null) {
             throw new NotFoundException("Id admin tidak ditemukan");
         }
-        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
-        organisasi.setAlamat(organisasi.getAlamat());
-        organisasi.setKecamatan(organisasi.getKecamatan());
-        organisasi.setKabupaten(organisasi.getKabupaten());
-        organisasi.setProvinsi(organisasi.getProvinsi());
-        organisasi.setNomerTelepon(organisasi.getNomerTelepon());
-        organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
-        organisasi.setAdmin(admmin);
-        String imageUrl = uploadFoto(image, "_organisasi_" + idAdmin);
-        organisasi.setFotoOrganisasi(imageUrl);
 
-        return organisasiRepository.save(organisasi);
-    }
-
-    @Override
-    public Organisasi EditByid(Long id, Organisasi organisasi, MultipartFile image) throws IOException{
-        Organisasi organisasi1 = organisasiRepository.findById(id).orElse(null);
-        if (organisasi1 == null) {
-            throw new NotFoundException("Organisasi dengan id " + id + " tidak ditemukan");
+        Optional<Organisasi> existingOrganisasiOptional = organisasiRepository.findOrganisasiByIdAdmin(idAdmin);
+        if (!existingOrganisasiOptional.isPresent()) {
+            throw new NotFoundException("Organisasi dengan id admin " + idAdmin + " tidak ditemukan");
         }
-        Admin admin = organisasi.getAdmin();
+
+        Organisasi existingOrganisasi = existingOrganisasiOptional.get();
+
+        if (existingOrganisasi.getFotoOrganisasi() != null && !existingOrganisasi.getFotoOrganisasi().isEmpty()) {
+            String currentFotoUrl = existingOrganisasi.getFotoOrganisasi();
+            String fileName = currentFotoUrl.substring(currentFotoUrl.indexOf("/o/") + 3, currentFotoUrl.indexOf("?alt=media"));
+            deleteFoto(fileName);
+        }
+
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = uploadFoto(image, "_organisasi_" + idAdmin);
+            organisasi.setFotoOrganisasi(imageUrl);
+        } else {
+            organisasi.setFotoOrganisasi(existingOrganisasi.getFotoOrganisasi());
+        }
+
         organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
         organisasi.setAlamat(organisasi.getAlamat());
         organisasi.setKecamatan(organisasi.getKecamatan());
@@ -211,8 +211,38 @@ public class OrganisasiImpl implements OrganisasiService {
         organisasi.setNomerTelepon(organisasi.getNomerTelepon());
         organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
         organisasi.setAdmin(admin);
-        String imageUrl = uploadFoto(image, "organisasi" + id);
-        organisasi.setFotoOrganisasi(imageUrl);
+
+        return organisasiRepository.save(organisasi);
+    }
+
+    @Override
+    public Organisasi EditByid(Long id, Organisasi organisasi, MultipartFile image) throws IOException {
+        Organisasi existingOrganisasi = organisasiRepository.findById(id).orElse(null);
+        if (existingOrganisasi == null) {
+            throw new NotFoundException("Organisasi dengan id " + id + " tidak ditemukan");
+        }
+
+        if (existingOrganisasi.getFotoOrganisasi() != null && !existingOrganisasi.getFotoOrganisasi().isEmpty()) {
+            String currentFotoUrl = existingOrganisasi.getFotoOrganisasi();
+            String fileName = currentFotoUrl.substring(currentFotoUrl.indexOf("/o/") + 3, currentFotoUrl.indexOf("?alt=media"));
+            deleteFoto(fileName);
+        }
+
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = uploadFoto(image, "organisasi" + id);
+            organisasi.setFotoOrganisasi(imageUrl);
+        } else {
+            organisasi.setFotoOrganisasi(existingOrganisasi.getFotoOrganisasi());
+        }
+
+        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+        organisasi.setAlamat(organisasi.getAlamat());
+        organisasi.setKecamatan(organisasi.getKecamatan());
+        organisasi.setKabupaten(organisasi.getKabupaten());
+        organisasi.setProvinsi(organisasi.getProvinsi());
+        organisasi.setNomerTelepon(organisasi.getNomerTelepon());
+        organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
+        organisasi.setAdmin(organisasi.getAdmin());
 
         return organisasiRepository.save(organisasi);
     }

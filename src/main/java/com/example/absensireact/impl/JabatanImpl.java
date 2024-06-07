@@ -39,8 +39,8 @@ public class JabatanImpl implements JabatanService {
     }
 
     @Override
-    public Optional<Jabatan> getJabatanById(Long id) {
-        return Optional.empty();
+    public Optional<Jabatan> getJabatanById(Long idJabatan) {
+        return  jabatanRepository.findById(idJabatan);
     }
 
     @Override
