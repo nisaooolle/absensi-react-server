@@ -105,6 +105,39 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public List<User> getAllByJabatan(Long idJabatan) {
+        Optional<Jabatan> jabatanOptional = jabatanRepository.findById(idJabatan);
+        if (jabatanOptional.isEmpty()) {
+            throw new NotFoundException("id Jabatan tidak ditemukan");
+        }
+
+        List<User> users = userRepository.findByIdJabatan(idJabatan);
+        if (users.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return users;
+    }
+
+    @Override
+    public User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, User updatedUser) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("id user tidak ditemukan");
+        }
+        User user = userOptional.get();
+        user.setJabatan(jabatanRepository.findById(idJabatan)
+                .orElseThrow(() -> new NotFoundException("id jabatan tidak ditemukan")));
+        user.setShift(shiftRepository.findById(idShift)
+                .orElseThrow(() -> new NotFoundException("id shift tidak ditemukan")));
+        if (updatedUser.getUsername() != null) {
+            user.setUsername(updatedUser.getUsername());
+        }
+
+
+        return userRepository.save(user);
+    }
+    @Override
     public User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift) {
         Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
         if (adminOptional.isPresent()) {

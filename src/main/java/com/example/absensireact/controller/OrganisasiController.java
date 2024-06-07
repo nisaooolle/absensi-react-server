@@ -5,6 +5,7 @@ import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.service.OrganisasiService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -93,13 +94,14 @@ public class OrganisasiController {
         return ResponseEntity.ok(updatedOrganisasi);
     }
 
-    @PutMapping("/organisasi/editById/{id}" )
+    @PutMapping(value = "/organisasi/editById/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Organisasi> editOrganisasi(
             @PathVariable Long id,
-            @RequestBody Organisasi organisasi,
-            @RequestPart("image") MultipartFile image
+            @RequestParam Long idAdmin,
+            @RequestPart("organisasi") Organisasi organisasi,
+            @RequestPart(value = "image", required = false) MultipartFile image
     ) throws IOException {
-        Organisasi updatedOrganisasi = organisasiService.EditByid(id, organisasi, image);
+        Organisasi updatedOrganisasi = organisasiService.EditByid(id,idAdmin, organisasi, image);
         return ResponseEntity.ok(updatedOrganisasi);
     }
 

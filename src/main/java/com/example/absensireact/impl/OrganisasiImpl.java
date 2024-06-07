@@ -216,10 +216,12 @@ public class OrganisasiImpl implements OrganisasiService {
     }
 
     @Override
-    public Organisasi EditByid(Long id, Organisasi organisasi, MultipartFile image) throws IOException {
-        Organisasi existingOrganisasi = organisasiRepository.findById(id).orElse(null);
-        if (existingOrganisasi == null) {
-            throw new NotFoundException("Organisasi dengan id " + id + " tidak ditemukan");
+    public Organisasi EditByid(Long id, Long idAdmin , Organisasi organisasi, MultipartFile image) throws IOException {
+        Organisasi existingOrganisasi = organisasiRepository.findById(id).orElseThrow(() -> new NotFoundException("Organisasi dengan id " + id + " tidak ditemukan"));
+
+        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
+        if (adminOptional.isEmpty()) {
+            throw new NotFoundException("Id admin tidak ditemukan");
         }
 
         if (existingOrganisasi.getFotoOrganisasi() != null && !existingOrganisasi.getFotoOrganisasi().isEmpty()) {
@@ -234,17 +236,17 @@ public class OrganisasiImpl implements OrganisasiService {
         } else {
             organisasi.setFotoOrganisasi(existingOrganisasi.getFotoOrganisasi());
         }
+        Admin admin = adminOptional.get();
+        existingOrganisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+        existingOrganisasi.setAlamat(organisasi.getAlamat());
+        existingOrganisasi.setKecamatan(organisasi.getKecamatan());
+        existingOrganisasi.setKabupaten(organisasi.getKabupaten());
+        existingOrganisasi.setProvinsi(organisasi.getProvinsi());
+        existingOrganisasi.setNomerTelepon(organisasi.getNomerTelepon());
+        existingOrganisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
+        existingOrganisasi.setAdmin(admin);
 
-        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
-        organisasi.setAlamat(organisasi.getAlamat());
-        organisasi.setKecamatan(organisasi.getKecamatan());
-        organisasi.setKabupaten(organisasi.getKabupaten());
-        organisasi.setProvinsi(organisasi.getProvinsi());
-        organisasi.setNomerTelepon(organisasi.getNomerTelepon());
-        organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
-        organisasi.setAdmin(organisasi.getAdmin());
-
-        return organisasiRepository.save(organisasi);
+        return organisasiRepository.save(existingOrganisasi);
     }
     @Override
     public void deleteOrganisasi(Long id) throws IOException {

@@ -27,7 +27,7 @@ public interface OrganisasiService {
 
     Organisasi UbahDataOrgannisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException;
 
-    Organisasi EditByid(Long id, Organisasi organisasi, MultipartFile image) throws IOException;
+    Organisasi EditByid(Long id,Long idAdmin ,  Organisasi organisasi, MultipartFile image) throws IOException;
 
     void deleteOrganisasi(Long id) throws IOException;
 }

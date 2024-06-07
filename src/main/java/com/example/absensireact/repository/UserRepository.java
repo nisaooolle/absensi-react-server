@@ -2,6 +2,7 @@ package com.example.absensireact.repository;
 
 
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.Jabatan;
 import com.example.absensireact.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,7 @@ public interface UserRepository extends JpaRepository<User , Long> {
     @Query(value = "SELECT * FROM user WHERE id_admin = :adminId" , nativeQuery = true)
     List<User> findByadminIdAbsensi (Long adminId);
 
+    List<User> findByJabatan (Jabatan jabatan);
     List<User> findByAdmin(Admin admin);
 
 

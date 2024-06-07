@@ -69,6 +69,16 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/user/byJabatan/{idJabatan}")
+    public ResponseEntity<List<User>> getUsersByJabatan(@PathVariable Long idJabatan) {
+        try {
+            List<User> users = userImpl.getAllByJabatan(idJabatan);
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("/user/getUserBy/{id}")
     public ResponseEntity<User> GetUserById (@PathVariable Long id){
         User user = userImpl.getById(id);
@@ -76,7 +86,7 @@ public class UserController {
     }
 
     @PutMapping("/user/editBY/{id}")
-    public ResponseEntity<User> editUser(@PathVariable Long id, @RequestPart("user") User user ) {
+    public ResponseEntity<User> editUser(@PathVariable Long id, @RequestBody  User user ) {
         try {
             User updatedUser = userImpl.edit(id, user );
             return ResponseEntity.ok(updatedUser);
@@ -85,6 +95,18 @@ public class UserController {
         }
     }
 
+    @PutMapping("/user/edit-kar/{id}")
+    public ResponseEntity<User> editUser(@PathVariable("id") Long id,
+                                         @RequestParam(required = false) Long idJabatan,
+                                         @RequestParam(required = false) Long idShift,
+                                         @RequestBody User updatedUser) {
+        try {
+            User editedUser = userImpl.editUsernameJabatanShift(id, idJabatan, idShift, updatedUser);
+            return ResponseEntity.ok(editedUser);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
     @PutMapping("/user/editFotoBY/{id}")
     public ResponseEntity<User> editFotoUser(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         try {
