@@ -79,6 +79,15 @@ public class UserController {
         }
     }
 
+    @GetMapping("/user/byShift/{idShift}")
+    public ResponseEntity<List<User>> getUsersByShift(@PathVariable Long idShift) {
+        try {
+            List<User> users = userImpl.getAllByShift(idShift);
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     @GetMapping("/user/getUserBy/{id}")
     public ResponseEntity<User> GetUserById (@PathVariable Long id){
         User user = userImpl.getById(id);

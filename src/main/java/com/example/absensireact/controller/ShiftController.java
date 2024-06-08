@@ -48,17 +48,20 @@ public class ShiftController {
 
     @PutMapping("/editbyId/{id}")
     public ResponseEntity<Shift> editShiftById(@PathVariable("id") Long id,
-                                               @RequestBody Shift shift) {
-        Shift updatedShift = shiftService.editShiftById(id, shift);
+                                               @RequestParam Long idAdmin,
+                                               @RequestBody Shift shift
+    ) {
+        Shift updatedShift = shiftService.editShiftById(id, idAdmin , shift);
         return new ResponseEntity<>(updatedShift, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Map<String, Boolean>> deleteShiftById(@PathVariable("id") Long id) {
+    public ResponseEntity<Map<String, Boolean>> deleteShift(@PathVariable("id") Long id) {
         Map<String, Boolean> response = shiftService.delete(id);
-        if (response == null || response.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (response.get("Deleted")) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

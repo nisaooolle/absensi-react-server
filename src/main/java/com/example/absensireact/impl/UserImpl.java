@@ -120,6 +120,22 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public List<User> getAllByShift(Long idShift) {
+        Optional<Shift> shiftOptional = shiftRepository.findById(idShift);
+        if (shiftOptional.isEmpty()) {
+            throw new NotFoundException("id Jabatan tidak ditemukan");
+        }
+
+        List<User> users = userRepository.findByIdShift(idShift);
+        if (users.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return users;
+    }
+
+
+    @Override
     public User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, User updatedUser) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
