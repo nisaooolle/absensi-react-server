@@ -18,6 +18,12 @@ public interface UserService {
     User Register(User user, Long idOrganisasi);
 
 
+    List<User> getAllByJabatan(Long idJabatan);
+
+    List<User> getAllByShift(Long idShift);
+
+    User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, User user);
+
     User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift);
 
     List<User> GetAllKaryawanByIdAdmin(Long idAdmin);

@@ -60,6 +60,12 @@ public class AbsensiController {
 
         excelAbsensiBulanan.excelAbsensiBulanan(month, year, response);
     }
+
+    @GetMapping("/absensi/export/absensi-bulanan-simpel")
+    public void exportAbsensiBulananSimpel(@RequestParam("bulan") int bulan, HttpServletResponse response) throws IOException {
+
+        excelAbsensiBulanan.excelAbsensiBulananSimpel(bulan,response);
+    }
     @GetMapping("/absensi/rekap-perkaryawan/export")
     public ResponseEntity<?> exportAbsensiToExcel() {
         try {
@@ -92,6 +98,17 @@ public class AbsensiController {
         }
     }
 
+
+    @GetMapping("/absensi/get-absensi-bulan-simpel")
+    public ResponseEntity<List<Absensi>> getAbsensiByBulanSimpel(@RequestParam("bulan") int bulan) {
+        try {
+            List<Absensi> absensiList = absensiService.getAbsensiByBulanSimpel(bulan);
+            return ResponseEntity.ok(absensiList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @GetMapping("/absensi/get-absensi-bulan")
     public List<Absensi> getAbsensiByBulan(@RequestParam("tanggalAbsen") String tanggalAbsenStr) {

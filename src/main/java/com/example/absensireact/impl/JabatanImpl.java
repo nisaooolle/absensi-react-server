@@ -3,6 +3,7 @@ package com.example.absensireact.impl;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Jabatan;
+import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.JabatanRepository;
 import com.example.absensireact.repository.UserRepository;
@@ -10,7 +11,9 @@ import com.example.absensireact.service.JabatanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -109,10 +112,24 @@ public class JabatanImpl implements JabatanService {
     }
 
     @Override
-    public void deleteJabatan(Long idJabatan) {
-        if (!jabatanRepository.existsById(idJabatan)) {
-            throw new NotFoundException("Jabatan not found with id: " + idJabatan);
+    public Map<String, Boolean> deleteJabatan(Long idJabatan) {
+        try {
+            List<User> users = userRepository.findByIdJabatan(idJabatan);
+            for (User user : users) {
+                user.setJabatan(null);
+                userRepository.save(user);
+            }
+
+            jabatanRepository.deleteById(idJabatan);
+
+            Map<String, Boolean> res = new HashMap<>();
+            res.put("Deleted", Boolean.TRUE);
+            return res;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Boolean> res = new HashMap<>();
+            res.put("Deleted", Boolean.FALSE);
+            return res;
         }
-        jabatanRepository.deleteById(idJabatan);
     }
 }

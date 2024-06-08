@@ -2,10 +2,12 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.model.Jabatan;
 import com.example.absensireact.service.JabatanService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -53,8 +55,12 @@ public class JabatanController {
     }
 
     @DeleteMapping("/jabatan/delete/{idJabatan}")
-    public ResponseEntity<String> deleteJabatan(@PathVariable Long idJabatan) {
-        jabatanService.deleteJabatan(idJabatan);
-        return ResponseEntity.ok("Jabatan deleted successfully.");
+    public ResponseEntity<Map<String, Boolean>> deleteJabatan(@PathVariable("idJabatan") Long idJabatan) {
+        Map<String, Boolean> response = jabatanService.deleteJabatan(idJabatan);
+        if (response.get("Deleted")) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

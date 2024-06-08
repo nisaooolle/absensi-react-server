@@ -3,6 +3,7 @@ package com.example.absensireact.service;
 import com.example.absensireact.model.Jabatan;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface JabatanService {
@@ -15,5 +16,5 @@ public interface JabatanService {
 
     Jabatan editJabatanById(Long id, Jabatan jabatan);
 
-    void deleteJabatan(Long idJabatan);
+    Map<String, Boolean> deleteJabatan(Long idJabatan);
 }

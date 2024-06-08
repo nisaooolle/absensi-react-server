@@ -2,6 +2,8 @@ package com.example.absensireact.repository;
 
 
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.Jabatan;
+import com.example.absensireact.model.Shift;
 import com.example.absensireact.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,11 +18,18 @@ public interface UserRepository extends JpaRepository<User , Long> {
     @Query(value = "SELECT * FROM user WHERE id_jabatan = :idJabatan" , nativeQuery = true)
     List<User> findByIdJabatan(Long idJabatan);
 
+    @Query(value = "SELECT * FROM user WHERE id_jabatan = :idJabatan" , nativeQuery = true)
+    Optional<User> findByJabatanId(Long idJabatan);
+
     @Query(value = "SELECT * FROM user WHERE id_admin = :adminId" , nativeQuery = true)
     List<User> findByadminIdAbsensi (Long adminId);
 
+    List<User> findByJabatan (Jabatan jabatan);
     List<User> findByAdmin(Admin admin);
 
+    List<User>findByShift (Shift shift);
+    @Query(value = "SELECT * FROM user WHERE id_shift = :idShift" , nativeQuery = true)
+    List<User> findByIdShift(Long idShift);
 
     Optional<User> findByEmailAndUsername(String email, String username);
     @Query(value = "SELECT * FROM user WHERE email = :email", nativeQuery = true)

@@ -142,6 +142,7 @@ public class AbsensiImpl implements AbsensiService {
         return absensiList;
     }
 
+    @Override
     public List<Absensi> getAbsensiByBulan(Date tanggalAbsen) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(tanggalAbsen);
@@ -156,6 +157,17 @@ public class AbsensiImpl implements AbsensiService {
 
         return absensiList;
     }
+
+    @Override
+    public List<Absensi> getAbsensiByBulanSimpel(int month) {
+        logger.info("Fetching absensi for month: " + month);
+
+        List<Absensi> absensiList = absensiRepository.findByMonth(month);
+
+        logger.info("Number of records found: " + absensiList.size());
+
+        return absensiList;
+}
 
     @Override
     public Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException {

@@ -17,7 +17,10 @@ public interface ShiftService {
 
     Shift PostShift(Long idAdmin, Shift shift);
 
-    Shift editShiftById(Long id, Shift shift);
+
+
+
+    Shift editShiftById(Long id, Long idAdmin, Shift updatedShift);
 
     Map<String, Boolean> delete(Long id);
 }
