@@ -26,7 +26,8 @@ public interface AdminService {
     Admin uploadImage (Long id, MultipartFile image ) throws IOException;
 
 
-    Admin ubahUsernamedanemail(Long id, String email, String username);
+
+    Admin ubahUsernamedanemail(Long id, Admin updateadmin);
 
     Map<String, Boolean> delete(Long id);
 }

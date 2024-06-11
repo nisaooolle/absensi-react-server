@@ -98,13 +98,12 @@ public class OrganisasiController {
     public ResponseEntity<Organisasi> editOrganisasi(
             @PathVariable Long id,
             @RequestParam Long idAdmin,
-            @RequestPart("organisasi") Organisasi organisasi,
+            @RequestPart(value = "organisasi") Organisasi organisasi,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) throws IOException {
-        Organisasi updatedOrganisasi = organisasiService.EditByid(id,idAdmin, organisasi, image);
+        Organisasi updatedOrganisasi = organisasiService.EditByid(id, idAdmin, organisasi, image);
         return ResponseEntity.ok(updatedOrganisasi);
     }
-
     @DeleteMapping("/organisasi/delete/{id}")
     public ResponseEntity<Void> deleteOrganisasi(@PathVariable Long id) throws IOException {
         organisasiService.deleteOrganisasi(id);

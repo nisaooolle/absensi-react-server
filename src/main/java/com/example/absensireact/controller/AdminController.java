@@ -69,8 +69,8 @@ public class AdminController {
     }
 
     @PutMapping("/admin/edit-email-username/{id}")
-    public ResponseEntity<Admin> editemailusername(@PathVariable Long id, @RequestParam("email") String email , @RequestParam("username")String username) {
-        Admin updatedAdmin = adminService.ubahUsernamedanemail(id, email , username);
+    public ResponseEntity<Admin> editemailusername(@PathVariable Long id, @RequestBody Admin updateAdmin) {
+        Admin updatedAdmin = adminService.ubahUsernamedanemail(id , updateAdmin);
         return new ResponseEntity<>(updatedAdmin, HttpStatus.OK);
     }
     @DeleteMapping("/admin/delete/{id}")
