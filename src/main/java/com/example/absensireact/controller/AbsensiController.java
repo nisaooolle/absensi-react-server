@@ -3,6 +3,7 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.exel.AbsensiExportService;
+import com.example.absensireact.exel.ExcelAbsensiMingguan;
 import com.example.absensireact.exel.ExcelAbsnesiBulanan;
 import com.example.absensireact.model.Absensi;
 import com.example.absensireact.repository.AbsensiRepository;
@@ -20,6 +21,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.NotActiveException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -50,6 +52,8 @@ public class AbsensiController {
     @Autowired
     private ExcelAbsnesiBulanan excelAbsensiBulanan;
 
+    @Autowired
+    private ExcelAbsensiMingguan excelAbsensiMingguan;
 
     @GetMapping("/absensi/export/absensi-bulanan")
     public void exportAbsensiBulanan(@RequestParam("bulan") @DateTimeFormat(pattern = "yyyy-MM") Date bulan, HttpServletResponse response) throws IOException {
@@ -63,8 +67,25 @@ public class AbsensiController {
 
     @GetMapping("/absensi/export/absensi-bulanan-simpel")
     public void exportAbsensiBulananSimpel(@RequestParam("bulan") int bulan, HttpServletResponse response) throws IOException {
-
         excelAbsensiBulanan.excelAbsensiBulananSimpel(bulan,response);
+    }
+
+    @GetMapping("/absensi/export/absensi-mingguan")
+    public void exportAbsensiMingguan(
+            @RequestParam("tanggalAwal") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date tanggalAwal,
+            @RequestParam("tanggalAkhir") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date tanggalAkhir,
+            HttpServletResponse response) throws IOException {
+        if (tanggalAwal == null || tanggalAkhir == null) {
+         throw new NotActiveException("Tanggal tidak valid");
+        }
+        excelAbsensiMingguan.excelAbsensiMingguan(tanggalAwal, tanggalAkhir, response);
+    }
+    @GetMapping("/absensi/rekap-mingguan")
+    public ResponseEntity<Map<String, List<Absensi>>> getAbsensiMingguan(
+            @RequestParam("tanggalAwal") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date tanggalAwal,
+            @RequestParam("tanggalAkhir") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date tanggalAkhir) {
+        Map<String, List<Absensi>> absensiMingguan = absensiService.getAbsensiByMingguan(tanggalAwal, tanggalAkhir);
+        return ResponseEntity.ok(absensiMingguan);
     }
     @GetMapping("/absensi/rekap-perkaryawan/export")
     public ResponseEntity<?> exportAbsensiToExcel() {
@@ -127,6 +148,11 @@ public class AbsensiController {
 
     @GetMapping("/absensi/by-tanggal")
     public List<Absensi> getAbsensiByTanggal(@RequestParam("tanggalAbsen") String tanggalAbsenStr) {
+        if (tanggalAbsenStr == null || tanggalAbsenStr.isEmpty()) {
+            // Handle empty or null tanggalAbsenStr, perhaps return an error response
+            return Collections.emptyList();
+        }
+
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date tanggalAbsen = null;
         try {
@@ -134,26 +160,25 @@ public class AbsensiController {
             logger.info("Parsed date: " + tanggalAbsen);
         } catch (ParseException e) {
             logger.severe("Failed to parse date: " + e.getMessage());
-            // handle exception, possibly return an error response
+            return Collections.emptyList();
         }
 
         return absensiService.getAbsensiByTanggal(tanggalAbsen);
     }
-//    @GetMapping("/rekap/export/{tanggal}")
-//    public ResponseEntity<?> exportAbsensiByTanggal(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date tanggalAbsen) {
-//        try {
-//            ByteArrayInputStream byteArrayInputStream = absensiExportService.exportAbsensiByTanggal(tanggalAbsen);
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.add("Content-Disposition", "attachment; filename=absensi.xlsx");
-//
-//            return ResponseEntity.ok()
-//                    .headers(headers)
-//                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//                    .body(byteArrayInputStream.readAllBytes());
-//        } catch (IOException e) {
-//            return ResponseEntity.status(500).body("Failed to export data");
-//        }
-//    }
+
+    @GetMapping("/absensi/export/harian")
+    public void exportAbsensiHarian(
+            @RequestParam("tanggal") @DateTimeFormat(pattern = "yyyy-MM-dd") Date tanggal,
+            HttpServletResponse response
+    ) {
+        try {
+            excelAbsensiMingguan.excelAbsensiHarian(tanggal, response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // handle exception
+        }
+    }
+
     @GetMapping("/absensi/getByUserId/{userId}")
     public ResponseEntity<List<Absensi>> getAbsensiByUserId(@PathVariable Long userId) {
         List<Absensi> absensi = absensiService.getAbsensiByUserId(userId);
@@ -164,35 +189,7 @@ public class AbsensiController {
     }
 
 
-//    @GetMapping("/absensi/admin/{adminId}/search")
-//    public ResponseEntity<List<Absensi>> getAllByAdminAndDate(
-//            @PathVariable Long adminId,
-//            @RequestParam(required = false) String year,
-//            @RequestParam(required = false) String month,
-//            @RequestParam(required = false) String day) {
-//        try {
-//            String date = (year != null ? year : "") +
-//                    (month != null ? "-" + month : "") +
-//                    (day != null ? "-" + day : "");
-//
-//            if (date.isEmpty()) {
-//                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//            }
-//
-//            List<Absensi> absensiList = absensiService.getByAdminAndDate(adminId, date);
-//            if (absensiList.isEmpty()) {
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            }
-//            return new ResponseEntity<>(absensiList, HttpStatus.OK);
-//        } catch (NumberFormatException e) {
-//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-//        } catch (NotFoundException e) {
-//            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-    @GetMapping("/absensi/admin/{adminId}")
+     @GetMapping("/absensi/admin/{adminId}")
     public ResponseEntity<List<Absensi>> getAllByAdmin(@PathVariable Long adminId) {
         try {
             List<Absensi> absensiList = absensiService.getAllByAdmin(adminId);
