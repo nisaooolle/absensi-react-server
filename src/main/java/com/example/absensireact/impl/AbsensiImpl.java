@@ -169,6 +169,29 @@ public class AbsensiImpl implements AbsensiService {
         return absensiList;
 }
 
+
+    @Override
+    public Map<String, List<Absensi>> getAbsensiByMingguan(Date tanggalAwal, Date tanggalAkhir) {
+        List<Absensi> absensiList = absensiRepository.findByMingguan(tanggalAwal, tanggalAkhir);
+        Map<String, List<Absensi>> weeklyAbsensiMap = new HashMap<>();
+
+        for (Absensi absensi : absensiList) {
+            String weekRange = getWeekRange(absensi.getTanggalAbsen());
+            weeklyAbsensiMap.computeIfAbsent(weekRange, k -> new ArrayList<>()).add(absensi);
+        }
+
+        return weeklyAbsensiMap;
+    }
+
+    private String getWeekRange(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        Date startOfWeek = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_WEEK, 6);
+        Date endOfWeek = calendar.getTime();
+        return startOfWeek.toString() + " - " + endOfWeek.toString();
+    }
     @Override
     public Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException {
         Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));

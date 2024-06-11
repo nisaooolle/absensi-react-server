@@ -182,7 +182,7 @@ public User(){
         this.role = role;
     }
     public void calculateLamaKerja() {
-        if (startKerja != null && statusKerja.equals("aktif")) {
+        if (startKerja != null && statusKerja != null && statusKerja.equals("aktif")) {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
                 Date startDate = dateFormat.parse(startKerja);
@@ -190,10 +190,30 @@ public User(){
 
                 long diffInMillies = Math.abs(currentDate.getTime() - startDate.getTime());
                 long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-                lamaKerja = String.valueOf(diffInDays);
+                long years = diffInDays / 365;
+                long months = (diffInDays % 365) / 30;
+                long weeks = ((diffInDays % 365) % 30) / 7;
+                long days = ((diffInDays % 365) % 30) % 7;
+
+                StringBuilder lamaKerjaBuilder = new StringBuilder();
+                if (years > 0) {
+                    lamaKerjaBuilder.append(years).append(" tahun ");
+                }
+                if (months > 0) {
+                    lamaKerjaBuilder.append(months).append(" bulan ");
+                }
+                if (weeks > 0) {
+                    lamaKerjaBuilder.append(weeks).append(" minggu ");
+                }
+                if (days > 0) {
+                    lamaKerjaBuilder.append(days).append(" hari ");
+                }
+
+                lamaKerja = lamaKerjaBuilder.toString();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
     }
+
 }

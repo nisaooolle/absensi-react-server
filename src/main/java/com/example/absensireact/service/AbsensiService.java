@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface  AbsensiService {
@@ -26,6 +27,8 @@ public interface  AbsensiService {
 
 
     List<Absensi> getAbsensiByBulanSimpel(int month);
+
+    Map<String, List<Absensi>> getAbsensiByMingguan(Date startDate, Date endDate);
 
     Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk , String keteranganTerlambat) throws IOException;
 

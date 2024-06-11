@@ -10,18 +10,19 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class ExcelAbsnesiBulanan {
+public class ExcelAbsensiMingguan {
+
     @Autowired
     private AbsensiRepository absensiRepository;
 
-    public void excelAbsensiBulanan(int month, int year, HttpServletResponse response) throws IOException {
+    public void excelAbsensiMingguan(Date tanggalAwal, Date tanggalAkhir, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Absensi-Bulanan");
+        Sheet sheet = workbook.createSheet("Absensi-mingguan");
+        int rowNum = 0; // Deklarasi dan inisialisasi variabel rowNum
 
         // Cell styles
         CellStyle styleHeader = workbook.createCellStyle();
@@ -32,6 +33,9 @@ public class ExcelAbsnesiBulanan {
         styleHeader.setBorderBottom(BorderStyle.THIN);
         styleHeader.setBorderLeft(BorderStyle.THIN);
 
+        Font fontWhite = workbook.createFont();
+        fontWhite.setColor(IndexedColors.WHITE.getIndex()); // Set font color to white
+
         CellStyle styleNumber = workbook.createCellStyle();
         styleNumber.setAlignment(HorizontalAlignment.RIGHT);
         styleNumber.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -39,6 +43,7 @@ public class ExcelAbsnesiBulanan {
         styleNumber.setBorderRight(BorderStyle.THIN);
         styleNumber.setBorderBottom(BorderStyle.THIN);
         styleNumber.setBorderLeft(BorderStyle.THIN);
+        styleNumber.setFont(fontWhite); // Set font to white
 
         // Conditional formatting colors
         CellStyle styleColor1 = workbook.createCellStyle();
@@ -61,23 +66,19 @@ public class ExcelAbsnesiBulanan {
         styleColor4.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         styleColor4.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        // Fetch data
-        List<Absensi> absensiList = absensiRepository.findByMonthAndYear(month, year);
+        // Header style with red background and white text
+        CellStyle styleHeaderRed = workbook.createCellStyle();
+        styleHeaderRed.cloneStyleFrom(styleHeader);
+        styleHeaderRed.setFillForegroundColor(IndexedColors.RED.getIndex());
+        styleHeaderRed.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styleHeaderRed.setFont(fontWhite); // Set font color to white
 
-        // Group by user
+        List<Absensi> absensiList = absensiRepository.findByMingguan(tanggalAwal, tanggalAkhir);
+
         Map<String, List<Absensi>> userAbsensiMap = new HashMap<>();
         for (Absensi absensi : absensiList) {
             userAbsensiMap.computeIfAbsent(absensi.getUser().getUsername(), k -> new ArrayList<>()).add(absensi);
         }
-
-        int rowNum = 0;
-
-        // Title row
-        Row titleRow = sheet.createRow(rowNum++);
-        Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("DATA ABSENSI BULAN : " + month + " - " + year);
-        titleCell.setCellStyle(styleHeader);
-        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5)); // Merging cells for title
 
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
@@ -101,7 +102,11 @@ public class ExcelAbsnesiBulanan {
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
-                cell.setCellStyle(styleHeader);
+//                if (rowNum == 3) { // Apply red background and white text only for the first header row
+//                    cell.setCellStyle(styleHeaderRed);
+//                } else {
+//                    cell.setCellStyle(styleHeader);
+//                }
             }
 
             // Data rows
@@ -129,16 +134,15 @@ public class ExcelAbsnesiBulanan {
                 cell4.setCellStyle(styleNumber);
 
                 CellStyle styleColor = null;
-
                 switch (absensi.getStatusAbsen()) {
                     case "Lebih Awal":
-                        row.setRowStyle(styleColor4);
+                        styleColor = styleColor4;
                         break;
                     case "Terlambat":
-                        row.setRowStyle(styleColor1);
+                        styleColor = styleColor1;
                         break;
                     case "Izin":
-                        row.setRowStyle(styleColor2);
+                        styleColor = styleColor2;
                         break;
                 }
                 if (styleColor != null) {
@@ -147,10 +151,8 @@ public class ExcelAbsnesiBulanan {
                     }
                 }
             }
-            // Add a blank row between each user's table for readability
             rowNum++;
         }
-
 
         // Adjust column width
         for (int i = 0; i < 5; i++) {
@@ -163,9 +165,10 @@ public class ExcelAbsnesiBulanan {
         workbook.close();
     }
 
-    public void excelAbsensiBulananSimpel(int month , HttpServletResponse response) throws IOException {
+    public void excelAbsensiHarian(Date tanggal, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Absensi-Bulanan");
+        Sheet sheet = workbook.createSheet("Absensi-harian");
+        int rowNum = 0; // Deklarasi dan inisialisasi variabel rowNum
 
         // Cell styles
         CellStyle styleHeader = workbook.createCellStyle();
@@ -176,6 +179,9 @@ public class ExcelAbsnesiBulanan {
         styleHeader.setBorderBottom(BorderStyle.THIN);
         styleHeader.setBorderLeft(BorderStyle.THIN);
 
+        Font fontWhite = workbook.createFont();
+        fontWhite.setColor(IndexedColors.WHITE.getIndex()); // Set font color to white
+
         CellStyle styleNumber = workbook.createCellStyle();
         styleNumber.setAlignment(HorizontalAlignment.RIGHT);
         styleNumber.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -183,6 +189,7 @@ public class ExcelAbsnesiBulanan {
         styleNumber.setBorderRight(BorderStyle.THIN);
         styleNumber.setBorderBottom(BorderStyle.THIN);
         styleNumber.setBorderLeft(BorderStyle.THIN);
+        styleNumber.setFont(fontWhite); // Set font to white
 
         // Conditional formatting colors
         CellStyle styleColor1 = workbook.createCellStyle();
@@ -205,23 +212,25 @@ public class ExcelAbsnesiBulanan {
         styleColor4.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         styleColor4.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        // Fetch data
-        List<Absensi> absensiList = absensiRepository.findByMonth(month);
+        // Header style with red background and white text
+        CellStyle styleHeaderRed = workbook.createCellStyle();
+        styleHeaderRed.cloneStyleFrom(styleHeader);
+        styleHeaderRed.setFillForegroundColor(IndexedColors.RED.getIndex());
+        styleHeaderRed.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styleHeaderRed.setFont(fontWhite); // Set font color to white
 
-        // Group by user
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(tanggal);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is zero-based
+        int year = calendar.get(Calendar.YEAR);
+
+        List<Absensi> absensiList = absensiRepository.findByTanggalAbsen(day, month, year);
+
         Map<String, List<Absensi>> userAbsensiMap = new HashMap<>();
         for (Absensi absensi : absensiList) {
             userAbsensiMap.computeIfAbsent(absensi.getUser().getUsername(), k -> new ArrayList<>()).add(absensi);
         }
-
-        int rowNum = 0;
-
-        // Title row
-        Row titleRow = sheet.createRow(rowNum++);
-        Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("DATA ABSENSI BULAN : " + month );
-        titleCell.setCellStyle(styleHeader);
-        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5)); // Merging cells for title
 
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
@@ -245,7 +254,11 @@ public class ExcelAbsnesiBulanan {
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
-                cell.setCellStyle(styleHeader);
+//                if (rowNum == 3) { // Apply red background and white text only for the first header row
+//                    cell.setCellStyle(styleHeaderRed);
+//                } else {
+//                    cell.setCellStyle(styleHeader);
+//                }
             }
 
             // Data rows
@@ -273,16 +286,15 @@ public class ExcelAbsnesiBulanan {
                 cell4.setCellStyle(styleNumber);
 
                 CellStyle styleColor = null;
-
                 switch (absensi.getStatusAbsen()) {
                     case "Lebih Awal":
-                        row.setRowStyle(styleColor4);
+                        styleColor = styleColor4;
                         break;
                     case "Terlambat":
-                        row.setRowStyle(styleColor1);
+                        styleColor = styleColor1;
                         break;
                     case "Izin":
-                        row.setRowStyle(styleColor2);
+                        styleColor = styleColor2;
                         break;
                 }
                 if (styleColor != null) {
@@ -290,12 +302,9 @@ public class ExcelAbsnesiBulanan {
                         row.getCell(i).setCellStyle(styleColor);
                     }
                 }
-
             }
-            // Add a blank row between each user's table for readability
             rowNum++;
         }
-
 
         // Adjust column width
         for (int i = 0; i < 5; i++) {
@@ -303,49 +312,9 @@ public class ExcelAbsnesiBulanan {
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=AbsensiBulanan.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=AbsensiHarian.xlsx");
         workbook.write(response.getOutputStream());
         workbook.close();
     }
 
-    public List<Absensi> importFromExcel(InputStream inputStream) throws IOException {
-        List<Absensi> absensiList = new ArrayList<>();
-
-
-        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
-
-            Iterator<Row> iterator = sheet.iterator();
-            while (iterator.hasNext()) {
-                Row currentRow = iterator.next();
-
-                if (currentRow.getRowNum() == 0) {
-                    continue;
-                }
-
-                Absensi absensi = new Absensi();
-
-                Iterator<Cell> cellIterator = currentRow.iterator();
-                while (cellIterator.hasNext()) {
-                    Cell currentCell = cellIterator.next();
-                    int columnIndex = currentCell.getColumnIndex();
-
-                    switch (columnIndex) {
-                        case 0:
-                            absensi.setTanggalAbsen(currentCell.getDateCellValue());
-                            break;
-                        case 1:
-                            absensi.setJamMasuk(currentCell.getStringCellValue());
-                            break;
-                        case 2:
-                            absensi.setLokasiMasuk(currentCell.getStringCellValue());
-                            break;
-                    }
-                }
-
-                absensiList.add(absensi);
-            }
-        }
-        return absensiList;
     }
-}
