@@ -216,8 +216,9 @@ public class OrganisasiImpl implements OrganisasiService {
     }
 
     @Override
-    public Organisasi EditByid(Long id, Long idAdmin , Organisasi organisasi, MultipartFile image) throws IOException {
-        Organisasi existingOrganisasi = organisasiRepository.findById(id).orElseThrow(() -> new NotFoundException("Organisasi dengan id " + id + " tidak ditemukan"));
+    public Organisasi EditByid(Long id, Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
+        Organisasi existingOrganisasi = organisasiRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Organisasi dengan id " + id + " tidak ditemukan"));
 
         Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
         if (adminOptional.isEmpty()) {
@@ -236,6 +237,7 @@ public class OrganisasiImpl implements OrganisasiService {
         } else {
             organisasi.setFotoOrganisasi(existingOrganisasi.getFotoOrganisasi());
         }
+
         Admin admin = adminOptional.get();
         existingOrganisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
         existingOrganisasi.setAlamat(organisasi.getAlamat());
@@ -248,6 +250,7 @@ public class OrganisasiImpl implements OrganisasiService {
 
         return organisasiRepository.save(existingOrganisasi);
     }
+
     @Override
     public void deleteOrganisasi(Long id) throws IOException {
         Optional<Organisasi> organisasiOptional = organisasiRepository.findById(id);

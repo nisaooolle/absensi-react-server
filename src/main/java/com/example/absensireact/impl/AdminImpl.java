@@ -121,14 +121,14 @@ public class AdminImpl implements AdminService {
 
 
     @Override
-    public Admin ubahUsernamedanemail(Long id , String email , String username){
+    public Admin ubahUsernamedanemail(Long id ,Admin updateadmin){
         Optional<Admin> adminOptional = adminRepository.findById(id);
         if (adminOptional.isEmpty()) {
             throw new NotFoundException("Id admin tidak ditemukan :" + id);
         }
         Admin admin = adminOptional.get();
-        admin.setEmail(email);
-        admin.setUsername(username);
+        admin.setEmail(updateadmin.getEmail());
+        admin.setUsername(updateadmin.getUsername());
         return  adminRepository.save(admin);
     }
 
