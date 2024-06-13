@@ -55,19 +55,18 @@ public class AbsensiController {
     @Autowired
     private ExcelAbsensiMingguan excelAbsensiMingguan;
 
-    @GetMapping("/absensi/export/absensi-bulanan")
-    public void exportAbsensiBulanan(@RequestParam("bulan") @DateTimeFormat(pattern = "yyyy-MM") Date bulan, HttpServletResponse response) throws IOException {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(bulan);
-        int month = calendar.get(Calendar.MONTH) + 1; // Months are 0-based in Calendar
-        int year = calendar.get(Calendar.YEAR);
-
-        excelAbsensiBulanan.excelAbsensiBulanan(month, year, response);
-    }
-
     @GetMapping("/absensi/export/absensi-bulanan-simpel")
     public void exportAbsensiBulananSimpel(@RequestParam("bulan") int bulan, HttpServletResponse response) throws IOException {
         excelAbsensiBulanan.excelAbsensiBulananSimpel(bulan,response);
+    }
+   @GetMapping("/absensi/export/absensi-rekapan-perkaryawan")
+    public void exportAbsensiRekapanPerkaryawan(@RequestParam("userId") Long userId, HttpServletResponse response) throws IOException {
+        absensiExportService.excelAbsensiRekapanPerkaryawan(userId,response);
+    }
+
+    @GetMapping("/absensi/export/absensi-bulanan")
+    public void exportAbsensiBulanan(@RequestParam("month") int month, @RequestParam("year") int year, HttpServletResponse response) throws IOException {
+        excelAbsensiBulanan.excelAbsensiBulanan(month, year, response);
     }
 
     @GetMapping("/absensi/export/absensi-mingguan")
@@ -103,21 +102,15 @@ public class AbsensiController {
         }
     }
 
-    @GetMapping("/absensi/rekap/export/{userId}")
-    public ResponseEntity<?> exportAbsensiByUserId(@PathVariable Long userId) {
-        try {
-            ByteArrayInputStream byteArrayInputStream = absensiExportService.RekapPerkaryawanByUserId(userId);
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=absensi.xlsx");
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(byteArrayInputStream.readAllBytes());
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to export data");
-        }
-    }
+//    @GetMapping("/absensi/rekap/export/{userId}")
+//    public ResponseEntity<?> exportAbsensiByUserId(@PathVariable Long userId ,  HttpServletResponse response) {
+//        try {
+//            absensiExportService.excelAbsensiRekapanPerkaryawan(userId , response);
+//        } catch (IOException e) {
+//            return ResponseEntity.status(500).body("Failed to export data");
+//        }
+//        return null;
+//    }
 
 
     @GetMapping("/absensi/get-absensi-bulan-simpel")

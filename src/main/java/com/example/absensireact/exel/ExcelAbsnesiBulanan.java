@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -19,9 +20,22 @@ public class ExcelAbsnesiBulanan {
     @Autowired
     private AbsensiRepository absensiRepository;
 
+    private String getMonthName(int month) {
+        String[] monthNames = new DateFormatSymbols().getMonths();
+        int index = month - 1;
+        if (index >= 0 && index < monthNames.length) {
+            return monthNames[index];
+        }
+        return "Bulan Tidak Valid";
+    }
+
     public void excelAbsensiBulanan(int month, int year, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Absensi-Bulanan");
+
+        Font fontWhite = workbook.createFont();
+        fontWhite.setColor(IndexedColors.WHITE.getIndex()); // Set font color to white
+
 
         // Cell styles
         CellStyle styleHeader = workbook.createCellStyle();
@@ -32,34 +46,46 @@ public class ExcelAbsnesiBulanan {
         styleHeader.setBorderBottom(BorderStyle.THIN);
         styleHeader.setBorderLeft(BorderStyle.THIN);
 
+        CellStyle styleTitle = workbook.createCellStyle();
+        styleTitle.setAlignment(HorizontalAlignment.CENTER);
+        styleTitle.setVerticalAlignment(VerticalAlignment.CENTER);
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        styleTitle.setFont(titleFont);
+
         CellStyle styleNumber = workbook.createCellStyle();
-        styleNumber.setAlignment(HorizontalAlignment.RIGHT);
+        styleNumber.setAlignment(HorizontalAlignment.CENTER);
         styleNumber.setVerticalAlignment(VerticalAlignment.CENTER);
         styleNumber.setBorderTop(BorderStyle.THIN);
         styleNumber.setBorderRight(BorderStyle.THIN);
         styleNumber.setBorderBottom(BorderStyle.THIN);
         styleNumber.setBorderLeft(BorderStyle.THIN);
+        styleNumber.setFont(fontWhite);
+
+
+        CellStyle styleCenterNumber = workbook.createCellStyle();
+        styleCenterNumber.setAlignment(HorizontalAlignment.CENTER);
+        styleCenterNumber.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleCenterNumber.setBorderTop(BorderStyle.THIN);
+        styleCenterNumber.setBorderRight(BorderStyle.THIN);
+        styleCenterNumber.setBorderBottom(BorderStyle.THIN);
+        styleCenterNumber.setBorderLeft(BorderStyle.THIN);
 
         // Conditional formatting colors
-        CellStyle styleColor1 = workbook.createCellStyle();
-        styleColor1.cloneStyleFrom(styleNumber);
-        styleColor1.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
-        styleColor1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        CellStyle styleColorLate = workbook.createCellStyle();
+        styleColorLate.cloneStyleFrom(styleNumber);
+        styleColorLate.setFillForegroundColor(IndexedColors.RED.getIndex());
+        styleColorLate.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        CellStyle styleColor2 = workbook.createCellStyle();
-        styleColor2.cloneStyleFrom(styleNumber);
-        styleColor2.setFillForegroundColor(IndexedColors.BLUE.getIndex());
-        styleColor2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        CellStyle styleColorPermission = workbook.createCellStyle();
+        styleColorPermission.cloneStyleFrom(styleNumber);
+        styleColorPermission.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        styleColorPermission.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        CellStyle styleColor3 = workbook.createCellStyle();
-        styleColor3.cloneStyleFrom(styleNumber);
-        styleColor3.setFillForegroundColor(IndexedColors.RED.getIndex());
-        styleColor3.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        CellStyle styleColor4 = workbook.createCellStyle();
-        styleColor4.cloneStyleFrom(styleNumber);
-        styleColor4.setFillForegroundColor(IndexedColors.GREEN.getIndex());
-        styleColor4.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        CellStyle styleColorEarly = workbook.createCellStyle();
+        styleColorEarly.cloneStyleFrom(styleNumber);
+        styleColorEarly.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         // Fetch data
         List<Absensi> absensiList = absensiRepository.findByMonthAndYear(month, year);
@@ -75,14 +101,19 @@ public class ExcelAbsnesiBulanan {
         // Title row
         Row titleRow = sheet.createRow(rowNum++);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("DATA ABSENSI BULAN : " + month + " - " + year);
-        titleCell.setCellStyle(styleHeader);
-        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5)); // Merging cells for title
+        titleCell.setCellValue("DATA ABSENSI BULAN : " + getMonthName(month) + " - " + year);
+        titleCell.setCellStyle(styleTitle);
+        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4)); // Merging cells for title
 
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
             List<Absensi> userAbsensi = entry.getValue();
             String position = userAbsensi.get(0).getUser().getJabatan().getNamaJabatan();
+
+            // Variables to count absences for each user
+            int userTotalLate = 0;
+            int userTotalPermission = 0;
+            int userTotalEarly = 0;
 
             // Name and Position row
             Row nameRow = sheet.createRow(rowNum++);
@@ -104,13 +135,16 @@ public class ExcelAbsnesiBulanan {
                 cell.setCellStyle(styleHeader);
             }
 
+            // Add a blank row between header and data
+            rowNum++;
+
             // Data rows
             int userRowNum = 1;
             for (Absensi absensi : userAbsensi) {
                 Row row = sheet.createRow(rowNum++);
                 Cell cell0 = row.createCell(0);
                 cell0.setCellValue(userRowNum++);
-                cell0.setCellStyle(styleNumber);
+                cell0.setCellStyle(styleCenterNumber); // Use the centered number style
 
                 Cell cell1 = row.createCell(1);
                 cell1.setCellValue(new SimpleDateFormat("yyyy-MM-dd").format(absensi.getTanggalAbsen()));
@@ -131,14 +165,17 @@ public class ExcelAbsnesiBulanan {
                 CellStyle styleColor = null;
 
                 switch (absensi.getStatusAbsen()) {
-                    case "Lebih Awal":
-                        row.setRowStyle(styleColor4);
-                        break;
                     case "Terlambat":
-                        row.setRowStyle(styleColor1);
+                        styleColor = styleColorLate;
+                        userTotalLate++; // Increment late count
                         break;
                     case "Izin":
-                        row.setRowStyle(styleColor2);
+                        styleColor = styleColorPermission;
+                        userTotalPermission++; // Increment permission count
+                        break;
+                    case "Lebih Awal":
+                        styleColor = styleColorEarly;
+                        userTotalEarly++; // Increment early count
                         break;
                 }
                 if (styleColor != null) {
@@ -147,10 +184,26 @@ public class ExcelAbsnesiBulanan {
                     }
                 }
             }
+
+            // Adding summary row for each user
+            Row lateRow = sheet.createRow(rowNum++);
+            Cell lateCell = lateRow.createCell(0);
+            lateCell.setCellValue("Terlambat: " + userTotalLate);
+            lateCell.setCellStyle(styleHeader);
+
+            Row permissionRow = sheet.createRow(rowNum++);
+            Cell permissionCell = permissionRow.createCell(0);
+            permissionCell.setCellValue("Izin: " + userTotalPermission);
+            permissionCell.setCellStyle(styleHeader);
+
+            Row earlyRow = sheet.createRow(rowNum++);
+            Cell earlyCell = earlyRow.createCell(0);
+            earlyCell.setCellValue("Lebih Awal: " + userTotalEarly);
+            earlyCell.setCellStyle(styleHeader);
+
             // Add a blank row between each user's table for readability
             rowNum++;
         }
-
 
         // Adjust column width
         for (int i = 0; i < 5; i++) {
@@ -158,14 +211,18 @@ public class ExcelAbsnesiBulanan {
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=AbsensiBulanan.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=AbsensiBulanan : "+ getMonthName(month) + year + " .xlsx");
         workbook.write(response.getOutputStream());
         workbook.close();
     }
 
+
     public void excelAbsensiBulananSimpel(int month , HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Absensi-Bulanan");
+
+        Font fontWhite = workbook.createFont();
+        fontWhite.setColor(IndexedColors.WHITE.getIndex()); // Set font color to white
 
         // Cell styles
         CellStyle styleHeader = workbook.createCellStyle();
@@ -176,35 +233,46 @@ public class ExcelAbsnesiBulanan {
         styleHeader.setBorderBottom(BorderStyle.THIN);
         styleHeader.setBorderLeft(BorderStyle.THIN);
 
+        CellStyle styleTitle = workbook.createCellStyle();
+        styleTitle.setAlignment(HorizontalAlignment.CENTER);
+        styleTitle.setVerticalAlignment(VerticalAlignment.CENTER);
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        styleTitle.setFont(titleFont);
+
         CellStyle styleNumber = workbook.createCellStyle();
-        styleNumber.setAlignment(HorizontalAlignment.RIGHT);
+        styleNumber.setAlignment(HorizontalAlignment.CENTER);
         styleNumber.setVerticalAlignment(VerticalAlignment.CENTER);
         styleNumber.setBorderTop(BorderStyle.THIN);
         styleNumber.setBorderRight(BorderStyle.THIN);
         styleNumber.setBorderBottom(BorderStyle.THIN);
         styleNumber.setBorderLeft(BorderStyle.THIN);
+        styleNumber.setFont(fontWhite);
+
+
+        CellStyle styleCenterNumber = workbook.createCellStyle();
+        styleCenterNumber.setAlignment(HorizontalAlignment.CENTER);
+        styleCenterNumber.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleCenterNumber.setBorderTop(BorderStyle.THIN);
+        styleCenterNumber.setBorderRight(BorderStyle.THIN);
+        styleCenterNumber.setBorderBottom(BorderStyle.THIN);
+        styleCenterNumber.setBorderLeft(BorderStyle.THIN);
 
         // Conditional formatting colors
-        CellStyle styleColor1 = workbook.createCellStyle();
-        styleColor1.cloneStyleFrom(styleNumber);
-        styleColor1.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
-        styleColor1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        CellStyle styleColorLate = workbook.createCellStyle();
+        styleColorLate.cloneStyleFrom(styleNumber);
+        styleColorLate.setFillForegroundColor(IndexedColors.RED.getIndex());
+        styleColorLate.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        CellStyle styleColor2 = workbook.createCellStyle();
-        styleColor2.cloneStyleFrom(styleNumber);
-        styleColor2.setFillForegroundColor(IndexedColors.BLUE.getIndex());
-        styleColor2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        CellStyle styleColorPermission = workbook.createCellStyle();
+        styleColorPermission.cloneStyleFrom(styleNumber);
+        styleColorPermission.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        styleColorPermission.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        CellStyle styleColor3 = workbook.createCellStyle();
-        styleColor3.cloneStyleFrom(styleNumber);
-        styleColor3.setFillForegroundColor(IndexedColors.RED.getIndex());
-        styleColor3.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        CellStyle styleColor4 = workbook.createCellStyle();
-        styleColor4.cloneStyleFrom(styleNumber);
-        styleColor4.setFillForegroundColor(IndexedColors.GREEN.getIndex());
-        styleColor4.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
+        CellStyle styleColorEarly = workbook.createCellStyle();
+        styleColorEarly.cloneStyleFrom(styleNumber);
+        styleColorEarly.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         // Fetch data
         List<Absensi> absensiList = absensiRepository.findByMonth(month);
 
@@ -219,14 +287,19 @@ public class ExcelAbsnesiBulanan {
         // Title row
         Row titleRow = sheet.createRow(rowNum++);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("DATA ABSENSI BULAN : " + month );
-        titleCell.setCellStyle(styleHeader);
-        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 5)); // Merging cells for title
+        titleCell.setCellValue("DATA ABSENSI SIMPEL : " + getMonthName(month) );
+        titleCell.setCellStyle(styleTitle);
+        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4)); // Merging cells for title
 
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
             List<Absensi> userAbsensi = entry.getValue();
             String position = userAbsensi.get(0).getUser().getJabatan().getNamaJabatan();
+
+            // Variables to count absences for each user
+            int userTotalLate = 0;
+            int userTotalPermission = 0;
+            int userTotalEarly = 0;
 
             // Name and Position row
             Row nameRow = sheet.createRow(rowNum++);
@@ -248,13 +321,16 @@ public class ExcelAbsnesiBulanan {
                 cell.setCellStyle(styleHeader);
             }
 
+            // Add a blank row between header and data
+            rowNum++;
+
             // Data rows
             int userRowNum = 1;
             for (Absensi absensi : userAbsensi) {
                 Row row = sheet.createRow(rowNum++);
                 Cell cell0 = row.createCell(0);
                 cell0.setCellValue(userRowNum++);
-                cell0.setCellStyle(styleNumber);
+                cell0.setCellStyle(styleCenterNumber); // Use the centered number style
 
                 Cell cell1 = row.createCell(1);
                 cell1.setCellValue(new SimpleDateFormat("yyyy-MM-dd").format(absensi.getTanggalAbsen()));
@@ -275,14 +351,17 @@ public class ExcelAbsnesiBulanan {
                 CellStyle styleColor = null;
 
                 switch (absensi.getStatusAbsen()) {
-                    case "Lebih Awal":
-                        row.setRowStyle(styleColor4);
-                        break;
                     case "Terlambat":
-                        row.setRowStyle(styleColor1);
+                        styleColor = styleColorLate;
+                        userTotalLate++; // Increment late count
                         break;
                     case "Izin":
-                        row.setRowStyle(styleColor2);
+                        styleColor = styleColorPermission;
+                        userTotalPermission++; // Increment permission count
+                        break;
+                    case "Lebih Awal":
+                        styleColor = styleColorEarly;
+                        userTotalEarly++; // Increment early count
                         break;
                 }
                 if (styleColor != null) {
@@ -290,12 +369,27 @@ public class ExcelAbsnesiBulanan {
                         row.getCell(i).setCellStyle(styleColor);
                     }
                 }
-
             }
+
+            // Adding summary row for each user
+            Row lateRow = sheet.createRow(rowNum++);
+            Cell lateCell = lateRow.createCell(0);
+            lateCell.setCellValue("Terlambat: " + userTotalLate);
+            lateCell.setCellStyle(styleHeader);
+
+            Row permissionRow = sheet.createRow(rowNum++);
+            Cell permissionCell = permissionRow.createCell(0);
+            permissionCell.setCellValue("Izin: " + userTotalPermission);
+            permissionCell.setCellStyle(styleHeader);
+
+            Row earlyRow = sheet.createRow(rowNum++);
+            Cell earlyCell = earlyRow.createCell(0);
+            earlyCell.setCellValue("Lebih Awal: " + userTotalEarly);
+            earlyCell.setCellStyle(styleHeader);
+
             // Add a blank row between each user's table for readability
             rowNum++;
         }
-
 
         // Adjust column width
         for (int i = 0; i < 5; i++) {
@@ -303,7 +397,7 @@ public class ExcelAbsnesiBulanan {
         }
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=AbsensiBulanan.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=AbsensiSimpel : " + getMonthName(month) +".xlsx");
         workbook.write(response.getOutputStream());
         workbook.close();
     }
