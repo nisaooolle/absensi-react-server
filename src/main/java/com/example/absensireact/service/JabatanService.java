@@ -14,7 +14,7 @@ public interface JabatanService {
     Jabatan addJabatan(Long adminId, Jabatan jabatan);
     Jabatan editJabatan(Long adminId, Jabatan jabatan); // Corrected method signature
 
-    Jabatan editJabatanById(Long id, Jabatan jabatan);
+    Jabatan editJabatanById(Long idJabatan, Jabatan updateJabatan);
 
     Map<String, Boolean> deleteJabatan(Long idJabatan);
 }

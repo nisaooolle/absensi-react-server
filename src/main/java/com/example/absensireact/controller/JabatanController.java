@@ -26,7 +26,7 @@ public class JabatanController {
     }
 
     @GetMapping("/jabatan/getbyid/{idJabatan}")
-    public ResponseEntity<Jabatan> getJabatanById(@PathVariable Long idJabatan) {
+    public ResponseEntity<Jabatan> getJabatanById(@PathVariable("idJabatan") Long idJabatan) {
         Optional<Jabatan> jabatan = jabatanService.getJabatanById(idJabatan);
         return jabatan.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -48,9 +48,9 @@ public class JabatanController {
         Jabatan updatedJabatan = jabatanService.editJabatan(adminId, jabatan);
         return ResponseEntity.ok(updatedJabatan);
     }
-    @PutMapping("/jabatan/edit/{id}")
-    public ResponseEntity<Jabatan> editJabatanById(@PathVariable Long id, @RequestBody Jabatan jabatan) {
-        Jabatan updatedJabatan = jabatanService.editJabatan(id, jabatan);
+    @PutMapping("/jabatan/editById/{idJabatan}")
+    public ResponseEntity<Jabatan> editJabatanById(@PathVariable("idJabatan") Long idJabatan, @RequestBody Jabatan jabatan) {
+        Jabatan updatedJabatan = jabatanService.editJabatanById(idJabatan, jabatan);
         return ResponseEntity.ok(updatedJabatan);
     }
 
