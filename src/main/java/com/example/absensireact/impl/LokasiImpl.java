@@ -7,13 +7,16 @@ import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Lokasi;
 import com.example.absensireact.model.Organisasi;
+import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.LokasiRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
+import com.example.absensireact.repository.SuperAdminRepository;
 import com.example.absensireact.service.LokasiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +33,29 @@ public class LokasiImpl implements LokasiService {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Autowired
+    private SuperAdminRepository superAdminRepository;
+
+
+    @Override
+    public  List<Lokasi>getAllBySuperAdmin(Long idSuperAdmin){
+        Optional<SuperAdmin> superAdminOptional = superAdminRepository.findById(idSuperAdmin);
+        if (superAdminOptional.isEmpty()) {
+            throw new NotFoundException("ID Super Admin tidak ditemukan: " + idSuperAdmin);
+        }
+        SuperAdmin superAdmin = superAdminOptional.get();
+
+        List<Admin> adminList = adminRepository.findBySuperAdmin(superAdmin);
+
+        List<Lokasi> lokasiList = new ArrayList<>();
+
+        for (Admin admin : adminList) {
+            List<Lokasi> adminLokasiList = lokasiRepository.findByAdmin(admin);
+            lokasiList.addAll(adminLokasiList);
+        }
+
+        return lokasiList;
+    }
 //    @Override
 //    public LokasiDTO saveLokasi(LokasiDTO lokasiDTO) {
 //        Lokasi lokasi = convertToEntity(lokasiDTO);
@@ -74,6 +100,27 @@ public class LokasiImpl implements LokasiService {
         }
     }
 
+     @Override
+     public Lokasi tambahLokasiBySuperAdmin(Long idSuperAdmin, Lokasi lokasi, Long idOrganisasi) {
+         Optional<SuperAdmin> superadminOptional = superAdminRepository.findById(idSuperAdmin);
+         if (superadminOptional.isPresent()) {
+             SuperAdmin superAdmin = superadminOptional.get();
+             Optional<Organisasi> organisasiOptional = organisasiRepository.findById(idOrganisasi);
+             if (organisasiOptional.isPresent()) {
+                 Organisasi organisasi = organisasiOptional.get();
+                 lokasi.setNamaLokasi(lokasi.getNamaLokasi());
+                 lokasi.setAlamat(lokasi.getAlamat());
+                 lokasi.setAdmin(organisasi.getAdmin());
+                 lokasi.setOrganisasi(organisasi);
+                 return lokasiRepository.save(lokasi);
+             } else {
+                 throw new NotFoundException("Organisasi dengan ID " + idOrganisasi + " tidak ditemukan.");
+             }
+         } else {
+             throw new NotFoundException("Super admi dengan ID " + idSuperAdmin + " tidak ditemukan.");
+         }
+     }
+
     @Override
     public List<LokasiDTO> getAllLokasi() {
         return lokasiRepository.findAll().stream()
@@ -88,6 +135,10 @@ public class LokasiImpl implements LokasiService {
     }
 
     @Override
+    public Optional<Lokasi> getByIdLokasi(Long idLokasi){
+        return lokasiRepository.findById(idLokasi);
+    }
+    @Override
     public LokasiDTO updateLokasi(Long id, LokasiDTO lokasiDTO) {
         return lokasiRepository.findById(id).map(existingLokasi -> {
             updateEntity(existingLokasi, lokasiDTO);
@@ -97,8 +148,8 @@ public class LokasiImpl implements LokasiService {
     }
 
     @Override
-    public void deleteLokasi(Long id) {
-        lokasiRepository.deleteById(id);
+    public void deleteLokasi(Long idLokasi) {
+        lokasiRepository.deleteById(idLokasi);
     }
 
 
@@ -118,6 +169,14 @@ public class LokasiImpl implements LokasiService {
         }
     }
 
+    @Override
+    public Lokasi updateLokasiByIdlokasi(Long idLokasi, Lokasi lokasiDetails) {
+        return lokasiRepository.findById(idLokasi).map(lokasi -> {
+            lokasi.setNamaLokasi(lokasiDetails.getNamaLokasi());
+            lokasi.setAlamat(lokasiDetails.getAlamat());
+            return lokasiRepository.save(lokasi);
+        }).orElseThrow(() -> new NotFoundException("Lokasi not found with id " + idLokasi));
+    }
     private OrganisasiDTO convertOrganisasiToDto(Organisasi organisasi) {
         OrganisasiDTO organisasiDTO = new OrganisasiDTO();
         organisasiDTO.setId(organisasi.getId());

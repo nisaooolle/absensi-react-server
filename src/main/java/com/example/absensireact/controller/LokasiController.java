@@ -3,6 +3,7 @@ package com.example.absensireact.controller;
 import com.example.absensireact.dto.AdminDTO;
 import com.example.absensireact.dto.LokasiDTO;
 import com.example.absensireact.dto.OrganisasiDTO;
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Lokasi;
 import com.example.absensireact.service.LokasiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/lokasi")
@@ -18,10 +20,15 @@ public class LokasiController {
     @Autowired
     private LokasiService lokasiService;
 
-//    @PostMapping("/lokasi/add/{adminId}")
-//    public ResponseEntity<LokasiDTO> createLokasi(@RequestBody LokasiDTO lokasiDTO) {
-//        return ResponseEntity.ok(lokasiService.saveLokasi(lokasiDTO));
-//    }
+    @PostMapping("/add/superadmin/{idSuperAdmin}")
+    public ResponseEntity<Lokasi> tambahLokasiBySuperAdmin(
+            @PathVariable("idSuperAdmin") Long idSuperAdmin,
+            @RequestParam("idOrganisasi") Long idOrganisasi,
+            @RequestBody Lokasi lokasi) {
+
+        Lokasi savedLokasi = lokasiService.tambahLokasiBySuperAdmin(idSuperAdmin, lokasi, idOrganisasi);
+        return ResponseEntity.ok(savedLokasi);
+    }
     @PostMapping("/tambah/{idAdmin}")
     public ResponseEntity<Lokasi> tambahLokasi(@PathVariable("idAdmin") Long idAdmin, @RequestBody Lokasi lokasi , @RequestParam Long idOrganisasi) {
         Lokasi lokasiBaru = lokasiService.tambahLokasi(idAdmin, lokasi , idOrganisasi);
@@ -37,6 +44,26 @@ public class LokasiController {
     public ResponseEntity<LokasiDTO> getLokasiById(@PathVariable Long id) {
         LokasiDTO lokasiDTO = lokasiService.getLokasiById(id);
         return ResponseEntity.ok(lokasiDTO);
+    }
+
+    @PutMapping("/editByIdLokasi/{idLokasi}")
+    public ResponseEntity<Lokasi> updateLokasiByIdLokasi(@PathVariable Long idLokasi, @RequestBody Lokasi lokasiDetails) {
+        try {
+            Lokasi updatedLokasi = lokasiService.updateLokasiByIdlokasi(idLokasi, lokasiDetails);
+            return ResponseEntity.ok(updatedLokasi);
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/getByIdLokasi/{idLokasi}")
+    public ResponseEntity<Lokasi> getByIdLokasi(@PathVariable Long idLokasi) {
+        Optional<Lokasi> lokasi = lokasiService.getByIdLokasi(idLokasi);
+        if (lokasi.isPresent()) {
+            return ResponseEntity.ok(lokasi.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
      @GetMapping("/get-admin/{idAdmin}")
     public ResponseEntity<List<Lokasi>>getLokasiByAdmin (@PathVariable Long idAdmin){
@@ -65,6 +92,10 @@ public class LokasiController {
         }
     }
 
+    @GetMapping("/superadmin/{idSuperAdmin}")
+    public List<Lokasi> getLokasiBySuperAdmin(@PathVariable Long idSuperAdmin) {
+        return lokasiService.getAllBySuperAdmin(idSuperAdmin);
+    }
 
       @PutMapping("/Update/{id}")
     public ResponseEntity<LokasiDTO> updateLokasi(@PathVariable Long id, @RequestBody LokasiDTO lokasiDTO) {
@@ -72,8 +103,8 @@ public class LokasiController {
         return ResponseEntity.ok(updatedLokasi);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteLembur(@PathVariable Long id) {
-        lokasiService.deleteLokasi(id);
+    @DeleteMapping("/delete/{idLokasi}")
+    public void deleteLembur(@PathVariable Long idLokasi) {
+        lokasiService.deleteLokasi(idLokasi);
     }
 }

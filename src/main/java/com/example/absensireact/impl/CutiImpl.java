@@ -58,16 +58,19 @@ public class CutiImpl implements CutiService {
 
     @Override
     public Cuti IzinCuti(Long userId, Cuti cuti){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User dengan ID " + userId + " tidak ditemukan."));
-
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("id user tidak ditemukan");
+        }
+        User user1 = userOptional.get();
 
         cuti.setAwalCuti(cuti.getAwalCuti());
         cuti.setAkhirCuti(cuti.getAkhirCuti());
         cuti.setKeperluan(cuti.getKeperluan());
         cuti.setMasukKerja(cuti.getMasukKerja());
         cuti.setStatus("diproses");
-        cuti.setUser(user);
+        cuti.setUser(user1);
+        cuti.setOrganisasi(user1.getOrganisasi());
 
         return cutiRepository.save(cuti);
 
