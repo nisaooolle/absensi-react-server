@@ -6,11 +6,14 @@ import com.example.absensireact.helper.CutiPDF;
 import com.example.absensireact.model.Cuti;
 import com.example.absensireact.service.CutiService;
 import com.example.absensireact.service.UserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -31,21 +34,20 @@ public class CutiController {
         this.cutiPDF = cutiPDF;
     }
 
-//    @GetMapping(value = "/cuti/{id}/download")
-//    public void downloadCutiPDF(@PathVariable Long id, HttpServletResponse response) {
-//        Optional<Cuti> cutiOptional = cutiService.GetCutiById(id);
-//        if (cutiOptional.isPresent()) {
-//            Cuti cuti = cutiOptional.get();
-//            try {
-//                cutiPDF.downloadPDF(cuti, response);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-//            }
-//        } else {
-//            response.setStatus(HttpStatus.NOT_FOUND.value());
-//        }
-//    }
+    @GetMapping("/cuti/download-pdf/{id}")
+    public void downloadPDF(@PathVariable Long id, HttpServletResponse response) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        cutiPDF.generatePDF(id, baos);
+
+        // Set response headers
+        response.setContentType("application/pdf");
+        response.setHeader("Content-disposition", "attachment; filename=cuti.pdf");
+        response.setContentLength(baos.size());
+
+        // Write PDF content to response output stream
+        response.getOutputStream().write(baos.toByteArray());
+        response.getOutputStream().flush();
+    }
 
     @GetMapping("/cuti/getById/{id}")
     public Optional<Cuti> GetCutiById(@PathVariable Long id ){
