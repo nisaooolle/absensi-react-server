@@ -1,6 +1,7 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.config.AppConfig;
+import com.example.absensireact.dto.PasswordDTO;
 import com.example.absensireact.exception.BadRequestException;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.*;
@@ -153,6 +154,28 @@ public class UserImpl implements UserService {
 
         return userRepository.save(user);
     }
+
+
+
+    @Override
+    public User putPassword(PasswordDTO passwordDTO, Long id) {
+        User update = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Id Not Found"));
+
+        boolean isOldPasswordCorrect = encoder.matches(passwordDTO.getOld_password(), update.getPassword());
+
+        if (!isOldPasswordCorrect) {
+            throw new NotFoundException("Password lama tidak sesuai");
+        }
+
+        if (passwordDTO.getNew_password().equals(passwordDTO.getConfirm_new_password())) {
+            update.setPassword(encoder.encode(passwordDTO.getNew_password()));
+            return userRepository.save(update);
+        } else {
+            throw new BadRequestException("Password tidak sesuai");
+        }
+    }
+
     @Override
     public User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift) {
         Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
