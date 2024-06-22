@@ -2,7 +2,10 @@ package com.example.absensireact.controller;
 
 
 import com.example.absensireact.config.AppConfig;
+import com.example.absensireact.dto.PasswordDTO;
+import com.example.absensireact.exception.CommonResponse;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.exception.ResponseHelper;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -94,6 +98,10 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @PutMapping(path = "/user/edit-password/{id}")
+    public CommonResponse<User> putPassword( @RequestBody PasswordDTO password,  @PathVariable Long id ) {
+        return ResponseHelper.ok(userImpl.putPassword(password , id));
+    }
     @PutMapping("/user/editBY/{id}")
     public ResponseEntity<User> editUser(@PathVariable Long id, @RequestBody  User user ) {
         try {

@@ -1,5 +1,6 @@
 package com.example.absensireact.service;
 
+import com.example.absensireact.dto.PasswordDTO;
 import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,8 @@ public interface UserService {
     List<User> getAllByShift(Long idShift);
 
     User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, User user);
+
+    User putPassword(PasswordDTO passwordDTO, Long id);
 
     User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift);
 
