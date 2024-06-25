@@ -1,10 +1,9 @@
 package com.example.absensireact.impl;
 
-import com.example.absensireact.exception.InternalErrorException;
+import com.example.absensireact.dto.PasswordDTO;
+import com.example.absensireact.exception.BadRequestException;
 import com.example.absensireact.exception.NotFoundException;
-import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.SuperAdmin;
-import com.example.absensireact.model.User;
 import com.example.absensireact.repository.SuperAdminRepository;
 import com.example.absensireact.service.SuperAdminService;
 import com.google.auth.Credentials;
@@ -13,15 +12,12 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import net.bytebuddy.implementation.bind.annotation.Super;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -90,6 +86,26 @@ public class SuperAdminImpl implements SuperAdminService {
         }
        throw new NotFoundException("Id Super Admin tidak ditemukan");
     }
+
+    @Override
+    public SuperAdmin putPasswordSuperAdmin(PasswordDTO passwordDTO, Long id) {
+        SuperAdmin update = superAdminRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Id Not Found"));
+
+        boolean isOldPasswordCorrect = encoder.matches(passwordDTO.getOld_password(), update.getPassword());
+
+        if (!isOldPasswordCorrect) {
+            throw new NotFoundException("Password lama tidak sesuai");
+        }
+
+        if (passwordDTO.getNew_password().equals(passwordDTO.getConfirm_new_password())) {
+            update.setPassword(encoder.encode(passwordDTO.getNew_password()));
+            return superAdminRepository.save(update);
+        } else {
+            throw new BadRequestException("Password tidak sesuai");
+        }
+    }
+
 
     @Override
     public void deleteSuperAdmin(Long id) throws IOException {

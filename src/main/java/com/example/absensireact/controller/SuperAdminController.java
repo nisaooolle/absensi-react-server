@@ -1,5 +1,9 @@
 package com.example.absensireact.controller;
 
+import com.example.absensireact.dto.PasswordDTO;
+import com.example.absensireact.exception.CommonResponse;
+import com.example.absensireact.exception.ResponseHelper;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.model.User;
 import com.example.absensireact.service.SuperAdminService;
@@ -56,6 +60,11 @@ public class SuperAdminController {
                                                      @RequestBody SuperAdmin superAdmin) throws IOException {
         SuperAdmin editedSuperAdmin = superAdminService.EditSuperAdmin(id, image, superAdmin);
         return ResponseEntity.ok(editedSuperAdmin);
+    }
+
+    @PutMapping(path = "/superadmin/edit-password/{id}")
+    public CommonResponse<SuperAdmin> putPassword(@RequestBody PasswordDTO password, @PathVariable Long id ) {
+        return ResponseHelper.ok(superAdminService.putPasswordSuperAdmin(password , id));
     }
 
     @DeleteMapping("/superadmin/delete/{id}")

@@ -27,9 +27,6 @@ public class Admin {
     @Column(name = "role")
     private String role;
 
-//    @ManyToMany
-//    @JoinColumn(name = "idOrganisasi")
-//    private Organisasi organisasi;
 
     @ManyToOne
     @JoinColumn(name = "idSuperAdmin")

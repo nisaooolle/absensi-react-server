@@ -77,8 +77,7 @@ public class JabatanImpl implements JabatanService {
         Jabatan existingJabatan = jabatanRepository.findById(jabatan.getIdJabatan())
                 .orElseThrow(() -> new NotFoundException("Jabatan not found with id: " + jabatan.getIdJabatan()));
 
-        // Check if the provided admin is the same as the admin of the existing jabatan
-        if (!existingJabatan.getAdmin().equals(admin)) {
+         if (!existingJabatan.getAdmin().equals(admin)) {
             throw new IllegalArgumentException("You are not authorized to edit this Jabatan.");
         }
 

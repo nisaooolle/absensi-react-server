@@ -1,12 +1,13 @@
 package com.example.absensireact.impl;
 
 
+import com.example.absensireact.dto.PasswordDTO;
+import com.example.absensireact.exception.BadRequestException;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.SuperAdmin;
-import com.example.absensireact.repository.AdminRepository;
-import com.example.absensireact.repository.SuperAdminRepository;
-import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.model.User;
+import com.example.absensireact.repository.*;
 import com.example.absensireact.service.AdminService;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -35,13 +36,27 @@ public class AdminImpl implements AdminService {
 
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
-
     private final SuperAdminRepository superAdminRepository;
+    private final JabatanRepository jabatanRepository;
+    private final ShiftRepository shiftRepository;
+    private final OrganisasiRepository organisasiRepository;
+    private final LokasiRepository lokasiRepository;
+    private final LemburRepository lemburRepository;
+    private final CutiRepository cutiRepository;
+    private final AbsensiRepository absensiRepository;
 
-    public AdminImpl(AdminRepository adminRepository, UserRepository userRepository, SuperAdminRepository superAdminRepository) {
+
+    public AdminImpl(AdminRepository adminRepository, UserRepository userRepository, SuperAdminRepository superAdminRepository, JabatanRepository jabatanRepository, ShiftRepository shiftRepository, OrganisasiRepository organisasiRepository, LokasiRepository lokasiRepository, LemburRepository lemburRepository, CutiRepository cutiRepository, AbsensiRepository absensiRepository) {
         this.adminRepository = adminRepository;
         this.userRepository = userRepository;
         this.superAdminRepository = superAdminRepository;
+        this.jabatanRepository = jabatanRepository;
+        this.shiftRepository = shiftRepository;
+        this.organisasiRepository = organisasiRepository;
+        this.lokasiRepository = lokasiRepository;
+        this.lemburRepository = lemburRepository;
+        this.cutiRepository = cutiRepository;
+        this.absensiRepository = absensiRepository;
     }
 
 
@@ -132,6 +147,25 @@ public class AdminImpl implements AdminService {
         return  adminRepository.save(admin);
     }
 
+    @Override
+    public Admin putPasswordAdmin(PasswordDTO passwordDTO, Long id) {
+        Admin update = adminRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Id Not Found"));
+
+        boolean isOldPasswordCorrect = encoder.matches(passwordDTO.getOld_password(), update.getPassword());
+
+        if (!isOldPasswordCorrect) {
+            throw new NotFoundException("Password lama tidak sesuai");
+        }
+
+        if (passwordDTO.getNew_password().equals(passwordDTO.getConfirm_new_password())) {
+            update.setPassword(encoder.encode(passwordDTO.getNew_password()));
+            return adminRepository.save(update);
+        } else {
+            throw new BadRequestException("Password tidak sesuai");
+        }
+    }
+
     private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "admin/";
@@ -144,15 +178,47 @@ public class AdminImpl implements AdminService {
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
 
-    @Override
-    public Map<String, Boolean> delete(Long id) {
-        try {
-            adminRepository.deleteById(id);
-            Map<String, Boolean> res = new HashMap<>();
-            res.put("Deleted", Boolean.TRUE);
-            return res;
-        } catch (Exception e) {
-            return null;
-        }
+//    @Override
+//    public Map<String, Boolean> delete(Long id) {
+//        Map<String, Boolean> res = new HashMap<>();
+//        try {
+//            adminRepository.deleteById(id);
+//
+//            jabatanRepository.deleteByAdminId(id);
+//
+//            shiftRepository.deleteByAdminId(id);
+//
+//            organisasiRepository.deleteByAdminId(id);
+//
+//
+//            lokasiRepository.deleteByAdminId(id);
+//
+//            List<User> userList = userRepository.findByAdminId(id);
+//
+//            for (User user : userList) {
+//                absensiRepository.deleteByUserId(user.getId());
+//                lemburRepository.deleteByUserId(user.getId());
+//                cutiRepository.deleteByUserId(user.getId());
+//                userRepository.delete(user);
+//            }
+//
+//
+//            res.put("Deleted", Boolean.TRUE);
+//        } catch (Exception e) {
+//            res.put("Deleted", Boolean.FALSE);
+//        }
+//        return res;
+//    }
+@Override
+public Map<String, Boolean> delete(Long id) {
+    Map<String, Boolean> res = new HashMap<>();
+    try {
+        adminRepository.deleteById(id);
+        res.put("Deleted", Boolean.TRUE);
+    } catch (Exception e) {
+        res.put("Deleted", Boolean.FALSE);
     }
+    return res;
+}
+
 }

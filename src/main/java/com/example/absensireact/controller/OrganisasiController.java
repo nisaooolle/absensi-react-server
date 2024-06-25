@@ -60,16 +60,23 @@ public class OrganisasiController {
         }
     }
 
-    @PostMapping("/organisasi/tambahByIdAdmin/{idAdmin}")
-    public ResponseEntity<Organisasi> tambahOrganisasi(
+    @PostMapping("/organisasi/tambahByIdAdmin/{idAdmin}/data")
+    public ResponseEntity<Organisasi> tambahOrganisasiData(
             @PathVariable Long idAdmin,
-            @RequestPart("image") MultipartFile image,
-            @RequestBody Organisasi organisasi) throws IOException {
+            @RequestBody Organisasi organisasi) {
 
-
-
-        Organisasi savedOrganisasi = organisasiService.TambahOrganisasi(idAdmin, organisasi, image);
+        Organisasi savedOrganisasi = organisasiService.TambahOrganisasi(idAdmin, organisasi);
         return ResponseEntity.ok(savedOrganisasi);
+    }
+
+    @PostMapping(value = "/organisasi/tammbahImageByOrg/{idAdmin}/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Void> tambahOrganisasiImage(
+            @PathVariable Long idAdmin,
+            @RequestParam("organisasiId") Long organisasiId,
+            @RequestPart("image") MultipartFile image) throws IOException {
+
+        organisasiService.saveOrganisasiImage(idAdmin, organisasiId, image);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/organisasi/tambahByIdSuperAdmin/{idSuperAdmin}")

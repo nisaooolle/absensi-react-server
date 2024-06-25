@@ -85,33 +85,6 @@ public class OrganisasiImpl implements OrganisasiService {
         return organisasiRepository.findById(id);
     }
 
-    @Override
-    public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi, MultipartFile image) throws IOException {
-        Optional<Admin> adminOptional = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));
-
-        if (!adminOptional.isPresent()) {
-            throw new NotFoundException("Id Admin tidak ditemukan");
-        }
-        Admin admin = adminOptional.get();
-
-        Optional<Organisasi> existingOrganisasi = organisasiRepository.findOrganisasiByIdAdmin(idAdmin);
-        if (existingOrganisasi.isPresent()) {
-            throw new IllegalStateException("Admin sudah memiliki organisasi");
-        }
-
-        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
-        organisasi.setAlamat(organisasi.getAlamat());
-        organisasi.setKecamatan(organisasi.getKecamatan());
-        organisasi.setKabupaten(organisasi.getKabupaten());
-        organisasi.setProvinsi(organisasi.getProvinsi());
-        organisasi.setNomerTelepon(organisasi.getNomerTelepon());
-        organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
-        organisasi.setAdmin(admin);
-        String file = uploadFoto(image, "_organisasi_" + idAdmin);
-        organisasi.setFotoOrganisasi(file);
-
-        return organisasiRepository.save(organisasi);
-    }
 
     @Override
     public Organisasi TambahOrganisasiBySuperAdmin(Long idSuperAdmin, Long idAdmin, Organisasi organisasi) throws IOException {
@@ -145,6 +118,45 @@ public class OrganisasiImpl implements OrganisasiService {
         return organisasiRepository.save(organisasi);
 
     }
+
+    @Override
+    public Organisasi TambahOrganisasi(Long idAdmin, Organisasi organisasi) {
+        Optional<Admin> adminOptional = Optional.ofNullable(adminRepository.findById(idAdmin).orElse(null));
+
+        if (!adminOptional.isPresent()) {
+            throw new NotFoundException("Id Admin tidak ditemukan");
+        }
+        Admin admin = adminOptional.get();
+
+        Optional<Organisasi> existingOrganisasi = organisasiRepository.findOrganisasiByIdAdmin(idAdmin);
+        if (existingOrganisasi.isPresent()) {
+            throw new IllegalStateException("Admin sudah memiliki organisasi");
+        }
+
+        organisasi.setAdmin(admin);
+        organisasi.setNamaOrganisasi(organisasi.getNamaOrganisasi());
+        organisasi.setAlamat(organisasi.getAlamat());
+        organisasi.setKecamatan(organisasi.getKecamatan());
+        organisasi.setKabupaten(organisasi.getKabupaten());
+        organisasi.setProvinsi(organisasi.getProvinsi());
+        organisasi.setNomerTelepon(organisasi.getNomerTelepon());
+        organisasi.setEmailOrganisasi(organisasi.getEmailOrganisasi());
+        return organisasiRepository.save(organisasi);
+    }
+
+    @Override
+    public void saveOrganisasiImage(Long idAdmin, Long organisasiId, MultipartFile image) throws IOException {
+        Optional<Organisasi> organisasiOptional = organisasiRepository.findById(organisasiId);
+        if (!organisasiOptional.isPresent()) {
+            throw new NotFoundException("Organisasi tidak ditemukan");
+        }
+
+        Organisasi organisasi = organisasiOptional.get();
+        String file = uploadFoto(image, "_organisasi_" + idAdmin);
+        organisasi.setFotoOrganisasi(file);
+        organisasiRepository.save(organisasi);
+    }
+
     private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "organisasi/";
