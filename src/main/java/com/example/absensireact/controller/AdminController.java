@@ -1,7 +1,11 @@
 package com.example.absensireact.controller;
 
+import com.example.absensireact.dto.PasswordDTO;
+import com.example.absensireact.exception.CommonResponse;
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.exception.ResponseHelper;
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.User;
 import com.example.absensireact.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +66,11 @@ public class AdminController {
         return new ResponseEntity<>(admins, HttpStatus.OK);
     }
 
+
+    @PutMapping(path = "/admin/edit-password/{id}")
+    public CommonResponse<Admin> putPassword(@RequestBody PasswordDTO password, @PathVariable Long id ) {
+        return ResponseHelper.ok(adminService.putPasswordAdmin(password , id));
+    }
     @PutMapping("/admin/edit/{id}")
     public ResponseEntity<Admin> updateAdmin(@PathVariable Long id, @RequestBody Admin admin) {
         Admin updatedAdmin = adminService.edit(id, admin);

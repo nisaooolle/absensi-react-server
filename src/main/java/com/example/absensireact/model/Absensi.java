@@ -59,7 +59,7 @@ public class Absensi {
     @JoinColumn(name = "userId")
     private User  user;
 
-    private Date attendanceDate;
+
 
     public Absensi() {
 
@@ -81,7 +81,6 @@ public class Absensi {
         this.status = status;
         this.statusAbsen = statusAbsen;
         this.user = user;
-        this.attendanceDate = attendanceDate;
     }
 
     public Long getId() {
@@ -204,11 +203,5 @@ public class Absensi {
         this.user = user;
     }
 
-    public Date getAttendanceDate() {
-        return attendanceDate;
-    }
 
-    public void setAttendanceDate(Date attendanceDate) {
-        this.attendanceDate = attendanceDate;
-    }
 }

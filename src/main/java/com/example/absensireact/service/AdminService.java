@@ -1,5 +1,6 @@
 package com.example.absensireact.service;
 
+import com.example.absensireact.dto.PasswordDTO;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.LoginRequest;
 import com.example.absensireact.model.User;
@@ -28,6 +29,8 @@ public interface AdminService {
 
 
     Admin ubahUsernamedanemail(Long id, Admin updateadmin);
+
+    Admin putPasswordAdmin(PasswordDTO passwordDTO, Long id);
 
     Map<String, Boolean> delete(Long id);
 }
