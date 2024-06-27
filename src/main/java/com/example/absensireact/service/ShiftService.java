@@ -15,6 +15,8 @@ public interface ShiftService {
 
     Optional<Shift>getbyAdmin(Long idAdmin);
 
+    Optional<Shift> getByUserId(Long userId);
+
     Shift PostShift(Long idAdmin, Shift shift);
 
 

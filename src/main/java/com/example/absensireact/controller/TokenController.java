@@ -52,7 +52,7 @@ public class TokenController {
     }
 
     @GetMapping("/get-token/{userId}")
-    public ResponseEntity<Optional<Token>>getTokenByUser(@PathVariable Long userId){
+    public ResponseEntity<?>getTokenByUser(@PathVariable Long userId){
       Optional<Token> tokenOptional = Optional.ofNullable(tokenService.getByUser(userId)
               .orElseThrow(() -> new NotFoundException("User not found with id : " + userId)));
         if (tokenOptional.isPresent()) {

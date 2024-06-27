@@ -3,9 +3,11 @@ package com.example.absensireact.impl;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Absensi;
 import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.Shift;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AbsensiRepository;
 import com.example.absensireact.repository.AdminRepository;
+import com.example.absensireact.repository.ShiftRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.AbsensiService;
 import com.google.auth.Credentials;
@@ -21,6 +23,7 @@ import javax.persistence.EntityNotFoundException;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -37,14 +40,15 @@ public class AbsensiImpl implements AbsensiService {
     private final UserRepository userRepository;
 
     private final AdminRepository adminRepository;
+    private final ShiftRepository shiftRepository;
 
 
 
-    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository, AdminRepository adminRepository) throws IOException {
+    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository, AdminRepository adminRepository, ShiftRepository shiftRepository) throws IOException {
         this.absensiRepository = absensiRepository;
         this.userRepository = userRepository;
-
         this.adminRepository = adminRepository;
+        this.shiftRepository = shiftRepository;
     }
 
 
@@ -73,54 +77,7 @@ public class AbsensiImpl implements AbsensiService {
     }
 
 
-//    @Override
-//    public List<Absensi> getByAdminAndDate(Long adminId, String date) {
-//        String[] dateParts = date.split("-");
-//        int year = Integer.parseInt(dateParts[0]);
-//        int month = dateParts.length > 1 ? Integer.parseInt(dateParts[1]) : 0;
-//        int day = dateParts.length > 2 ? Integer.parseInt(dateParts[2]) : 0;
-//
-//        Optional<Admin> adminOptional = adminRepository.findById(adminId);
-//        if (adminOptional.isPresent()) {
-//            Admin admin = adminOptional.get();
-//            Optional<User> adminUser = userRepository.findByIdAdminAbsensi(admin.getId());
-//
-//            if (adminUser.isPresent()) {
-//                User user = adminUser.get();
-//
-//                List<Absensi> absensiList = absensiRepository.findByUserAndDate(user, year, month, day);
-//                return absensiList;
-//            } else {
-//                throw new NotFoundException("User not found for admin with id: " + adminId);
-//            }
-//        } else {
-//            throw new NotFoundException("Admin not found with id: " + adminId);
-//        }
-//    }
 
-//    @Override
-//    public List<Absensi> getByAdminAndDate(Long adminId, String date) {
-//        String[] dateParts = date.split("-");
-//        int year = Integer.parseInt(dateParts[0]);
-//        int month = dateParts.length > 1 ? Integer.parseInt(dateParts[1]) : 0;
-//        int day = dateParts.length > 2 ? Integer.parseInt(dateParts[2]) : 0;
-//
-//        Optional<Admin> adminOptional = adminRepository.findById(adminId);
-//        if (adminOptional.isPresent()) {
-//            Admin admin = adminOptional.get();
-//            Optional<User> adminUser = userRepository.findByIdAdminAbsensi(admin.getId());
-//
-//            if (adminUser.isPresent()) {
-//                User user = adminUser.get();
-//
-//                return absensiRepository.findByUserAndDate(user, year, month, day);
-//            } else {
-//                throw new NotFoundException("User not found for admin with id: " + adminId);
-//            }
-//        } else {
-//            throw new NotFoundException("Admin not found with id: " + adminId);
-//        }
-//    }
     @Override
     public List<Absensi> getAllAbsensi(){
         return  absensiRepository.findAll();
@@ -193,23 +150,29 @@ public class AbsensiImpl implements AbsensiService {
         return startOfWeek.toString() + " - " + endOfWeek.toString();
     }
     @Override
-    public Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException {
+    public Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException, ParseException {
         Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
         if (existingAbsensi.isPresent()) {
             throw new NotFoundException("User sudah melakukan absensi masuk pada hari yang sama sebelumnya.");
         } else {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User dengan ID " + userId + " tidak ditemukan."));
+            Shift shift = shiftRepository.findById(user.getShift().getId())
+                    .orElseThrow(() -> new NotFoundException("ID shift tidak ditemukan"));
 
             Date tanggalHariIni = truncateTime(new Date());
             Date masuk = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
             String jamMasukString = formatter.format(masuk);
-            String keterangan = (getHourOfDay(masuk) < 7) ? "Lebih Awal" : "Terlambat";
+
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            Date waktuMasukShift = timeFormatter.parse(shift.getWaktuMasuk());
+
+            String keterangan = (masuk.before(waktuMasukShift)) ? "Lebih Awal" : "Terlambat";
 
             Absensi absensi = new Absensi();
             absensi.setUser(user);
-            absensi.setTanggalAbsen(tanggalHariIni); // Store the Date object
+            absensi.setTanggalAbsen(tanggalHariIni);
             absensi.setJamMasuk(jamMasukString);
             absensi.setJamPulang("-");
             absensi.setLokasiMasuk(lokasiMasuk);
@@ -225,7 +188,7 @@ public class AbsensiImpl implements AbsensiService {
 
 
     @Override
-    public Absensi Pulang(Long userId, MultipartFile image, String lokasiPulang , String keteranganPulangAwal) throws IOException {
+    public Absensi Pulang(Long userId, MultipartFile image, String lokasiPulang, String keteranganPulangAwal) throws IOException, ParseException {
         Absensi absensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()))
                 .orElseThrow(() -> new NotFoundException("User belum melakukan absensi masuk hari ini."));
 
@@ -233,7 +196,18 @@ public class AbsensiImpl implements AbsensiService {
             throw new NotFoundException("User sudah melakukan absensi pulang hari ini.");
         }
 
+        Shift shift = shiftRepository.findById(absensi.getUser().getShift().getId())
+                .orElseThrow(() -> new NotFoundException("ID shift tidak ditemukan"));
+
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        Date waktuPulangShift = timeFormatter.parse(shift.getWaktuPulang());
+
         Date pulang = new Date();
+
+        if (pulang.before(waktuPulangShift)) {
+            throw new NotFoundException("User tidak bisa melakukan absensi pulang sebelum waktu yang ditentukan dalam shift.");
+        }
+
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         String jamPulangString = formatter.format(pulang);
 
@@ -244,6 +218,7 @@ public class AbsensiImpl implements AbsensiService {
 
         return absensiRepository.save(absensi);
     }
+
 
     @Override
     public boolean checkUserAlreadyAbsenToday(Long userId) {
