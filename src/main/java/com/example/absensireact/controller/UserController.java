@@ -92,6 +92,16 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/user/byAdmin/{idAdmin}")
+    public ResponseEntity<List<User>> getUsersByAdmin(@PathVariable Long idAdmin) {
+        try {
+            List<User> users = userImpl.getAllByAdmin(idAdmin);
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
     @GetMapping("/user/getUserBy/{id}")
     public ResponseEntity<User> GetUserById (@PathVariable Long id){
         User user = userImpl.getById(id);

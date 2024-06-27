@@ -121,6 +121,13 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public List<User> getAllByAdmin(Long idAdmin) {
+        Admin admin = adminRepository.findById(idAdmin)
+                .orElseThrow(() -> new NotFoundException("id Admin tidak ditemukan: " + idAdmin));
+        List<User> userList = userRepository.findByIdAdmin(idAdmin);
+        return userList;
+    }
+    @Override
     public List<User> getAllByShift(Long idShift) {
         Optional<Shift> shiftOptional = shiftRepository.findById(idShift);
         if (shiftOptional.isEmpty()) {

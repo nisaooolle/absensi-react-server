@@ -30,6 +30,12 @@ public class ShiftController {
         return new ResponseEntity<>(shifts, HttpStatus.OK);
     }
 
+    @GetMapping("/getShift-byUserId/{userId}")
+    public ResponseEntity<?> getAllShiftsByUserId(@PathVariable Long userId) {
+        Optional<Shift> shifts = shiftService.getByUserId(userId);
+        return new ResponseEntity<>(shifts, HttpStatus.OK);
+    }
+
     @GetMapping("/getbyId/{id}")
     public ResponseEntity<Shift> getShiftById(@PathVariable("id") Long id) {
         Optional<Shift> shift = shiftService.getshiftById(id);

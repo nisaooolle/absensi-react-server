@@ -242,6 +242,8 @@ public class AbsensiController {
             return ResponseEntity.ok().body(absensi);
         } catch (IOException | EntityNotFoundException | NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
     }
      @PutMapping("/absensi/pulang/{userId}")
@@ -253,7 +255,7 @@ public class AbsensiController {
         try {
             Absensi absensi = absensiService.Pulang(userId ,image , lokasiPulang , keteranganPulangAwal );
             return ResponseEntity.ok().body(absensi);
-        } catch (IOException | NotFoundException e) {
+        } catch (IOException | NotFoundException | ParseException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -50,6 +50,13 @@ public class ShiftImpl implements ShiftService {
     }
 
     @Override
+    public Optional<Shift> getByUserId(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("id user tidak ditemukan"));
+
+        return shiftRepository.findById(user.getShift().getId());
+    }
+    @Override
     public Shift PostShift(Long idAdmin, Shift shift){
         Optional<Admin> admin1 = adminRepository.findById(idAdmin);
         if (admin1.isPresent()) {
