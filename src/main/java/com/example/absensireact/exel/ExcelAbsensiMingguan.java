@@ -82,13 +82,15 @@ public class ExcelAbsensiMingguan {
 
         CellStyle styleColorPermission = workbook.createCellStyle();
         styleColorPermission.cloneStyleFrom(styleNumber);
-        styleColorPermission.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        styleColorPermission.setFillForegroundColor(IndexedColors.DARK_YELLOW.getIndex());
         styleColorPermission.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         CellStyle styleColorEarly = workbook.createCellStyle();
         styleColorEarly.cloneStyleFrom(styleNumber);
-        styleColorEarly.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        styleColorEarly.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+
 
         List<Absensi> absensiList = absensiRepository.findByMingguan(tanggalAwal, tanggalAkhir);
 
@@ -103,7 +105,7 @@ public class ExcelAbsensiMingguan {
         titleCell.setCellValue("DATA ABSENSI MINGGUAN : " + formatDate(tanggalAwal) + " - " + formatDate(tanggalAkhir));
         titleCell.setCellStyle(styleTitle);
         sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4)); // Merging cells for title
-
+        rowNum++;
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
             List<Absensi> userAbsensi = entry.getValue();
@@ -162,7 +164,7 @@ public class ExcelAbsensiMingguan {
                 cell4.setCellStyle(styleNumber);
 
                 CellStyle styleColor = null;
-
+                rowNum++;
                 switch (absensi.getStatusAbsen()) {
                     case "Terlambat":
                         styleColor = styleColorLate;
@@ -221,6 +223,10 @@ public class ExcelAbsensiMingguan {
         Sheet sheet = workbook.createSheet("Absensi-harian");
 
 
+        Font fontWhite = workbook.createFont();
+        fontWhite.setColor(IndexedColors.WHITE.getIndex());
+
+
         // Cell styles
         CellStyle styleHeader = workbook.createCellStyle();
         styleHeader.setAlignment(HorizontalAlignment.CENTER);
@@ -244,6 +250,8 @@ public class ExcelAbsensiMingguan {
         styleNumber.setBorderRight(BorderStyle.THIN);
         styleNumber.setBorderBottom(BorderStyle.THIN);
         styleNumber.setBorderLeft(BorderStyle.THIN);
+        styleNumber.setFont(fontWhite);
+
 
         CellStyle styleCenterNumber = workbook.createCellStyle();
         styleCenterNumber.setAlignment(HorizontalAlignment.CENTER);
@@ -261,13 +269,15 @@ public class ExcelAbsensiMingguan {
 
         CellStyle styleColorPermission = workbook.createCellStyle();
         styleColorPermission.cloneStyleFrom(styleNumber);
-        styleColorPermission.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        styleColorPermission.setFillForegroundColor(IndexedColors.DARK_YELLOW.getIndex());
         styleColorPermission.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         CellStyle styleColorEarly = workbook.createCellStyle();
         styleColorEarly.cloneStyleFrom(styleNumber);
-        styleColorEarly.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        styleColorEarly.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(tanggal);
@@ -291,7 +301,7 @@ public class ExcelAbsensiMingguan {
         titleCell.setCellValue("DATA ABSENSI HARIAN : " + day + " " + getMonthName(month) + " " + year);
         titleCell.setCellStyle(styleTitle);
         sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4)); // Merging cells for title
-
+        rowNum++;
 
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
@@ -351,7 +361,7 @@ public class ExcelAbsensiMingguan {
                 cell4.setCellStyle(styleNumber);
 
                 CellStyle styleColor = null;
-
+                rowNum++;
                 switch (absensi.getStatusAbsen()) {
                     case "Terlambat":
                         styleColor = styleColorLate;

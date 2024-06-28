@@ -43,7 +43,7 @@ public class LemburImpl implements LemburService {
         if (userLembur == null) {
             throw new NotFoundException("User id tidak ditemukan");
         }
-        lembur.setTanggalLebur(lembur.getTanggalLebur());
+        lembur.setTanggalLembur(lembur.getTanggalLembur());
         lembur.setJamMulai(lembur.getJamMulai());
         lembur.setJamSelesai(lembur.getJamSelesai());
         lembur.setKeteranganLembur(lembur.getKeteranganLembur());
@@ -57,7 +57,7 @@ public class LemburImpl implements LemburService {
         Optional<Lembur> lemburOptional = lemburRepository.findById(id);
         if (lemburOptional.isPresent()) {
             Lembur lembur = lemburOptional.get();
-            lembur.setTanggalLebur(updatedLembur.getTanggalLebur());
+            lembur.setTanggalLembur(updatedLembur.getTanggalLembur());
             lembur.setJamMulai(updatedLembur.getJamMulai());
             lembur.setJamSelesai(updatedLembur.getJamSelesai());
             lembur.setKeteranganLembur(updatedLembur.getKeteranganLembur());
