@@ -115,12 +115,12 @@ public class AbsensiExportService {
 
         CellStyle styleColorPermission = workbook.createCellStyle();
         styleColorPermission.cloneStyleFrom(styleNumber);
-        styleColorPermission.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        styleColorPermission.setFillForegroundColor(IndexedColors.DARK_YELLOW.getIndex());
         styleColorPermission.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         CellStyle styleColorEarly = workbook.createCellStyle();
         styleColorEarly.cloneStyleFrom(styleNumber);
-        styleColorEarly.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+        styleColorEarly.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         // Fetch data
         List<Absensi> absensiList = absensiRepository.findabsensiByUserId(userId);
@@ -139,7 +139,7 @@ public class AbsensiExportService {
         titleCell.setCellValue("DATA REKAPAN PERKARYAWAN "  );
         titleCell.setCellStyle(styleTitle);
         sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4)); // Merging cells for title
-
+         rowNum++;
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
             List<Absensi> userAbsensi = entry.getValue();
@@ -155,6 +155,7 @@ public class AbsensiExportService {
             nameCell.setCellValue("Nama :  " + userName);
             nameCell.setCellStyle(styleHeader);
 
+            rowNum++;
 
 
             // Header row
@@ -167,7 +168,6 @@ public class AbsensiExportService {
             }
 
             // Add a blank row between header and data
-            rowNum++;
 
             // Data rows
             int userRowNum = 1;
@@ -194,7 +194,7 @@ public class AbsensiExportService {
                 cell4.setCellStyle(styleNumber);
 
                 CellStyle styleColor = null;
-
+                 rowNum++;
                 switch (absensi.getStatusAbsen()) {
                     case "Terlambat":
                         styleColor = styleColorLate;

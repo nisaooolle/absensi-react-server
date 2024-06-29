@@ -16,7 +16,7 @@ public class Lembur {
     private String nama ;
 
     @Column(name = "tanggalLembur")
-    private String tanggalLebur;
+    private String tanggalLembur;
 
     @Column(name = "jamMulai")
     private String jamMulai;
@@ -35,9 +35,9 @@ public class Lembur {
 
     }
 
-    public Lembur(Long id, String tanggalLebur, String jamMulai, String jamSelesai, String keteranganLembur, User user , String nama) {
+    public Lembur(Long id, String tanggalLembur, String jamMulai, String jamSelesai, String keteranganLembur, User user , String nama) {
         this.id = id;
-        this.tanggalLebur = tanggalLebur;
+        this.tanggalLembur = tanggalLembur;
         this.jamMulai = jamMulai;
         this.jamSelesai = jamSelesai;
         this.keteranganLembur = keteranganLembur;
@@ -54,12 +54,12 @@ public class Lembur {
         this.id = id;
     }
 
-    public String getTanggalLebur() {
-        return tanggalLebur;
+    public String getTanggalLembur() {
+        return tanggalLembur;
     }
 
-    public void setTanggalLebur(String tanggalLebur) {
-        this.tanggalLebur = tanggalLebur;
+    public void setTanggalLembur(String tanggalLembur) {
+        this.tanggalLembur = tanggalLembur;
     }
 
     public String getJamMulai() {
