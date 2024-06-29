@@ -178,37 +178,7 @@ public class AdminImpl implements AdminService {
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
 
-//    @Override
-//    public Map<String, Boolean> delete(Long id) {
-//        Map<String, Boolean> res = new HashMap<>();
-//        try {
-//            adminRepository.deleteById(id);
-//
-//            jabatanRepository.deleteByAdminId(id);
-//
-//            shiftRepository.deleteByAdminId(id);
-//
-//            organisasiRepository.deleteByAdminId(id);
-//
-//
-//            lokasiRepository.deleteByAdminId(id);
-//
-//            List<User> userList = userRepository.findByAdminId(id);
-//
-//            for (User user : userList) {
-//                absensiRepository.deleteByUserId(user.getId());
-//                lemburRepository.deleteByUserId(user.getId());
-//                cutiRepository.deleteByUserId(user.getId());
-//                userRepository.delete(user);
-//            }
-//
-//
-//            res.put("Deleted", Boolean.TRUE);
-//        } catch (Exception e) {
-//            res.put("Deleted", Boolean.FALSE);
-//        }
-//        return res;
-//    }
+
 @Override
 public Map<String, Boolean> delete(Long id) {
     Map<String, Boolean> res = new HashMap<>();

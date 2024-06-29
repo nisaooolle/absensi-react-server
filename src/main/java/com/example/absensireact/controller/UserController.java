@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -67,6 +68,7 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
     }
+
     @GetMapping("/user/get-allUser")
     public ResponseEntity<List<User>> getAllUser() {
         List<User> users = userImpl.getAll();
@@ -116,6 +118,16 @@ public class UserController {
     public ResponseEntity<User> editUser(@PathVariable Long id, @RequestBody  User user ) {
         try {
             User updatedUser = userImpl.edit(id, user );
+            return ResponseEntity.ok(updatedUser);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @PutMapping("/user/editBYSuper/{id}")
+    public ResponseEntity<User> editUserBySuper(@PathVariable Long id,@RequestParam Long idJabatan , @RequestParam Long idShift ,@RequestBody  User user ) {
+        try {
+            User updatedUser = userImpl.EditUserBySuper(id,idJabatan, idShift ,user );
             return ResponseEntity.ok(updatedUser);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

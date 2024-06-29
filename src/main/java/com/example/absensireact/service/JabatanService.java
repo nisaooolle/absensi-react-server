@@ -12,6 +12,9 @@ public interface JabatanService {
     List<Jabatan> getJabatanByAdminId(Long adminId);
     Optional<Jabatan> getJabatanById(Long id);
     Jabatan addJabatan(Long adminId, Jabatan jabatan);
+
+    List<Jabatan> getJabatanBySuperAdminId(Long idSuperAdmin);
+
     Jabatan editJabatan(Long adminId, Jabatan jabatan); // Corrected method signature
 
     Jabatan editJabatanById(Long idJabatan, Jabatan updateJabatan);

@@ -112,6 +112,10 @@ public class SuperAdminImpl implements SuperAdminService {
         Optional<SuperAdmin> superAdminOptional = superAdminRepository.findById(id);
         if (superAdminOptional.isPresent()) {
             SuperAdmin superAdmin = superAdminOptional.get();
+            if (superAdmin.getImageSuperAdmin().isEmpty()) {
+            superAdminRepository.deleteById(id);
+
+            }
             String fotoUrl = superAdmin.getImageSuperAdmin();
             String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
             deleteFoto(fileName);
@@ -119,6 +123,32 @@ public class SuperAdminImpl implements SuperAdminService {
         } else {
             throw new NotFoundException("Organisasi not found with id: " + id);
         }
+    }
+
+
+    @Override
+    public SuperAdmin ubahUsernamedanemail(Long id, SuperAdmin updateadmin){
+        Optional<SuperAdmin> superoptional = superAdminRepository.findById(id);
+        if (superoptional.isEmpty()) {
+            throw new NotFoundException("Id super admin tidak ditemukan :" + id);
+        }
+        SuperAdmin superAdmin = superoptional.get();
+
+        superAdmin.setEmail(updateadmin.getEmail());
+        superAdmin.setUsername(updateadmin.getUsername());
+        return  superAdminRepository.save(superAdmin);
+    }
+
+    @Override
+    public SuperAdmin uploadImage(Long id, MultipartFile image) throws IOException {
+        Optional<SuperAdmin> superOptional = superAdminRepository.findById(id);
+        if (superOptional.isEmpty()) {
+            throw new NotFoundException("Id admin tidak ditemukan");
+        }
+        String fileUrl = uploadFoto(image , "admin" + id);
+        SuperAdmin superAdmin = superOptional.get();
+        superAdmin.setImageSuperAdmin(fileUrl);
+        return superAdminRepository.save(superAdmin);
     }
 
 

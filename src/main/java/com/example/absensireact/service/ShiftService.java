@@ -15,6 +15,8 @@ public interface ShiftService {
 
     Optional<Shift>getbyAdmin(Long idAdmin);
 
+    List<Shift> getShiftBySuperAdminId(Long idSuperAdmin);
+
     Optional<Shift> getByUserId(Long userId);
 
     Shift PostShift(Long idAdmin, Shift shift);
@@ -22,7 +24,8 @@ public interface ShiftService {
 
 
 
-    Shift editShiftById(Long id, Long idAdmin, Shift updatedShift);
+
+    Shift editShiftById(Long id, Shift updatedShift);
 
     Map<String, Boolean> delete(Long id);
 }

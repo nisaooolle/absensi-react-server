@@ -11,10 +11,7 @@ import com.example.absensireact.service.ShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ShiftImpl implements ShiftService {
@@ -50,6 +47,16 @@ public class ShiftImpl implements ShiftService {
     }
 
     @Override
+    public List<Shift> getShiftBySuperAdminId(Long idSuperAdmin) {
+        List<Admin> admins = adminRepository.findBySuperAdminId(idSuperAdmin);
+        List<Shift> shifts = new ArrayList<>();
+        for (Admin admin : admins) {
+            shifts.addAll(shiftRepository.getByIdAdmin(admin.getId()));
+        }
+        return shifts;
+    }
+
+    @Override
     public Optional<Shift> getByUserId(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("id user tidak ditemukan"));
@@ -71,25 +78,21 @@ public class ShiftImpl implements ShiftService {
     }
 
     @Override
-    public Shift editShiftById(Long id, Long idAdmin, Shift updatedShift) {
-        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
-        if (adminOptional.isEmpty()) {
-            throw new NotFoundException("id admin tidak ditemukan");
-        }
+    public Shift editShiftById(Long id, Shift updatedShift) {
+
         Optional<Shift> shiftOptional = shiftRepository.findById(id);
         if (shiftOptional.isEmpty()) {
             throw new NotFoundException("Shift id tidak ditemukan");
         }
         Shift shift = shiftOptional.get();
-        Admin admin = adminOptional.get();
-
-        shift.setAdmin(admin);
         shift.setNamaShift(updatedShift.getNamaShift());
         shift.setWaktuMasuk(updatedShift.getWaktuMasuk());
         shift.setWaktuPulang(updatedShift.getWaktuPulang());
 
         return shiftRepository.save(shift);
     }
+
+
     @Override
     public Map<String, Boolean> delete(Long id) {
         try {

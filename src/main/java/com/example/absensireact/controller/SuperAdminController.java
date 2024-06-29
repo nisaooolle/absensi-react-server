@@ -2,11 +2,13 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.dto.PasswordDTO;
 import com.example.absensireact.exception.CommonResponse;
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.exception.ResponseHelper;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.model.User;
 import com.example.absensireact.service.SuperAdminService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +28,24 @@ public class SuperAdminController {
         this.superAdminService = superAdminService;
     }
 
+
+    @PutMapping("/superadmin/edit-email-username/{id}")
+    public ResponseEntity<SuperAdmin> editemailusername(@PathVariable Long id, @RequestBody SuperAdmin updateAdmin) {
+        SuperAdmin Admin = superAdminService.ubahUsernamedanemail(id , updateAdmin);
+        return new ResponseEntity<>(Admin, HttpStatus.OK);
+    }
+
+    @PutMapping("/superadmin/ubah-foto/{id}")
+    public ResponseEntity<?>EditFotoSuperAdmin(@PathVariable Long id , @RequestPart MultipartFile image  ){
+        try {
+            SuperAdmin updateSuperAdmin = superAdminService.uploadImage(id, image );
+            return new ResponseEntity<>(updateSuperAdmin, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 
     @GetMapping("/superadmin/getAll")
     public ResponseEntity<List<SuperAdmin>> getAllSuperAdmin() {
