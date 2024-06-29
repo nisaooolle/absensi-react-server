@@ -184,6 +184,21 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public User EditUserBySuper (Long id , Long idJabatan , Long idShift , User updateUser ){
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("id user tidak ditenukan : " + id);
+        }
+        User user = userOptional.get();
+        user.setUsername(updateUser.getUsername());
+        user.setJabatan(jabatanRepository.findById(idJabatan)
+                .orElseThrow(() -> new NotFoundException("id Jabatan tidak ditemukan :" + idJabatan)));
+        user.setShift(shiftRepository.findById(idShift)
+                .orElseThrow(() -> new NotFoundException("id Shift tidak ditemukan : " + idShift)));
+        return userRepository.save(user);
+    }
+
+    @Override
     public User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift) {
         Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
         if (adminOptional.isPresent()) {

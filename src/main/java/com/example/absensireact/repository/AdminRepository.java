@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface AdminRepository extends JpaRepository<Admin , Long> {
 
 
+    List<Admin> findBySuperAdminId(Long superAdminId);
 
     List<Admin> findBySuperAdmin (SuperAdmin superAdmin);
     @Query(value = "SELECT * FROM admin WHERE email = :email", nativeQuery = true)

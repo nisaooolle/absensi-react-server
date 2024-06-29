@@ -11,10 +11,7 @@ import com.example.absensireact.service.JabatanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class JabatanImpl implements JabatanService {
@@ -56,19 +53,15 @@ public class JabatanImpl implements JabatanService {
         return jabatanRepository.save(jabatan);
     }
 
-//    @Override
-//    public Jabatan TambahJabatan (Long adminId , Jabatan jabatan){
-//        Admin admin = adminRepository.findById(adminId)
-//                .orElseThrow(() -> new NotFoundException(  "Admin not found with id: " + adminId));
-//
-//        List<User> userList = userRepository.findByIdJabatan(id);
-//        String jmlhKaryawan = String.valueOf(userList.size());
-//
-//        jabatan.setJumlahKaryawan(jmlhKaryawan);
-//        jabatan.setAdmin(admin);
-//        jabatan.setNamaJabatan(jabatan.getNamaJabatan());
-//        return jabatanRepository.save(jabatan);
-//    }
+    @Override
+    public List<Jabatan> getJabatanBySuperAdminId(Long idSuperAdmin) {
+        List<Admin> admins = adminRepository.findBySuperAdminId(idSuperAdmin);
+        List<Jabatan> jabatans = new ArrayList<>();
+        for (Admin admin : admins) {
+            jabatans.addAll(jabatanRepository.findByAdminId(admin.getId()));
+        }
+        return jabatans;
+    }
     @Override
     public Jabatan editJabatan(Long adminId, Jabatan jabatan) {
         Admin admin = adminRepository.findById(adminId)

@@ -23,4 +23,8 @@ public interface SuperAdminService {
     SuperAdmin putPasswordSuperAdmin(PasswordDTO passwordDTO, Long id);
 
     void deleteSuperAdmin(Long id)throws IOException ;
+
+    SuperAdmin ubahUsernamedanemail(Long id, SuperAdmin updateadmin);
+
+    SuperAdmin uploadImage(Long id, MultipartFile image) throws IOException;
 }

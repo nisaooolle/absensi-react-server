@@ -43,6 +43,10 @@ public class JabatanController {
         return ResponseEntity.ok(newJabatan);
     }
 
+    @GetMapping("/jabatan/getBySuper/{idSuperAdmin}")
+    public List<Jabatan> getJabatanBySuperAdminId(@PathVariable Long idSuperAdmin) {
+        return jabatanService.getJabatanBySuperAdminId(idSuperAdmin);
+    }
     @PutMapping("/jabatan/edit/{adminId}")
     public ResponseEntity<Jabatan> editJabatan(@PathVariable Long adminId, @RequestBody Jabatan jabatan) {
         Jabatan updatedJabatan = jabatanService.editJabatan(adminId, jabatan);

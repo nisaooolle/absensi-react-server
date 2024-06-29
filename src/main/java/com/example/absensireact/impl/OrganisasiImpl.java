@@ -268,10 +268,15 @@ public class OrganisasiImpl implements OrganisasiService {
         Optional<Organisasi> organisasiOptional = organisasiRepository.findById(id);
         if (organisasiOptional.isPresent()) {
             Organisasi organisasi = organisasiOptional.get();
-            String fotoUrl = organisasi.getFotoOrganisasi();
-            String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
-             deleteFoto(fileName);
+            if (organisasi.getFotoOrganisasi() != null) {
+                String fotoUrl = organisasi.getFotoOrganisasi();
+                String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
+                deleteFoto(fileName);
+                organisasiRepository.deleteById(id);
+            } else {
+
              organisasiRepository.deleteById(id);
+            }
         } else {
             throw new NotFoundException("Organisasi not found with id: " + id);
         }

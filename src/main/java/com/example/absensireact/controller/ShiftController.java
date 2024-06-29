@@ -43,7 +43,10 @@ public class ShiftController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
+    @GetMapping("/getBySuper/{idSuperAdmin}")
+    public List<Shift> getShiftBySuperAdminId(@PathVariable Long idSuperAdmin) {
+        return shiftService.getShiftBySuperAdminId(idSuperAdmin);
+    }
 
     @PostMapping("/tambahShift/{idAdmin}")
     public ResponseEntity<Shift> postShift(@PathVariable("idAdmin") Long idAdmin,
@@ -54,10 +57,9 @@ public class ShiftController {
 
     @PutMapping("/editbyId/{id}")
     public ResponseEntity<Shift> editShiftById(@PathVariable("id") Long id,
-                                               @RequestParam Long idAdmin,
                                                @RequestBody Shift shift
     ) {
-        Shift updatedShift = shiftService.editShiftById(id, idAdmin , shift);
+        Shift updatedShift = shiftService.editShiftById(id, shift);
         return new ResponseEntity<>(updatedShift, HttpStatus.OK);
     }
 
