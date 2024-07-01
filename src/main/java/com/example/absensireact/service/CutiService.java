@@ -15,6 +15,8 @@ public interface CutiService {
     Cuti updateCutiById(Long id, Cuti updatedCuti);
 
 
+    List<Cuti> getAllByAdmin(Long adminId);
+
     Cuti IzinCuti(Long userId, Cuti cuti);
 
     Cuti TolakCuti(Long id, Cuti cuti);

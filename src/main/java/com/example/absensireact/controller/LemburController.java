@@ -1,9 +1,13 @@
 package com.example.absensireact.controller;
 
+import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.helper.LemburPDF;
+import com.example.absensireact.model.Cuti;
 import com.example.absensireact.model.Lembur;
 import com.example.absensireact.service.LemburService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +45,17 @@ public class LemburController {
         return lemburService.getAllLembur();
     }
 
+    @GetMapping("/lembur/admin/{adminId}")
+    public ResponseEntity<List<Lembur>> getAllByAdmin(@PathVariable Long adminId) {
+        try {
+            List<Lembur> lemburLIst = lemburService.getAllByAdmin(adminId);
+            return new ResponseEntity<>(lemburLIst, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping("/lembur/getByid/{id}")
     public Lembur getLemburById(@PathVariable Long id) {
         return lemburService.getLemburById(id);

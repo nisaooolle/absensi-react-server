@@ -13,5 +13,8 @@ public interface LemburService {
     Lembur IzinLembur(Long userId, Lembur lembur);
 
      Lembur updateLembur(Long id, Lembur lembur);
+
+    List<Lembur> getAllByAdmin(Long adminId);
+
     void deleteLembur(Long id);
 }

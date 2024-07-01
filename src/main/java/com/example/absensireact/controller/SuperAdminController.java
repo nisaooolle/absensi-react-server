@@ -30,7 +30,7 @@ public class SuperAdminController {
 
 
     @PutMapping("/superadmin/edit-email-username/{id}")
-    public ResponseEntity<SuperAdmin> editemailusername(@PathVariable Long id, @RequestBody SuperAdmin updateAdmin) {
+    public ResponseEntity<SuperAdmin> editemailusernamesuperadmin(@PathVariable Long id, @RequestBody SuperAdmin updateAdmin) {
         SuperAdmin Admin = superAdminService.ubahUsernamedanemail(id , updateAdmin);
         return new ResponseEntity<>(Admin, HttpStatus.OK);
     }
