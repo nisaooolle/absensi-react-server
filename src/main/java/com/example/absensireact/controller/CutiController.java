@@ -3,6 +3,7 @@ package com.example.absensireact.controller;
 
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.helper.CutiPDF;
+import com.example.absensireact.model.Absensi;
 import com.example.absensireact.model.Cuti;
 import com.example.absensireact.service.CutiService;
 import com.example.absensireact.service.UserService;
@@ -58,6 +59,17 @@ public class CutiController {
         return cutiOptional;
     }
 
+    @GetMapping("/cuti/admin/{adminId}")
+    public ResponseEntity<List<Cuti>> getAllByAdmin(@PathVariable Long adminId) {
+        try {
+            List<Cuti> absensiList = cutiService.getAllByAdmin(adminId);
+            return new ResponseEntity<>(absensiList, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping("/cuti/getByUser/{userId}")
     public List<Cuti> GetCutiByUserId(@PathVariable Long userId){
         List<Cuti> cuti =  cutiService.GetCutiByUserId(userId);

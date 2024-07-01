@@ -1,14 +1,16 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
+import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Cuti;
 import com.example.absensireact.model.User;
+import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.CutiRepository;
  import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.CutiService;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +19,14 @@ public class CutiImpl implements CutiService {
     private final CutiRepository cutiRepository;
 
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
 
 
-    public CutiImpl(CutiRepository cutiRepository, UserRepository userRepository ) {
+    public CutiImpl(CutiRepository cutiRepository, UserRepository userRepository, AdminRepository adminRepository) {
         this.cutiRepository = cutiRepository;
         this.userRepository = userRepository;
-     }
+        this.adminRepository = adminRepository;
+    }
 
     @Override
     public List<Cuti> GetCutiAll(){
@@ -56,6 +60,29 @@ public class CutiImpl implements CutiService {
         }
     }
 
+    @Override
+    public List<Cuti> getAllByAdmin(Long adminId) {
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+
+        if (adminOptional.isPresent()) {
+            Long admin = adminOptional.get().getId();
+            List<User> users = userRepository.findByadminIdAbsensi(admin);
+
+            if (users.isEmpty()) {
+                throw new NotFoundException("Tidak ada pengguna yang terkait dengan admin dengan id: " + adminId);
+            }
+
+            List<Cuti> cutiList = new ArrayList<>();
+            for (User user : users) {
+                List<Cuti> cutiUser = cutiRepository.findByUser(user);
+                cutiList.addAll(cutiUser);
+            }
+
+            return cutiList;
+        } else {
+            throw new NotFoundException("Id Admin tidak ditemukan dengan id: " + adminId);
+        }
+    }
     @Override
     public Cuti IzinCuti(Long userId, Cuti cuti){
         Optional<User> userOptional = userRepository.findById(userId);
