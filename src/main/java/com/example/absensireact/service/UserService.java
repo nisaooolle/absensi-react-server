@@ -29,6 +29,9 @@ public interface UserService {
 
     User putPassword(PasswordDTO passwordDTO, Long id);
 
+
+    User ubahUsernamedanemail(Long id, User updateUser, Long idOrganisasi);
+
     User EditUserBySuper(Long id, Long idJabatan, Long idShift, User updateUser);
 
     User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift);

@@ -49,7 +49,6 @@ public class OrganisasiController {
         Optional<Organisasi> organisasi = organisasiService.GetOrganisasiById(id);
         return organisasi.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
     @GetMapping("/organisasi/superadmin/{idSuperAdmin}")
     public ResponseEntity<List<Organisasi>> getAllOrganisasiBySuperAdmin(@PathVariable Long idSuperAdmin) {
         try {

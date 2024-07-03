@@ -68,6 +68,11 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @PutMapping("/user/edit-email-username/{id}")
+    public ResponseEntity<User> editemailusername(@PathVariable Long id, @RequestBody User updateUser , @RequestParam(name = "idOrganisasi" ,  required = false) Long idOrganisasi) {
+        User user = userImpl.ubahUsernamedanemail(id , updateUser , idOrganisasi);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
     @GetMapping("/user/get-allUser")
     public ResponseEntity<List<User>> getAllUser() {
