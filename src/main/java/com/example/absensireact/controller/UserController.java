@@ -69,8 +69,8 @@ public class UserController {
         }
     }
     @PutMapping("/user/edit-email-username/{id}")
-    public ResponseEntity<User> editemailusername(@PathVariable Long id, @RequestBody User updateUser , @RequestParam(name = "idOrganisasi" ,  required = false) Long idOrganisasi) {
-        User user = userImpl.ubahUsernamedanemail(id , updateUser , idOrganisasi);
+    public ResponseEntity<User> editemailusername(@PathVariable Long id, @RequestBody User updateUser) {
+        User user = userImpl.ubahUsernamedanemail(id , updateUser );
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
