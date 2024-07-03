@@ -184,7 +184,7 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public User ubahUsernamedanemail(Long id, User updateUser, Long idOrganisasi){
+    public User ubahUsernamedanemail(Long id, User updateUser){
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
             throw new NotFoundException("Id User tidak ditemukan :" + id);
@@ -193,14 +193,6 @@ public class UserImpl implements UserService {
         user.setEmail(updateUser.getEmail());
         user.setUsername(updateUser.getUsername());
 
-        if (idOrganisasi != null) {
-            Optional<Organisasi> organisasiOptional = organisasiRepository.findById(idOrganisasi);
-            if (organisasiOptional.isPresent()) {
-                user.setOrganisasi(organisasiOptional.get());
-            } else {
-                throw new NotFoundException("Id Organisasi tidak ditemukan :" + idOrganisasi);
-            }
-        }
 
         return userRepository.save(user);
     }

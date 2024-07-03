@@ -30,7 +30,7 @@ public interface UserService {
     User putPassword(PasswordDTO passwordDTO, Long id);
 
 
-    User ubahUsernamedanemail(Long id, User updateUser, Long idOrganisasi);
+    User ubahUsernamedanemail(Long id, User updateUser);
 
     User EditUserBySuper(Long id, Long idJabatan, Long idShift, User updateUser);
 
