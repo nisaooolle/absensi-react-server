@@ -65,66 +65,72 @@ public class AbsensiExportService {
     }
 
 //
-
     public void excelAbsensiRekapanPerkaryawan(Long userId , HttpServletResponse response) throws IOException {
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Rekapan-Perkaryawan");
+    Workbook workbook = new XSSFWorkbook();
+    Sheet sheet = workbook.createSheet("Rekap-Perkaryawan");
 
-        Font fontWhite = workbook.createFont();
-        fontWhite.setColor(IndexedColors.WHITE.getIndex()); // Set font color to white
+    Font fontWhite = workbook.createFont();
+    fontWhite.setColor(IndexedColors.WHITE.getIndex());
 
-        // Cell styles
-        CellStyle styleHeader = workbook.createCellStyle();
-        styleHeader.setAlignment(HorizontalAlignment.CENTER);
-        styleHeader.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleHeader.setBorderTop(BorderStyle.THIN);
-        styleHeader.setBorderRight(BorderStyle.THIN);
-        styleHeader.setBorderBottom(BorderStyle.THIN);
-        styleHeader.setBorderLeft(BorderStyle.THIN);
+    // Cell styles
+    CellStyle styleHeader = workbook.createCellStyle();
+    styleHeader.setAlignment(HorizontalAlignment.CENTER);
+    styleHeader.setVerticalAlignment(VerticalAlignment.CENTER);
+    styleHeader.setBorderTop(BorderStyle.THIN);
+    styleHeader.setBorderRight(BorderStyle.THIN);
+    styleHeader.setBorderBottom(BorderStyle.THIN);
+    styleHeader.setBorderLeft(BorderStyle.THIN);
 
-        CellStyle styleTitle = workbook.createCellStyle();
-        styleTitle.setAlignment(HorizontalAlignment.CENTER);
-        styleTitle.setVerticalAlignment(VerticalAlignment.CENTER);
-        Font titleFont = workbook.createFont();
-        titleFont.setBold(true);
-        styleTitle.setFont(titleFont);
+    CellStyle styleTitle = workbook.createCellStyle();
+    styleTitle.setAlignment(HorizontalAlignment.CENTER);
+    styleTitle.setVerticalAlignment(VerticalAlignment.CENTER);
+    Font titleFont = workbook.createFont();
+    titleFont.setBold(true);
+    styleTitle.setFont(titleFont);
 
-        CellStyle styleNumber = workbook.createCellStyle();
-        styleNumber.setAlignment(HorizontalAlignment.CENTER);
-        styleNumber.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleNumber.setBorderTop(BorderStyle.THIN);
-        styleNumber.setBorderRight(BorderStyle.THIN);
-        styleNumber.setBorderBottom(BorderStyle.THIN);
-        styleNumber.setBorderLeft(BorderStyle.THIN);
-        styleNumber.setFont(fontWhite);
+    CellStyle styleNumber = workbook.createCellStyle();
+    styleNumber.setAlignment(HorizontalAlignment.CENTER);
+    styleNumber.setVerticalAlignment(VerticalAlignment.CENTER);
+    styleNumber.setBorderTop(BorderStyle.THIN);
+    styleNumber.setBorderRight(BorderStyle.THIN);
+    styleNumber.setBorderBottom(BorderStyle.THIN);
+    styleNumber.setBorderLeft(BorderStyle.THIN);
+    styleNumber.setFont(fontWhite);
 
+    CellStyle styleCenterNumber = workbook.createCellStyle();
+    styleCenterNumber.setAlignment(HorizontalAlignment.CENTER);
+    styleCenterNumber.setVerticalAlignment(VerticalAlignment.CENTER);
+    styleCenterNumber.setBorderTop(BorderStyle.THIN);
+    styleCenterNumber.setBorderRight(BorderStyle.THIN);
+    styleCenterNumber.setBorderBottom(BorderStyle.THIN);
+    styleCenterNumber.setBorderLeft(BorderStyle.THIN);
 
-        CellStyle styleCenterNumber = workbook.createCellStyle();
-        styleCenterNumber.setAlignment(HorizontalAlignment.CENTER);
-        styleCenterNumber.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleCenterNumber.setBorderTop(BorderStyle.THIN);
-        styleCenterNumber.setBorderRight(BorderStyle.THIN);
-        styleCenterNumber.setBorderBottom(BorderStyle.THIN);
-        styleCenterNumber.setBorderLeft(BorderStyle.THIN);
+    // Conditional formatting colors
+    CellStyle styleColorLate = workbook.createCellStyle();
+    styleColorLate.cloneStyleFrom(styleNumber);
+    styleColorLate.setFillForegroundColor(IndexedColors.RED.getIndex());
+    styleColorLate.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        // Conditional formatting colors
-        CellStyle styleColorLate = workbook.createCellStyle();
-        styleColorLate.cloneStyleFrom(styleNumber);
-        styleColorLate.setFillForegroundColor(IndexedColors.RED.getIndex());
-        styleColorLate.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    CellStyle styleColorPermission = workbook.createCellStyle();
+    styleColorPermission.cloneStyleFrom(styleNumber);
+    styleColorPermission.setFillForegroundColor(IndexedColors.DARK_YELLOW.getIndex());
+    styleColorPermission.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        CellStyle styleColorPermission = workbook.createCellStyle();
-        styleColorPermission.cloneStyleFrom(styleNumber);
-        styleColorPermission.setFillForegroundColor(IndexedColors.DARK_YELLOW.getIndex());
-        styleColorPermission.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    CellStyle styleColorEarly = workbook.createCellStyle();
+    styleColorEarly.cloneStyleFrom(styleNumber);
+    styleColorEarly.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+    styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        CellStyle styleColorEarly = workbook.createCellStyle();
-        styleColorEarly.cloneStyleFrom(styleNumber);
-        styleColorEarly.setFillForegroundColor(IndexedColors.GREEN.getIndex());
-        styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        // Fetch data
+    // Fetch data
         List<Absensi> absensiList = absensiRepository.findabsensiByUserId(userId);
 
+    if (absensiList.isEmpty()) {
+        // Handle case when there are no absences for the given month and year
+        Row emptyRow = sheet.createRow(0);
+        Cell emptyCell = emptyRow.createCell(0);
+        emptyCell.setCellValue("Tidak ada data absensi untuk user ini  ");
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 4)); // Merge cells for message
+    } else {
         // Group by user
         Map<String, List<Absensi>> userAbsensiMap = new HashMap<>();
         for (Absensi absensi : absensiList) {
@@ -136,13 +142,15 @@ public class AbsensiExportService {
         // Title row
         Row titleRow = sheet.createRow(rowNum++);
         Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("DATA REKAPAN PERKARYAWAN "  );
+        titleCell.setCellValue("DATA REKAPAN PERKARYAWAN : ");
         titleCell.setCellStyle(styleTitle);
         sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4)); // Merging cells for title
-         rowNum++;
+        rowNum++;
+
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
             List<Absensi> userAbsensi = entry.getValue();
+            String position = userAbsensi.get(0).getUser().getJabatan().getNamaJabatan();
 
             // Variables to count absences for each user
             int userTotalLate = 0;
@@ -155,8 +163,11 @@ public class AbsensiExportService {
             nameCell.setCellValue("Nama :  " + userName);
             nameCell.setCellStyle(styleHeader);
 
+            Row positionRow = sheet.createRow(rowNum++);
+            Cell positionCell = positionRow.createCell(0);
+            positionCell.setCellValue("Jabatan :   " + position);
+            positionCell.setCellStyle(styleHeader);
             rowNum++;
-
 
             // Header row
             Row headerRow = sheet.createRow(rowNum++);
@@ -166,8 +177,6 @@ public class AbsensiExportService {
                 cell.setCellValue(headers[i]);
                 cell.setCellStyle(styleHeader);
             }
-
-            // Add a blank row between header and data
 
             // Data rows
             int userRowNum = 1;
@@ -194,7 +203,6 @@ public class AbsensiExportService {
                 cell4.setCellStyle(styleNumber);
 
                 CellStyle styleColor = null;
-                 rowNum++;
                 switch (absensi.getStatusAbsen()) {
                     case "Terlambat":
                         styleColor = styleColorLate;
@@ -235,16 +243,16 @@ public class AbsensiExportService {
             // Add a blank row between each user's table for readability
             rowNum++;
         }
-
-        // Adjust column width
-        for (int i = 0; i < 5; i++) {
-            sheet.autoSizeColumn(i);
-        }
-
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=RekapanPerkaryawan.xlsx");
-        workbook.write(response.getOutputStream());
-        workbook.close();
     }
+
+    for (int i = 0; i < 5; i++) {
+        sheet.autoSizeColumn(i);
+    }
+
+    response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    response.setHeader("Content-Disposition", "attachment; filename=RekpaPerkaryawan.xlsx");
+    workbook.write(response.getOutputStream());
+    workbook.close();
+}
 
 }

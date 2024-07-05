@@ -36,10 +36,10 @@ public class ExcelAbsensiMingguan {
     public void excelAbsensiMingguan(Date tanggalAwal, Date tanggalAkhir, HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Absensi-mingguan");
-        int rowNum = 0; // Deklarasi dan inisialisasi variabel rowNum
+        int rowNum = 0;
 
         Font fontWhite = workbook.createFont();
-        fontWhite.setColor(IndexedColors.WHITE.getIndex()); // Set font color to white
+        fontWhite.setColor(IndexedColors.WHITE.getIndex());
 
         // Cell styles
         CellStyle styleHeader = workbook.createCellStyle();
@@ -90,8 +90,6 @@ public class ExcelAbsensiMingguan {
         styleColorEarly.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-
-
         List<Absensi> absensiList = absensiRepository.findByMingguan(tanggalAwal, tanggalAkhir);
 
         Map<String, List<Absensi>> userAbsensiMap = new HashMap<>();
@@ -105,7 +103,7 @@ public class ExcelAbsensiMingguan {
         titleCell.setCellValue("DATA ABSENSI MINGGUAN : " + formatDate(tanggalAwal) + " - " + formatDate(tanggalAkhir));
         titleCell.setCellStyle(styleTitle);
         sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4)); // Merging cells for title
-        rowNum++;
+
         for (Map.Entry<String, List<Absensi>> entry : userAbsensiMap.entrySet()) {
             String userName = entry.getKey();
             List<Absensi> userAbsensi = entry.getValue();
@@ -126,9 +124,6 @@ public class ExcelAbsensiMingguan {
             Cell positionCell = positionRow.createCell(0);
             positionCell.setCellValue("Jabatan :   " + position);
             positionCell.setCellStyle(styleHeader);
-
-            // Add a blank row between header and data
-            rowNum++;
 
             // Header row
             Row headerRow = sheet.createRow(rowNum++);
@@ -164,7 +159,6 @@ public class ExcelAbsensiMingguan {
                 cell4.setCellStyle(styleNumber);
 
                 CellStyle styleColor = null;
-                rowNum++;
                 switch (absensi.getStatusAbsen()) {
                     case "Terlambat":
                         styleColor = styleColorLate;
@@ -196,7 +190,6 @@ public class ExcelAbsensiMingguan {
             Cell permissionCell = permissionRow.createCell(0);
             permissionCell.setCellValue("Izin: " + userTotalPermission);
             permissionCell.setCellStyle(styleHeader);
-
 
             Row earlyRow = sheet.createRow(rowNum++);
             Cell earlyCell = earlyRow.createCell(0);
