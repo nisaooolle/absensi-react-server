@@ -221,7 +221,7 @@ public class ExcelAbsnesiBulanan {
     }
 
 
-        public void excelAbsensiBulananSimpel(int month, HttpServletResponse response) throws IOException {
+        public void excelAbsensiBulananSimpel(int month, int year ,  HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Absensi-Simpel");
 
@@ -278,13 +278,13 @@ public class ExcelAbsnesiBulanan {
         styleColorEarly.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         // Fetch data
-        List<Absensi> absensiList = absensiRepository.findByMonth(month);
+        List<Absensi> absensiList = absensiRepository.findByMonthAndYear(month , year);
 
         if (absensiList.isEmpty()) {
             // Handle case when there are no absences for the given month and year
             Row emptyRow = sheet.createRow(0);
             Cell emptyCell = emptyRow.createCell(0);
-            emptyCell.setCellValue("Tidak ada data absensi simpel untuk bulan " + getMonthName(month) );
+            emptyCell.setCellValue("Tidak ada data absensi simpel untuk bulan " + getMonthName(month) + "-" + year );
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 4)); // Merge cells for message
         } else {
             // Group by user

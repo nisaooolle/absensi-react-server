@@ -96,6 +96,7 @@ public class UserImpl implements UserService {
         user.setOrganisasi(organisasi);
         user.setRole("USER");
         user.setUsername(user.getUsername());
+        user.setFotoUser(null);
         user.setPassword(encoder.encode(user.getPassword()));
 
         // Hitung lama kerja
@@ -231,6 +232,7 @@ public class UserImpl implements UserService {
             user.calculateLamaKerja();
             user.setStartKerja(new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
             user.setStatusKerja("aktif");
+            user.setFotoUser(null);
             user.setAdmin(admin);
 
             return userRepository.save(user);
