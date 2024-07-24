@@ -16,8 +16,7 @@ public interface UserService {
 //    User Register(User user);
 
 
-    User Register(User user, Long idOrganisasi);
-
+    User Register(User user, Long idOrganisasi, Long idShift);
 
     List<User> getAllByJabatan(Long idJabatan);
 
