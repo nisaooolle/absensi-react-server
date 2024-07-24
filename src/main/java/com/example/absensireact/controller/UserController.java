@@ -46,12 +46,8 @@ public class UserController {
 
 
     @PostMapping("/user/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user, @RequestParam Long idOrganisasi) {
-        Organisasi organisasi = organisasiRepository.findById(idOrganisasi)
-                .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan"));
-
-        User newUser = userImpl.Register(user, idOrganisasi);
-
+    public ResponseEntity<User> registerUser(@RequestBody User user, @RequestParam Long idOrganisasi , @RequestParam Long idShift) {
+        User newUser = userImpl.Register(user, idOrganisasi , idShift);
         return ResponseEntity.ok(newUser);
     }
     @GetMapping("/user/{idAdmin}/users")

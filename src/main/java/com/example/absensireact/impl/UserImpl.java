@@ -61,7 +61,7 @@ public class UserImpl implements UserService {
     AuthenticationManager authenticationManager;
 
     @Override
-    public User Register(User user, Long idOrganisasi) {
+    public User Register(User user, Long idOrganisasi, Long idShift) {
         if (adminRepository.existsByEmail(user.getEmail())) {
             throw new BadRequestException("Email sudah digunakan oleh admin");
         }
@@ -72,6 +72,9 @@ public class UserImpl implements UserService {
 
         Organisasi organisasi = organisasiRepository.findById(idOrganisasi)
                 .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan"));
+
+        Shift shift = shiftRepository.findById(idShift)
+                .orElseThrow(() -> new NotFoundException("id shift tidak ditemnukan : " + idShift));
 
         Long adminId = organisasi.getAdmin().getId();
 
@@ -88,21 +91,17 @@ public class UserImpl implements UserService {
         SimpleDateFormat indonesianDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
         String tanggalKerja = indonesianDateFormat.format(date);
 
+        user.setShift(shift);
         user.setStartKerja(tanggalKerja);
         user.setStatusKerja("aktif");
         user.setJabatan(null);
-        user.setShift(null);
         user.setAdmin(admin);
         user.setOrganisasi(organisasi);
         user.setRole("USER");
         user.setUsername(user.getUsername());
-        user.setFotoUser(null);
         user.setPassword(encoder.encode(user.getPassword()));
-
         // Hitung lama kerja
         user.calculateLamaKerja();
-
-        // Simpan user ke dalam database
         return userRepository.save(user);
     }
 

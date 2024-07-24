@@ -181,7 +181,8 @@ public User(){
     public void setRole(String role) {
         this.role = role;
     }
-    public void calculateLamaKerja() {
+
+    public String calculateLamaKerja() {
         if (startKerja != null && statusKerja != null && statusKerja.equals("aktif")) {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
@@ -190,30 +191,21 @@ public User(){
 
                 long diffInMillies = Math.abs(currentDate.getTime() - startDate.getTime());
                 long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
                 long years = diffInDays / 365;
                 long months = (diffInDays % 365) / 30;
-                long weeks = ((diffInDays % 365) % 30) / 7;
-                long days = ((diffInDays % 365) % 30) % 7;
+                long days = (diffInDays % 365) % 30;
 
-                StringBuilder lamaKerjaBuilder = new StringBuilder();
-                if (years > 0) {
-                    lamaKerjaBuilder.append(years).append(" tahun ");
-                }
-                if (months > 0) {
-                    lamaKerjaBuilder.append(months).append(" bulan ");
-                }
-                if (weeks > 0) {
-                    lamaKerjaBuilder.append(weeks).append(" minggu ");
-                }
-                if (days > 0) {
-                    lamaKerjaBuilder.append(days).append(" hari ");
-                }
+                String lamaKerjaResult = String.format("%d tahun %d bulan %d hari", years, months, days).trim();
+                this.lamaKerja = lamaKerjaResult;
 
-                lamaKerja = lamaKerjaBuilder.toString();
+                return lamaKerjaResult;
             } catch (ParseException e) {
                 e.printStackTrace();
+                this.lamaKerja = "Tanggal mulai kerja tidak valid";
+                return this.lamaKerja;
             }
         }
+        return lamaKerja;
     }
-
 }
