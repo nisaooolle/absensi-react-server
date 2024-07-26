@@ -32,8 +32,6 @@ public class User {
    @Column(name = "startKerja")
    private String startKerja;
 
-   @Column(name = "lamaKerja")
-   private String lamaKerja;
 
    @Column(name = "statusKerja")
    private String statusKerja;
@@ -62,14 +60,13 @@ public User(){
 
 }
 
-    public User(Long id, String email, String password, String username, String fotoUser, String startKerja, String lamaKerja, String statusKerja, Organisasi organisasi, Jabatan jabatan, Shift shift, Admin admin, String role) {
+    public User(Long id, String email, String password, String username, String fotoUser, String startKerja,  String statusKerja, Organisasi organisasi, Jabatan jabatan, Shift shift, Admin admin, String role) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.username = username;
         this.fotoUser = fotoUser;
         this.startKerja = startKerja;
-        this.lamaKerja = lamaKerja;
         this.statusKerja = statusKerja;
         this.organisasi = organisasi;
         this.jabatan = jabatan;
@@ -126,13 +123,7 @@ public User(){
         this.startKerja = startKerja;
     }
 
-    public String getLamaKerja() {
-        return lamaKerja;
-    }
 
-    public void setLamaKerja(String lamaKerja) {
-        this.lamaKerja = lamaKerja;
-    }
 
     public String getStatusKerja() {
         return statusKerja;
@@ -182,30 +173,5 @@ public User(){
         this.role = role;
     }
 
-    public String calculateLamaKerja() {
-        if (startKerja != null && statusKerja != null && statusKerja.equals("aktif")) {
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
-                Date startDate = dateFormat.parse(startKerja);
-                Date currentDate = new Date();
 
-                long diffInMillies = Math.abs(currentDate.getTime() - startDate.getTime());
-                long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-                long years = diffInDays / 365;
-                long months = (diffInDays % 365) / 30;
-                long days = (diffInDays % 365) % 30;
-
-                String lamaKerjaResult = String.format("%d tahun %d bulan %d hari", years, months, days).trim();
-                this.lamaKerja = lamaKerjaResult;
-
-                return lamaKerjaResult;
-            } catch (ParseException e) {
-                e.printStackTrace();
-                this.lamaKerja = "Tanggal mulai kerja tidak valid";
-                return this.lamaKerja;
-            }
-        }
-        return lamaKerja;
-    }
 }
