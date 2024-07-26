@@ -5,6 +5,7 @@ import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Shift;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
+import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.repository.ShiftRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.ShiftService;
@@ -23,6 +24,9 @@ public class ShiftImpl implements ShiftService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private OrganisasiRepository organisasiRepository;
 
     @Override
     public List<Shift> getAllShift(){
@@ -46,6 +50,10 @@ public class ShiftImpl implements ShiftService {
 
     }
 
+    @Override
+    public List<Shift> getShiftsByAdmin(Long idAdmin) {
+        return shiftRepository.findByAdminId(idAdmin);
+    }
     @Override
     public List<Shift> getShiftBySuperAdminId(Long idSuperAdmin) {
         List<Admin> admins = adminRepository.findBySuperAdminId(idSuperAdmin);

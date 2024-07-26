@@ -11,6 +11,9 @@ import java.util.Optional;
 @Repository
 public interface ShiftRepository extends JpaRepository<Shift , Long> {
 
+
+    List<Shift> findByAdminId(Long idAdmin);
+
     @Query(value = "SELECT * FROM shift WHERE id_admin = :idAdmin" , nativeQuery = true)
     Optional<Shift> findByIdAdmin (Long idAdmin);
 

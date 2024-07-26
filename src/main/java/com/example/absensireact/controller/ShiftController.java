@@ -19,6 +19,12 @@ public class ShiftController {
     @Autowired
     private ShiftService shiftService;
 
+
+    @GetMapping("/getbyadmin")
+    public ResponseEntity<List<Shift>> getShiftsByAdmin(@RequestParam("idAdmin") Long idAdmin) {
+        List<Shift> shifts = shiftService.getShiftsByAdmin(idAdmin);
+        return ResponseEntity.ok(shifts);
+    }
     @GetMapping("/getall")
     public ResponseEntity<List<Shift>> getAllShifts() {
         List<Shift> shifts = shiftService.getAllShift();
