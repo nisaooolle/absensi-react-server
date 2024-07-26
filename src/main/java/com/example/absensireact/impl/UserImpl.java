@@ -100,8 +100,6 @@ public class UserImpl implements UserService {
         user.setRole("USER");
         user.setUsername(user.getUsername());
         user.setPassword(encoder.encode(user.getPassword()));
-        // Hitung lama kerja
-        user.calculateLamaKerja();
         return userRepository.save(user);
     }
 
@@ -228,10 +226,8 @@ public class UserImpl implements UserService {
                     .orElseThrow(() -> new NotFoundException("Jabatan tidak ditemukan")));
             user.setShift(shiftRepository.findById(idShift)
                     .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan")));
-            user.calculateLamaKerja();
             user.setStartKerja(new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
             user.setStatusKerja("aktif");
-            user.setFotoUser(null);
             user.setAdmin(admin);
 
             return userRepository.save(user);
