@@ -38,6 +38,11 @@ public class ImportDataKaryawan {
         for (int i = 5; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if (row != null) {
+                Cell firstCell = row.getCell(0);
+                if (firstCell != null && "No".equalsIgnoreCase(getCellValue(firstCell))) {
+                    continue;
+                }
+
                 User user = new User();
 
                 Cell emailCell = row.getCell(1);
