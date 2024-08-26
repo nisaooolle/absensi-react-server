@@ -1,30 +1,28 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
-import com.example.absensireact.model.Absensi;
-import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.Shift;
-import com.example.absensireact.model.User;
-import com.example.absensireact.repository.AbsensiRepository;
-import com.example.absensireact.repository.AdminRepository;
-import com.example.absensireact.repository.ShiftRepository;
-import com.example.absensireact.repository.UserRepository;
+import com.example.absensireact.model.*;
+import com.example.absensireact.repository.*;
 import com.example.absensireact.service.AbsensiService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -32,6 +30,8 @@ import java.util.logging.Logger;
 @Service
 public class AbsensiImpl implements AbsensiService {
     static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
+
+    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
 
     private static final Logger logger = Logger.getLogger(AbsensiService.class.getName());
 
@@ -42,13 +42,16 @@ public class AbsensiImpl implements AbsensiService {
     private final AdminRepository adminRepository;
     private final ShiftRepository shiftRepository;
 
+    private final OrangTuaRepository orangTuaRepository;
 
 
-    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository, AdminRepository adminRepository, ShiftRepository shiftRepository) throws IOException {
+
+    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository, AdminRepository adminRepository, ShiftRepository shiftRepository, OrangTuaRepository orangTuaRepository) throws IOException {
         this.absensiRepository = absensiRepository;
         this.userRepository = userRepository;
         this.adminRepository = adminRepository;
         this.shiftRepository = shiftRepository;
+        this.orangTuaRepository = orangTuaRepository;
     }
 
 
@@ -116,15 +119,16 @@ public class AbsensiImpl implements AbsensiService {
     }
 
     @Override
-    public List<Absensi> getAbsensiByBulanSimpel(int month) {
-        logger.info("Fetching absensi for month: " + month);
+    public List<Absensi> getAbsensiByBulanSimpel(int month, Long idAdmin) {
+        Admin admin = adminRepository.findById(idAdmin)
+                .orElseThrow(() -> new NotFoundException(" id admin tidak ditemukaan : " + idAdmin));
 
         List<Absensi> absensiList = absensiRepository.findByMonth(month);
 
-        logger.info("Number of records found: " + absensiList.size());
+//        logger.info("Number of records found: " + absensiList.size());
 
         return absensiList;
-}
+    }
 
 
     @Override
@@ -139,6 +143,21 @@ public class AbsensiImpl implements AbsensiService {
 
         return weeklyAbsensiMap;
     }
+
+    @Override
+    public Map<String, List<Absensi>> getAbsensiByMingguanPerKelas(Date tanggalAwal, Date tanggalAkhir, Long kelasId) {
+        // Fetch data based on the provided dates and kelasId
+        List<Absensi> absensiList = absensiRepository.findByMingguanAndKelas(tanggalAwal, tanggalAkhir, kelasId);
+        Map<String, List<Absensi>> weeklyAbsensiMap = new HashMap<>();
+
+        for (Absensi absensi : absensiList) {
+            String weekRange = getWeekRange(absensi.getTanggalAbsen());
+            weeklyAbsensiMap.computeIfAbsent(weekRange, k -> new ArrayList<>()).add(absensi);
+        }
+
+        return weeklyAbsensiMap;
+    }
+
 
     private String getWeekRange(Date date) {
         Calendar calendar = Calendar.getInstance();
@@ -180,7 +199,7 @@ public class AbsensiImpl implements AbsensiService {
             absensi.setKeteranganTerlambat(keteranganTerlambat != null ? keteranganTerlambat : "-");
             absensi.setStatusAbsen(keterangan);
 
-            absensi.setFotoMasuk(uploadFile(image, "foto_masuk_" + userId));
+            absensi.setFotoMasuk(uploadFoto(image));
 
             return absensiRepository.save(absensi);
         }
@@ -214,7 +233,7 @@ public class AbsensiImpl implements AbsensiService {
         absensi.setKeteranganPulangAwal(keteranganPulangAwal != null ? keteranganPulangAwal : "-");
         absensi.setJamPulang(jamPulangString);
         absensi.setLokasiPulang(lokasiPulang);
-        absensi.setFotoPulang(uploadFile(image, "foto_pulang_" + userId));
+        absensi.setFotoPulang(uploadFotoPUlang(image));
 
         return absensiRepository.save(absensi);
     }
@@ -224,6 +243,12 @@ public class AbsensiImpl implements AbsensiService {
     public boolean checkUserAlreadyAbsenToday(Long userId) {
         Optional<Absensi> absensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
         return absensi.isPresent();
+    }
+
+    @Override
+    public boolean hasTakenLeave(Long userId) {
+        Optional<Absensi> izin = absensiRepository.findByUserIdAndKeteranganIzin(userId);
+        return izin.isPresent();
     }
 
     @Override
@@ -248,7 +273,7 @@ public class AbsensiImpl implements AbsensiService {
         }
     }
     @Override
-    public Absensi izinTengahHari(Long userId , String keterangaPulangAwal )   {
+    public Absensi izinTengahHari(Long userId , Absensi keterangaPulangAwal )   {
         Optional<Absensi> existingAbsensi = absensiRepository.findByUserIdAndTanggalAbsen(userId, truncateTime(new Date()));
         if (existingAbsensi.isPresent()) {
             Absensi absensi = existingAbsensi.get();
@@ -256,7 +281,7 @@ public class AbsensiImpl implements AbsensiService {
             SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
             String jamPulang = formatter.format(masuk);
             absensi.setJamPulang(jamPulang);
-            absensi.setKeteranganPulangAwal(keterangaPulangAwal);
+            absensi.setKeteranganPulangAwal(keterangaPulangAwal.getKeteranganPulangAwal());
             absensi.setStatusAbsen("Izin Tengah Hari");
             return absensiRepository.save(absensi);
         } else {
@@ -348,28 +373,142 @@ public class AbsensiImpl implements AbsensiService {
         return true;
     }
 
-    private String uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String folderPath = "fotoAbsen/fotoMasuk/";
-        String fullPath = folderPath + timestamp + "_" + fileName;
-        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, multipartFile.getBytes());
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+    private String uploadFoto(MultipartFile multipartFile) throws IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", multipartFile.getResource());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.exchange(base_url, HttpMethod.POST, requestEntity, String.class);
+        String fileUrl = extractFileUrlFromResponse(response.getBody());
+        return fileUrl;
     }
 
-    private String uploadFilePulang(MultipartFile multipartFile, String fileName) throws IOException {
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        String folderPath = "fotoAbsen/fotoPulang/";
-        String fullPath = folderPath + timestamp + "_" + fileName;
-        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, multipartFile.getBytes());
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+    private String uploadFotoPUlang(MultipartFile multipartFile) throws IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        String base_url = "https://s3.lynk2.co/api/s3/absenPulang";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", multipartFile.getResource());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.exchange(base_url, HttpMethod.POST, requestEntity, String.class);
+        String fileUrl = extractFileUrlFromResponse(response.getBody());
+        return fileUrl;
+    }
+
+    private String extractFileUrlFromResponse(String responseBody) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonResponse = mapper.readTree(responseBody);
+        JsonNode dataNode = jsonResponse.path("data");
+        String urlFile = dataNode.path("url_file").asText();
+
+        return urlFile;
+    }
+//    private String uploadFile(MultipartFile multipartFile, String fileName) throws IOException {
+//        String timestamp = String.valueOf(System.currentTimeMillis());
+//        String folderPath = "/absenMasuk/";
+//        String fullPath = folderPath + timestamp + "_" + fileName;
+//        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+//        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+//        storage.create(blobInfo, multipartFile.getBytes());
+//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+//    }
+//
+//    private String uploadFilePulang(MultipartFile multipartFile, String fileName) throws IOException {
+//        String timestamp = String.valueOf(System.currentTimeMillis());
+//        String folderPath = "fotoAbsen/fotoPulang/";
+//        String fullPath = folderPath + timestamp + "_" + fileName;
+//        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+//        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+//        storage.create(blobInfo, multipartFile.getBytes());
+//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+//    }
+
+
+
+    @Override
+    public List<Absensi> getAbsensiByKelas(Long kelasId) {
+        List<User> users = userRepository.findByKelasId(kelasId);
+        if (users.isEmpty()) {
+            throw new NotFoundException("Tidak ada pengguna yang terkait dengan kelas dengan id: " + kelasId);
+        }
+
+        List<Absensi> absensiList = new ArrayList<>();
+        for (User user : users) {
+            List<Absensi> userAbsensi = absensiRepository.findByUser(user);
+            absensiList.addAll(userAbsensi);
+        }
+
+        return absensiList;
+    }
+
+    @Override
+    public Map<String, List<Absensi>> getAbsensiByBulananPerKelas(int bulan, int tahun, Long kelasId) {
+        // Fetch data based on the provided month, year, and kelasId
+        List<Absensi> absensiList = absensiRepository.findByBulananAndKelas(bulan, tahun, kelasId);
+        Map<String, List<Absensi>> monthlyAbsensiMap = new HashMap<>();
+
+        for (Absensi absensi : absensiList) {
+            String monthKey = getMonthKey(absensi.getTanggalAbsen());
+            monthlyAbsensiMap.computeIfAbsent(monthKey, k -> new ArrayList<>()).add(absensi);
+        }
+
+        return monthlyAbsensiMap;
+    }
+
+    private String getMonthKey(Date tanggalAbsen) {
+        LocalDate date = new java.sql.Date(tanggalAbsen.getTime()).toLocalDate();
+        return date.getYear() + "-" + String.format("%02d", date.getMonthValue());
+    }
+
+    @Override
+    public Map<String, List<Absensi>> getAbsensiHarianByKelas(Date tanggal, Long kelasId) {
+        // Normalize date to start and end of the day
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(tanggal);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date startOfDay = calendar.getTime();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        Date endOfDay = calendar.getTime();
+
+        // Fetch data based on the provided date and kelasId
+        List<Absensi> absensiList = absensiRepository.findByTanggalAndKelas(startOfDay, endOfDay, kelasId);
+        Map<String, List<Absensi>> dailyAbsensiMap = new HashMap<>();
+
+        // Use the date as the key
+        String dateKey = startOfDay.toString();
+        dailyAbsensiMap.put(dateKey, absensiList);
+
+        return dailyAbsensiMap;
+    }
+
+    @Override
+    public List<Absensi> getAbsensiByOrangTua(Long orangTuaId) {
+        // Fetch the OrangTua entity
+        OrangTua orangTua = orangTuaRepository.findById(orangTuaId)
+                .orElseThrow(() -> new RuntimeException("OrangTua not found"));
+
+        // Fetch all Absensi entries where the associated user has the given orangTuaId
+        return absensiRepository.findByOrangTuaId(orangTuaId);
+    }
+
+    @Override
+    public List<Absensi> getStatusAbsenIzinByOrangTua(Long idOrangTua) {
+        return absensiRepository.getStatusAbsenIzinByOrangTua(idOrangTua);
     }
 
 }

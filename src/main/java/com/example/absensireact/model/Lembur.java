@@ -27,7 +27,7 @@ public class Lembur {
     @Column(name = "keteranganLembur")
     private String keteranganLembur;
 
-     @OneToOne
+    @OneToOne
     @JoinColumn(name = "userId")
     private User user;
 

@@ -18,7 +18,7 @@ public class Jabatan {
     @Column(name = "jumlahKaryawan")
     private String jumlahKaryawan;
 
-     @ManyToOne
+    @ManyToOne
     @JoinColumn(name = "adminId")
     private Admin admin;
 
@@ -32,7 +32,7 @@ public class Jabatan {
         this.namaJabatan = namaJabatan;
         this.jumlahKaryawan = jumlahKaryawan;
         this.admin = admin;
-     }
+    }
 
     public Long getIdJabatan() {
         return idJabatan;
