@@ -1,5 +1,4 @@
 package com.example.absensireact.model;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -13,13 +12,27 @@ public class Notifications {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
+
     @OneToOne
     @JoinColumn(name = "userId")
     private User user;
 
-    @Column(name = "message")
+    @OneToOne
+    @JoinColumn(name = "adminId")
+    private Admin admin;
+
+    @Lob
+    @Column(name = "message", columnDefinition = "TEXT")
     private String message;
+
+    @Column(name = "tempatAcara")
+    private String tempatAcara;
+
+    @Column(name = "namaAcara")
+    private String namaAcara;
+
+    @Column(name = "tanggalAcara")
+    private Date tanggalAcara;
 
     @Column(name = "cretedAT")
     private Date createdAt;
@@ -28,10 +41,14 @@ public class Notifications {
 
     }
 
-    public Notifications(Long id, User user, String message, Date createdAt) {
+    public Notifications(Long id, User user, Admin admin, String message, String tempatAcara, String namaAcara, Date tanggalAcara, Date createdAt) {
         this.id = id;
         this.user = user;
+        this.admin = admin;
         this.message = message;
+        this.tempatAcara = tempatAcara;
+        this.namaAcara = namaAcara;
+        this.tanggalAcara = tanggalAcara;
         this.createdAt = createdAt;
     }
 
@@ -65,5 +82,39 @@ public class Notifications {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getTempatAcara() {
+        return tempatAcara;
+    }
+
+    public void setTempatAcara(String tempatAcara) {
+        this.tempatAcara = tempatAcara;
+    }
+
+    public String getNamaAcara() {
+        return namaAcara;
+    }
+
+    public void setNamaAcara(String namaAcara) {
+        this.namaAcara = namaAcara;
+    }
+
+
+
+    public Date getTanggalAcara() {
+        return tanggalAcara;
+    }
+
+    public void setTanggalAcara(Date tanggalAcara) {
+        this.tanggalAcara = tanggalAcara;
+    }
+
+    public Admin getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
     }
 }

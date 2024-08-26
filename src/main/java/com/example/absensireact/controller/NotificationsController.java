@@ -4,6 +4,7 @@ import com.example.absensireact.model.Notifications;
 import com.example.absensireact.service.NotificationsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,17 +12,21 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/notifications")
+@CrossOrigin(origins = "*")
 public class NotificationsController {
 
     @Autowired
     private NotificationsService notificationsService;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @GetMapping
     public List<Notifications> getAllNotifications() {
         return notificationsService.getAllNotif();
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/getByUser/{userId}")
     public ResponseEntity<?> getNotificationsByUser(@PathVariable Long userId) {
         try {
             List<Notifications> notifications = notificationsService.getNotfiUser(userId);
@@ -31,17 +36,45 @@ public class NotificationsController {
         }
     }
 
-    @PostMapping("/user/{userId}")
-    public ResponseEntity<?> createNotification(@PathVariable Long userId, @RequestParam String message) {
+    @GetMapping("/user/getById/{id}")
+    public ResponseEntity<?> getNotificationsById(@PathVariable Long id) {
         try {
-            Notifications notification = notificationsService.tambahNotif(userId, message);
-            return ResponseEntity.ok(notification);
+            Optional<Notifications> notifications = notificationsService.getById(id);
+            return ResponseEntity.ok(notifications);
         } catch (NotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PutMapping("/{id}")
+    @GetMapping("/user/getByAdmin/{adminId}")
+    public ResponseEntity<?> getNotificationsByAdmin(@PathVariable Long adminId) {
+        try {
+            List<Notifications> notifications = notificationsService.getNotfiAllByAdminId(adminId);
+            return ResponseEntity.ok(notifications);
+        } catch (NotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/user/sendByadmin/{adminId}")
+    public ResponseEntity<?> createNotification(@PathVariable Long adminId , @RequestParam Long userId , @RequestBody Notifications message) {
+        try {
+            Notifications notification = notificationsService.tambahNotif(adminId , userId, message);
+            return ResponseEntity.ok(notification);
+        } catch (NotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PostMapping("/user/send/{idAdmin}")
+    public ResponseEntity<Notifications> sendNotificationToAllUsers(
+            @PathVariable Long idAdmin,
+            @RequestBody Notifications notifications) {
+        Notifications sentNotification = notificationsService.sendToAllUser(idAdmin, notifications);
+        messagingTemplate.convertAndSend("/topic/notifications", sentNotification);
+        return ResponseEntity.ok(sentNotification);
+    }
+
+    @PutMapping("/editbyId/{id}")
     public ResponseEntity<?> updateNotification(@PathVariable Long id, @RequestBody Notifications notifications) {
         try {
             Notifications updatedNotification = notificationsService.editNotifById(id, notifications);
@@ -51,7 +84,7 @@ public class NotificationsController {
         }
     }
 
-    @PutMapping("/user/{userId}")
+    @PutMapping("/editby/user/{userId}")
     public ResponseEntity<?> updateNotificationByUserId(@PathVariable Long userId, @RequestBody Notifications notifications) {
         try {
             Notifications updatedNotification = notificationsService.editNotifByUserId(userId, notifications);
@@ -61,7 +94,7 @@ public class NotificationsController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
         boolean success = notificationsService.deleteNotif(id);
         if (success) {

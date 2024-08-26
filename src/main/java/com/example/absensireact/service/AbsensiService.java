@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +28,13 @@ public interface  AbsensiService {
     List<Absensi> getAbsensiByBulan(Date tanggalAbsen);
 
 
-    List<Absensi> getAbsensiByBulanSimpel(int month);
+
+    List<Absensi> getAbsensiByBulanSimpel(int month, Long idAdmin);
+
 
     Map<String, List<Absensi>> getAbsensiByMingguan(Date startDate, Date endDate);
 
+    Map<String, List<Absensi>> getAbsensiByMingguanPerKelas(Date startDate, Date endDate, Long kelasId);
 
     Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException, ParseException;
 
@@ -39,9 +43,12 @@ public interface  AbsensiService {
 
     boolean checkUserAlreadyAbsenToday(Long userId);
 
+    boolean hasTakenLeave(Long userId);
+
     Absensi izin(Long userId, String keteranganIzin)  ;
 
-    Absensi izinTengahHari(Long userId, String keteranganPulangAwal)  ;
+
+    Absensi izinTengahHari(Long userId, Absensi keterangaPulangAwal);
 
     List<Absensi>getByStatusAbsen(Long userId, String statusAbsen);
 
@@ -54,10 +61,15 @@ public interface  AbsensiService {
 
     List<Absensi> getAbsensiByUserId(Long userId);
 
+    List<Absensi> getAbsensiByKelas(Long kelasId);
 
+    Map<String, List<Absensi>> getAbsensiByBulananPerKelas(int bulan, int tahun, Long kelasId);
 
+    Map<String, List<Absensi>> getAbsensiHarianByKelas(Date tanggal, Long kelasId);
 
+    List<Absensi> getAbsensiByOrangTua(Long orangTuaId);
 
+    List<Absensi> getStatusAbsenIzinByOrangTua(Long idOrangTua);
 
 
 }

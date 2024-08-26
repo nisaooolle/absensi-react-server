@@ -1,10 +1,6 @@
 package com.example.absensireact.service;
 
-import com.example.absensireact.dto.ForGotPass;
-import com.example.absensireact.dto.PasswordDTO;
-import com.example.absensireact.dto.ResetPassDTO;
-import com.example.absensireact.dto.VerifyCode;
-import com.example.absensireact.model.Organisasi;
+import com.example.absensireact.dto.*;
 import com.example.absensireact.model.Reset_Password;
 import com.example.absensireact.model.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 public interface UserService {
 
@@ -21,7 +17,8 @@ public interface UserService {
 //    User Register(User user);
 
 
-    User ubahPassByForgot (ResetPassDTO updatePass);
+    User ubahPassByForgot(ResetPassDTO updatePass);
+
 
     Reset_Password validasiCodeUniqResPass(VerifyCode codeUser);
 
@@ -33,18 +30,27 @@ public interface UserService {
 
     List<User> getAllByAdmin(Long idAdmin);
 
+    List<User> getAllByAdminandKelas(Long idAdmin, Long KlasId);
+
+    List<User> getAllBySuperAdmin(Long idSuperAdmin);
+
     List<User> getAllByShift(Long idShift);
 
-    User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, User user);
+    User EditUserBySuper(Long id, Long idJabatan, Long idShift, User updateUser);
+
+    User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua);
+
+    User TambahUserKelas(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua, Long idKelas);
+
+
+    User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, Long idOrangTua, Long idKelas, UserDTO updatedUserDTO);
 
     User putPassword(PasswordDTO passwordDTO, Long id);
 
 
     User ubahUsernamedanemail(Long id, User updateUser);
 
-    User EditUserBySuper(Long id, Long idJabatan, Long idShift, User updateUser);
-
-    User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift);
+    User EditUserBySuper(Long id, Long idShift, Long idOrangTua, Long idKelas, User updateUser);
 
     List<User> GetAllKaryawanByIdAdmin(Long idAdmin);
 
@@ -61,4 +67,9 @@ public interface UserService {
     void delete(Long id) throws IOException;
 
     void deleteUser(Long id);
+
+    List<User> getUsersByIdKelas(Long idKelas);
+
+
+
 }
