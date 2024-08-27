@@ -100,20 +100,19 @@ public class UserController {
         return userImpl.GetAllKaryawanByIdAdmin(idAdmin);
     }
 
-//    @PostMapping("/user/tambahkaryawan/{idAdmin}")
-//    public ResponseEntity<User> tambahKaryawan(
-//            @RequestBody UserDTO userDTO,
-//            @PathVariable Long idAdmin,
-//            @RequestParam Long idOrganisasi,
-//            @RequestParam Long idOrangTua,
-//            @RequestParam Long idShift) {
-//        try {
-//            User savedUser = userImpl.Tambahkaryawan(userDTO, idAdmin, idOrganisasi, idShift, idOrangTua);
-//            return ResponseEntity.ok(savedUser);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//    }
+    @PostMapping("/user/tambahkaryawan/{idAdmin}")
+    public ResponseEntity<User> tambahKaryawan(
+            @RequestBody UserDTO userDTO,
+            @PathVariable Long idAdmin,
+            @RequestParam Long idOrganisasi,
+            @RequestParam Long idShift) {
+        try {
+            User savedUser = userImpl.Tambahkaryawan(userDTO, idAdmin, idOrganisasi, idShift);
+            return ResponseEntity.ok(savedUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 //    @PostMapping("/user/tambahuser/byAdmin/{idAdmin}/byKelas")
 //    public ResponseEntity<User> tambahUserKelas(

@@ -713,41 +713,43 @@ public class UserImpl implements UserService {
 //        return userRepository.save(user);
 //    }
 
-//    @Override
-//    public User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua) {
-//        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
-//        if (adminOptional.isPresent()) {
-//            Admin admin = adminOptional.get();
-//
-//            // Cek apakah email atau username sudah terdaftar
-//            if (userRepository.existsByEmail(userDTO.getEmail())) {
-//                throw new BadRequestException("Email " + userDTO.getEmail() + " telah digunakan");
-//            }
-//            if (userRepository.existsByUsername(userDTO.getUsername())) {
-//                throw new BadRequestException("Username " + userDTO.getUsername() + " telah digunakan");
-//            }
-//
-//            User user = new User();
-//            user.setPassword(encoder.encode(userDTO.getPassword()));
-//            user.setRole("USER");
-//            user.setStatus("Siswa"); // Set status otomatis menjadi "Siswa"
-//
-//            user.setEmail(userDTO.getEmail());
-//            user.setUsername(userDTO.getUsername());
-//            user.setOrganisasi(organisasiRepository.findById(idOrganisasi)
-//                    .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan")));
-//            user.setShift(shiftRepository.findById(idShift)
-//                    .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan")));
-//            user.setOrangTua(orangTuaRepository.findById(idOrangTua)
-//                    .orElseThrow(() -> new NotFoundException("id Orang Tua tidak ditemukan : " + idOrangTua)));
-//            user.setStartKerja(new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
-//            user.setAdmin(admin);
-//
-//            return userRepository.save(user);
-//        } else {
-//            throw new NotFoundException("Id Admin tidak ditemukan");
-//        }
-//    }
+    @Override
+    public User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift) {
+        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+
+            // Cek apakah email atau username sudah terdaftar
+            if (userRepository.existsByEmail(userDTO.getEmail())) {
+                throw new BadRequestException("Email " + userDTO.getEmail() + " telah digunakan");
+            }
+            if (userRepository.existsByUsername(userDTO.getUsername())) {
+                throw new BadRequestException("Username " + userDTO.getUsername() + " telah digunakan");
+            }
+
+            User user = new User();
+            user.setPassword(encoder.encode(userDTO.getPassword()));
+            user.setRole("USER");
+
+            user.setEmail(userDTO.getEmail());
+            user.setUsername(userDTO.getUsername());
+            user.setOrganisasi(organisasiRepository.findById(idOrganisasi)
+                    .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan")));
+            user.setShift(shiftRepository.findById(idShift)
+                    .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan")));
+            user.setStartKerja(new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
+            user.setAdmin(admin);
+
+            return userRepository.save(user);
+        } else {
+            throw new NotFoundException("Id Admin tidak ditemukan");
+        }
+    }
+
+    @Override
+    public User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua) {
+        return null;
+    }
 
 //    @Override
 //    public User TambahUserKelas(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua, Long idKelas) {
