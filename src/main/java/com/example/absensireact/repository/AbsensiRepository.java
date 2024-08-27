@@ -45,35 +45,35 @@ public interface AbsensiRepository extends JpaRepository<Absensi , Long> {
     @Query(value = "SELECT * FROM absensi WHERE user_id = :userId AND status_absen = :statusAbsen " , nativeQuery = true)
     List<Absensi> getByStatusAbsen (Long userId  , String statusAbsen);
 
-    @Query("SELECT a FROM Absensi a WHERE DAY(a.tanggalAbsen) = :day AND MONTH(a.tanggalAbsen) = :month AND YEAR(a.tanggalAbsen) = :year AND a.user.kelas.id = :kelasId")
-    List<Absensi> findByKelasIdAndDate(@Param("kelasId") Long kelasId, @Param("day") int day, @Param("month") int month, @Param("year") int year);
+//    @Query("SELECT a FROM Absensi a WHERE DAY(a.tanggalAbsen) = :day AND MONTH(a.tanggalAbsen) = :month AND YEAR(a.tanggalAbsen) = :year AND a.user.kelas.id = :kelasId")
+//    List<Absensi> findByKelasIdAndDate(@Param("kelasId") Long kelasId, @Param("day") int day, @Param("month") int month, @Param("year") int year);
 
-    @Query("SELECT a FROM Absensi a WHERE MONTH(a.tanggalAbsen) = :month AND YEAR(a.tanggalAbsen) = :year AND a.user.kelas.id = :kelasId")
-    List<Absensi> findByKelasIdAndBulan(@Param("kelasId") Long kelasId, @Param("month") int month, @Param("year") int year);
+//    @Query("SELECT a FROM Absensi a WHERE MONTH(a.tanggalAbsen) = :month AND YEAR(a.tanggalAbsen) = :year AND a.user.kelas.id = :kelasId")
+//    List<Absensi> findByKelasIdAndBulan(@Param("kelasId") Long kelasId, @Param("month") int month, @Param("year") int year);
 
-    @Query("SELECT a FROM Absensi a WHERE a.tanggalAbsen BETWEEN :tanggalAwal AND :tanggalAkhir AND a.user.kelas.id = :kelasId")
-    List<Absensi> findByMingguanAndKelas(
-            @Param("tanggalAwal") Date tanggalAwal,
-            @Param("tanggalAkhir") Date tanggalAkhir,
-            @Param("kelasId") Long kelasId);
+//    @Query("SELECT a FROM Absensi a WHERE a.tanggalAbsen BETWEEN :tanggalAwal AND :tanggalAkhir AND a.user.kelas.id = :kelasId")
+//    List<Absensi> findByMingguanAndKelas(
+//            @Param("tanggalAwal") Date tanggalAwal,
+//            @Param("tanggalAkhir") Date tanggalAkhir,
+//            @Param("kelasId") Long kelasId);
 
-    @Query("SELECT a FROM Absensi a WHERE a.user.kelas.id = :kelasId AND FUNCTION('MONTH', a.tanggalAbsen) = :bulan AND FUNCTION('YEAR', a.tanggalAbsen) = :tahun")
-    List<Absensi> findByBulananAndKelas(@Param("bulan") int bulan, @Param("tahun") int tahun, @Param("kelasId") Long kelasId);
+//    @Query("SELECT a FROM Absensi a WHERE a.user.kelas.id = :kelasId AND FUNCTION('MONTH', a.tanggalAbsen) = :bulan AND FUNCTION('YEAR', a.tanggalAbsen) = :tahun")
+//    List<Absensi> findByBulananAndKelas(@Param("bulan") int bulan, @Param("tahun") int tahun, @Param("kelasId") Long kelasId);
 
-    @Query("SELECT a FROM Absensi a WHERE a.user.kelas.id = :kelasId AND a.tanggalAbsen BETWEEN :startOfDay AND :endOfDay")
-    List<Absensi> findByTanggalAndKelas(@Param("startOfDay") Date startOfDay, @Param("endOfDay") Date endOfDay, @Param("kelasId") Long kelasId);
+//    @Query("SELECT a FROM Absensi a WHERE a.user.kelas.id = :kelasId AND a.tanggalAbsen BETWEEN :startOfDay AND :endOfDay")
+//    List<Absensi> findByTanggalAndKelas(@Param("startOfDay") Date startOfDay, @Param("endOfDay") Date endOfDay, @Param("kelasId") Long kelasId);
 
-    @Query("SELECT a FROM Absensi a WHERE a.user.id IN (SELECT u.id FROM User u WHERE u.orangTua.id = :orangTuaId)")
-    List<Absensi> findByOrangTuaId(@Param("orangTuaId") Long orangTuaId);
+//    @Query("SELECT a FROM Absensi a WHERE a.user.id IN (SELECT u.id FROM User u WHERE u.orangTua.id = :orangTuaId)")
+//    List<Absensi> findByOrangTuaId(@Param("orangTuaId") Long orangTuaId);
 
-    @Query("SELECT a FROM Absensi a WHERE a.user.kelas.id = :kelasId")
-    List<Absensi> findAbsensiByKelasId(@Param("kelasId") Long kelasId);
+//    @Query("SELECT a FROM Absensi a WHERE a.user.kelas.id = :kelasId")
+//    List<Absensi> findAbsensiByKelasId(@Param("kelasId") Long kelasId);
 
-    @Query(value = "SELECT a.* FROM absensi a " +
-            "INNER JOIN user u ON a.user_id = u.id " +
-            "INNER JOIN orang_tua o ON u.id_orang_tua = o.id " +
-            "WHERE o.id = :idOrangTua AND a.status_absen = 'Izin'", nativeQuery = true)
-    List<Absensi> getStatusAbsenIzinByOrangTua(@Param("idOrangTua") Long idOrangTua);
+//    @Query(value = "SELECT a.* FROM absensi a " +
+//            "INNER JOIN user u ON a.user_id = u.id " +
+//            "INNER JOIN orang_tua o ON u.id_orang_tua = o.id " +
+//            "WHERE o.id = :idOrangTua AND a.status_absen = 'Izin'", nativeQuery = true)
+//    List<Absensi> getStatusAbsenIzinByOrangTua(@Param("idOrangTua") Long idOrangTua);
 
 
 }

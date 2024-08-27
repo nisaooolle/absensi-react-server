@@ -67,7 +67,7 @@ public class ExcelDataSiswa {
 
         // Header row
         Row headerRow = sheet.createRow(rowNum++);
-        String[] headers = {"No", "Nama Siswa", "Email", "Start Belajar", "Status Belajar", "Kelas"};
+        String[] headers = {"No", "Nama Siswa", "Email", "Start Belajar", "Status Belajar"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
@@ -93,8 +93,8 @@ public class ExcelDataSiswa {
             row.createCell(4).setCellValue(siswa.getStatusKerja());
             row.getCell(4).setCellStyle(styleLeft);
 
-            row.createCell(5).setCellValue(siswa.getKelas().getNamaKelas());
-            row.getCell(5).setCellStyle(styleLeft);
+//            row.createCell(5).setCellValue(siswa.getKelas().getNamaKelas());
+//            row.getCell(5).setCellStyle(styleLeft);
         }
 
         // Adjust column width
@@ -108,94 +108,94 @@ public class ExcelDataSiswa {
         workbook.close();
     }
 
-    public void exportDataSiswaperKelas(Long idAdmin, Long KlasId, HttpServletResponse response) throws IOException {
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Data Siswa");
-
-        // Font and cell styles
-        Font fontWhite = workbook.createFont();
-        fontWhite.setColor(IndexedColors.WHITE.getIndex());
-
-        CellStyle styleHeader = workbook.createCellStyle();
-        styleHeader.setAlignment(HorizontalAlignment.LEFT);
-        styleHeader.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleHeader.setBorderTop(BorderStyle.THIN);
-        styleHeader.setBorderRight(BorderStyle.THIN);
-        styleHeader.setBorderBottom(BorderStyle.THIN);
-        styleHeader.setBorderLeft(BorderStyle.THIN);
-
-        // Set background color to the header style
-        styleHeader.setFillForegroundColor(IndexedColors.BLUE.getIndex());
-        styleHeader.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        Font headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setColor(IndexedColors.WHITE.getIndex());  // Set font color to white
-        styleHeader.setFont(headerFont);
-
-        CellStyle styleLeft = workbook.createCellStyle(); // Mengubah nama menjadi styleLeft
-        styleLeft.setAlignment(HorizontalAlignment.LEFT); // Diubah menjadi kiri
-        styleLeft.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleLeft.setBorderTop(BorderStyle.THIN);
-        styleLeft.setBorderRight(BorderStyle.THIN);
-        styleLeft.setBorderBottom(BorderStyle.THIN);
-        styleLeft.setBorderLeft(BorderStyle.THIN);
-
-        // Fetch data from service
-        List<User> siswaList = userService.getAllByAdminandKelas(idAdmin, KlasId);
-
-        int rowNum = 0;
-
-        // Title row
-        Row titleRow = sheet.createRow(rowNum++);
-        Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("DATA SISWA PERKELAS");
-//        titleCell.setCellStyle(styleHeader);
-        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4));
-
-        // Header row
-        Row headerRow = sheet.createRow(rowNum++);
-        String[] headers = {"No", "Nama Siswa", "Email", "Start Belajar", "Status Belajar", "Kelas"};
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(styleHeader);
-        }
-
-        // Data rows
-        int no = 1;
-        for (User siswa : siswaList) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(no++);
-            row.getCell(0).setCellStyle(styleLeft);
-
-            row.createCell(1).setCellValue(siswa.getUsername());
-            row.getCell(1).setCellStyle(styleLeft);
-
-            row.createCell(2).setCellValue(siswa.getEmail());
-            row.getCell(2).setCellStyle(styleLeft);
-
-            row.createCell(3).setCellValue(siswa.getStartKerja());
-            row.getCell(3).setCellStyle(styleLeft);
-
-            row.createCell(4).setCellValue(siswa.getStatusKerja());
-            row.getCell(4).setCellStyle(styleLeft);
-
-            row.createCell(5).setCellValue(siswa.getKelas().getNamaKelas());
-            row.getCell(5).setCellStyle(styleLeft);
-        }
-
-        // Adjust column width
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
-
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=DataSiswa.xlsx");
-        workbook.write(response.getOutputStream());
-        workbook.close();
-    }
-
+//    public void exportDataSiswaperKelas(Long idAdmin, Long KlasId, HttpServletResponse response) throws IOException {
+//        Workbook workbook = new XSSFWorkbook();
+//        Sheet sheet = workbook.createSheet("Data Siswa");
+//
+//        // Font and cell styles
+//        Font fontWhite = workbook.createFont();
+//        fontWhite.setColor(IndexedColors.WHITE.getIndex());
+//
+//        CellStyle styleHeader = workbook.createCellStyle();
+//        styleHeader.setAlignment(HorizontalAlignment.LEFT);
+//        styleHeader.setVerticalAlignment(VerticalAlignment.CENTER);
+//        styleHeader.setBorderTop(BorderStyle.THIN);
+//        styleHeader.setBorderRight(BorderStyle.THIN);
+//        styleHeader.setBorderBottom(BorderStyle.THIN);
+//        styleHeader.setBorderLeft(BorderStyle.THIN);
+//
+//        // Set background color to the header style
+//        styleHeader.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+//        styleHeader.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//
+//        Font headerFont = workbook.createFont();
+//        headerFont.setBold(true);
+//        headerFont.setColor(IndexedColors.WHITE.getIndex());  // Set font color to white
+//        styleHeader.setFont(headerFont);
+//
+//        CellStyle styleLeft = workbook.createCellStyle(); // Mengubah nama menjadi styleLeft
+//        styleLeft.setAlignment(HorizontalAlignment.LEFT); // Diubah menjadi kiri
+//        styleLeft.setVerticalAlignment(VerticalAlignment.CENTER);
+//        styleLeft.setBorderTop(BorderStyle.THIN);
+//        styleLeft.setBorderRight(BorderStyle.THIN);
+//        styleLeft.setBorderBottom(BorderStyle.THIN);
+//        styleLeft.setBorderLeft(BorderStyle.THIN);
+//
+//        // Fetch data from service
+//        List<User> siswaList = userService.getAllByAdminandKelas(idAdmin, KlasId);
+//
+//        int rowNum = 0;
+//
+//        // Title row
+//        Row titleRow = sheet.createRow(rowNum++);
+//        Cell titleCell = titleRow.createCell(0);
+//        titleCell.setCellValue("DATA SISWA PERKELAS");
+////        titleCell.setCellStyle(styleHeader);
+//        sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 4));
+//
+//        // Header row
+//        Row headerRow = sheet.createRow(rowNum++);
+//        String[] headers = {"No", "Nama Siswa", "Email", "Start Belajar", "Status Belajar"};
+//        for (int i = 0; i < headers.length; i++) {
+//            Cell cell = headerRow.createCell(i);
+//            cell.setCellValue(headers[i]);
+//            cell.setCellStyle(styleHeader);
+//        }
+//
+//        // Data rows
+//        int no = 1;
+//        for (User siswa : siswaList) {
+//            Row row = sheet.createRow(rowNum++);
+//            row.createCell(0).setCellValue(no++);
+//            row.getCell(0).setCellStyle(styleLeft);
+//
+//            row.createCell(1).setCellValue(siswa.getUsername());
+//            row.getCell(1).setCellStyle(styleLeft);
+//
+//            row.createCell(2).setCellValue(siswa.getEmail());
+//            row.getCell(2).setCellStyle(styleLeft);
+//
+//            row.createCell(3).setCellValue(siswa.getStartKerja());
+//            row.getCell(3).setCellStyle(styleLeft);
+//
+//            row.createCell(4).setCellValue(siswa.getStatusKerja());
+//            row.getCell(4).setCellStyle(styleLeft);
+//
+////            row.createCell(5).setCellValue(siswa.getKelas().getNamaKelas());
+////            row.getCell(5).setCellStyle(styleLeft);
+//        }
+//
+//        // Adjust column width
+//        for (int i = 0; i < headers.length; i++) {
+//            sheet.autoSizeColumn(i);
+//        }
+//
+//        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//        response.setHeader("Content-Disposition", "attachment; filename=DataSiswa.xlsx");
+//        workbook.write(response.getOutputStream());
+//        workbook.close();
+//    }
+//
 
     public static void templateExcelSiswa(HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
@@ -245,7 +245,7 @@ public class ExcelDataSiswa {
 
         // Header row
         Row headerRow = sheet.createRow(rowNum++);
-        String[] headers = {"No", "Nama Siswa", "Email", "Password", "Nama Wali Murid", "Nama Waktu Pembelajaran", "Nama Organisasi", "Kelas"};
+        String[] headers = {"No", "Nama Siswa", "Email", "Password", "Nama Wali Murid", "Nama Waktu Pembelajaran", "Nama Organisasi"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);

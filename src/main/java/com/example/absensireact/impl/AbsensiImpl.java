@@ -42,16 +42,14 @@ public class AbsensiImpl implements AbsensiService {
     private final AdminRepository adminRepository;
     private final ShiftRepository shiftRepository;
 
-    private final OrangTuaRepository orangTuaRepository;
 
 
 
-    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository, AdminRepository adminRepository, ShiftRepository shiftRepository, OrangTuaRepository orangTuaRepository) throws IOException {
+    public AbsensiImpl(AbsensiRepository absensiRepository, UserRepository userRepository, AdminRepository adminRepository, ShiftRepository shiftRepository) throws IOException {
         this.absensiRepository = absensiRepository;
         this.userRepository = userRepository;
         this.adminRepository = adminRepository;
         this.shiftRepository = shiftRepository;
-        this.orangTuaRepository = orangTuaRepository;
     }
 
 
@@ -144,19 +142,19 @@ public class AbsensiImpl implements AbsensiService {
         return weeklyAbsensiMap;
     }
 
-    @Override
-    public Map<String, List<Absensi>> getAbsensiByMingguanPerKelas(Date tanggalAwal, Date tanggalAkhir, Long kelasId) {
-        // Fetch data based on the provided dates and kelasId
-        List<Absensi> absensiList = absensiRepository.findByMingguanAndKelas(tanggalAwal, tanggalAkhir, kelasId);
-        Map<String, List<Absensi>> weeklyAbsensiMap = new HashMap<>();
-
-        for (Absensi absensi : absensiList) {
-            String weekRange = getWeekRange(absensi.getTanggalAbsen());
-            weeklyAbsensiMap.computeIfAbsent(weekRange, k -> new ArrayList<>()).add(absensi);
-        }
-
-        return weeklyAbsensiMap;
-    }
+//    @Override
+//    public Map<String, List<Absensi>> getAbsensiByMingguanPerKelas(Date tanggalAwal, Date tanggalAkhir, Long kelasId) {
+//        // Fetch data based on the provided dates and kelasId
+//        List<Absensi> absensiList = absensiRepository.findByMingguanAndKelas(tanggalAwal, tanggalAkhir, kelasId);
+//        Map<String, List<Absensi>> weeklyAbsensiMap = new HashMap<>();
+//
+//        for (Absensi absensi : absensiList) {
+//            String weekRange = getWeekRange(absensi.getTanggalAbsen());
+//            weeklyAbsensiMap.computeIfAbsent(weekRange, k -> new ArrayList<>()).add(absensi);
+//        }
+//
+//        return weeklyAbsensiMap;
+//    }
 
 
     private String getWeekRange(Date date) {
@@ -435,80 +433,80 @@ public class AbsensiImpl implements AbsensiService {
 
 
 
-    @Override
-    public List<Absensi> getAbsensiByKelas(Long kelasId) {
-        List<User> users = userRepository.findByKelasId(kelasId);
-        if (users.isEmpty()) {
-            throw new NotFoundException("Tidak ada pengguna yang terkait dengan kelas dengan id: " + kelasId);
-        }
+//    @Override
+//    public List<Absensi> getAbsensiByKelas(Long kelasId) {
+//        List<User> users = userRepository.findByKelasId(kelasId);
+//        if (users.isEmpty()) {
+//            throw new NotFoundException("Tidak ada pengguna yang terkait dengan kelas dengan id: " + kelasId);
+//        }
+//
+//        List<Absensi> absensiList = new ArrayList<>();
+//        for (User user : users) {
+//            List<Absensi> userAbsensi = absensiRepository.findByUser(user);
+//            absensiList.addAll(userAbsensi);
+//        }
+//
+//        return absensiList;
+//    }
 
-        List<Absensi> absensiList = new ArrayList<>();
-        for (User user : users) {
-            List<Absensi> userAbsensi = absensiRepository.findByUser(user);
-            absensiList.addAll(userAbsensi);
-        }
-
-        return absensiList;
-    }
-
-    @Override
-    public Map<String, List<Absensi>> getAbsensiByBulananPerKelas(int bulan, int tahun, Long kelasId) {
-        // Fetch data based on the provided month, year, and kelasId
-        List<Absensi> absensiList = absensiRepository.findByBulananAndKelas(bulan, tahun, kelasId);
-        Map<String, List<Absensi>> monthlyAbsensiMap = new HashMap<>();
-
-        for (Absensi absensi : absensiList) {
-            String monthKey = getMonthKey(absensi.getTanggalAbsen());
-            monthlyAbsensiMap.computeIfAbsent(monthKey, k -> new ArrayList<>()).add(absensi);
-        }
-
-        return monthlyAbsensiMap;
-    }
+//    @Override
+//    public Map<String, List<Absensi>> getAbsensiByBulananPerKelas(int bulan, int tahun, Long kelasId) {
+//        // Fetch data based on the provided month, year, and kelasId
+//        List<Absensi> absensiList = absensiRepository.findByBulananAndKelas(bulan, tahun, kelasId);
+//        Map<String, List<Absensi>> monthlyAbsensiMap = new HashMap<>();
+//
+//        for (Absensi absensi : absensiList) {
+//            String monthKey = getMonthKey(absensi.getTanggalAbsen());
+//            monthlyAbsensiMap.computeIfAbsent(monthKey, k -> new ArrayList<>()).add(absensi);
+//        }
+//
+//        return monthlyAbsensiMap;
+//    }
 
     private String getMonthKey(Date tanggalAbsen) {
         LocalDate date = new java.sql.Date(tanggalAbsen.getTime()).toLocalDate();
         return date.getYear() + "-" + String.format("%02d", date.getMonthValue());
     }
 
-    @Override
-    public Map<String, List<Absensi>> getAbsensiHarianByKelas(Date tanggal, Long kelasId) {
-        // Normalize date to start and end of the day
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTime(tanggal);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        Date startOfDay = calendar.getTime();
+//    @Override
+//    public Map<String, List<Absensi>> getAbsensiHarianByKelas(Date tanggal, Long kelasId) {
+//        // Normalize date to start and end of the day
+//        Calendar calendar = GregorianCalendar.getInstance();
+//        calendar.setTime(tanggal);
+//        calendar.set(Calendar.HOUR_OF_DAY, 0);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        Date startOfDay = calendar.getTime();
+//
+//        calendar.set(Calendar.HOUR_OF_DAY, 23);
+//        calendar.set(Calendar.MINUTE, 59);
+//        calendar.set(Calendar.SECOND, 59);
+//        Date endOfDay = calendar.getTime();
+//
+//        // Fetch data based on the provided date and kelasId
+//        List<Absensi> absensiList = absensiRepository.findByTanggalAndKelas(startOfDay, endOfDay, kelasId);
+//        Map<String, List<Absensi>> dailyAbsensiMap = new HashMap<>();
+//
+//        // Use the date as the key
+//        String dateKey = startOfDay.toString();
+//        dailyAbsensiMap.put(dateKey, absensiList);
+//
+//        return dailyAbsensiMap;
+//    }
 
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        Date endOfDay = calendar.getTime();
+//    @Override
+//    public List<Absensi> getAbsensiByOrangTua(Long orangTuaId) {
+//        // Fetch the OrangTua entity
+//        OrangTua orangTua = orangTuaRepository.findById(orangTuaId)
+//                .orElseThrow(() -> new RuntimeException("OrangTua not found"));
+//
+//        // Fetch all Absensi entries where the associated user has the given orangTuaId
+//        return absensiRepository.findByOrangTuaId(orangTuaId);
+//    }
 
-        // Fetch data based on the provided date and kelasId
-        List<Absensi> absensiList = absensiRepository.findByTanggalAndKelas(startOfDay, endOfDay, kelasId);
-        Map<String, List<Absensi>> dailyAbsensiMap = new HashMap<>();
-
-        // Use the date as the key
-        String dateKey = startOfDay.toString();
-        dailyAbsensiMap.put(dateKey, absensiList);
-
-        return dailyAbsensiMap;
-    }
-
-    @Override
-    public List<Absensi> getAbsensiByOrangTua(Long orangTuaId) {
-        // Fetch the OrangTua entity
-        OrangTua orangTua = orangTuaRepository.findById(orangTuaId)
-                .orElseThrow(() -> new RuntimeException("OrangTua not found"));
-
-        // Fetch all Absensi entries where the associated user has the given orangTuaId
-        return absensiRepository.findByOrangTuaId(orangTuaId);
-    }
-
-    @Override
-    public List<Absensi> getStatusAbsenIzinByOrangTua(Long idOrangTua) {
-        return absensiRepository.getStatusAbsenIzinByOrangTua(idOrangTua);
-    }
+//    @Override
+//    public List<Absensi> getStatusAbsenIzinByOrangTua(Long idOrangTua) {
+//        return absensiRepository.getStatusAbsenIzinByOrangTua(idOrangTua);
+//    }
 
 }
