@@ -7,19 +7,28 @@ import com.example.absensireact.exception.BadRequestException;
 import com.example.absensireact.exception.CommonResponse;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.exception.ResponseHelper;
+import com.example.absensireact.exel.ExcelDataKaryawan;
 import com.example.absensireact.exel.ExcelDataSiswa;
+import com.example.absensireact.exel.ImportDataKaryawan;
+import com.example.absensireact.exel.ImportSiswa;
+import com.example.absensireact.model.Admin;
+import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,6 +55,12 @@ public class UserController {
 
     @Autowired
     private ExcelDataSiswa excelDataSiswa;
+
+    @Autowired
+    private ExcelDataKaryawan excelDataKaryawan;
+
+    @Autowired
+    private ImportDataKaryawan importDataKaryawan;
 
     @Autowired
     private AppConfig appConfig;
@@ -333,6 +348,43 @@ public class UserController {
 //                .body("Admin dengan ID " + adminId + " tidak ditemukan"));
 //    }
 
+    @GetMapping("/user/export/{idAdmin}")
+    public ResponseEntity<InputStreamResource> exportKaryawanByAdmin(@PathVariable Long idAdmin) {
+        List<User> users = userImpl.GetAllKaryawanByIdAdmin(idAdmin);
 
+        ByteArrayInputStream in = ExcelDataKaryawan.karyawanToExcel(users);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=karyawan.xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new InputStreamResource(in));
+    }
+
+    @GetMapping("/download/template-excel-karyawan")
+    public ResponseEntity<Void> templateExcelKaryawan(HttpServletResponse response) {
+        try {
+            ExcelDataKaryawan.templateExcelKaryawan(response);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PostMapping("/import/data-karyawan/admin/{adminId}")
+    public ResponseEntity<String> importKaryawan(@RequestPart("file") MultipartFile file, @PathVariable Long adminId) {
+        return adminRepository.findById(adminId).map(admin -> {
+            try {
+                importDataKaryawan.importKaryawan(file, admin);
+                return ResponseEntity.ok("Import berhasil!");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Terjadi kesalahan saat mengimpor data: " + e.getMessage());
+            }
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("SuperAdmin not found"));
+    }
 
 }
