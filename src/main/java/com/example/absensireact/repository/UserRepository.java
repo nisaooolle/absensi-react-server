@@ -31,17 +31,17 @@ public interface UserRepository extends JpaRepository<User , Long> {
     @Query(value = "SELECT * FROM user WHERE id_admin = :idAdmin", nativeQuery = true)
     List<User> findByIdAdmin (Long idAdmin);
 
-    @Query(value = "SELECT * FROM user WHERE id_admin = :idAdmin AND id_kelas = :kelasId", nativeQuery = true)
-    List<User> findByIdAdminAndKelasId(Long idAdmin, Long kelasId);
+//    @Query(value = "SELECT * FROM user WHERE id_admin = :idAdmin AND id_kelas = :kelasId", nativeQuery = true)
+//    List<User> findByIdAdminAndKelasId(Long idAdmin, Long kelasId);
     @Query(value = "SELECT * FROM user WHERE id_super_admin = :idSuperAdmin", nativeQuery = true)
     List<User> findByIdSuperAdmin (Long idSuperAdmin);
     @Query(value = "SELECT * FROM user WHERE username = :username", nativeQuery = true)
     Optional<User> findByUsername (String username);
 
-    @Query(value = "SELECT * FROM user WHERE id_kelas = :idKelas", nativeQuery = true)
-    List<User> findUsersByKelas(Long idKelas);
+//    @Query(value = "SELECT * FROM user WHERE id_kelas = :idKelas", nativeQuery = true)
+//    List<User> findUsersByKelas(Long idKelas);
 
-    List<User> findByKelasId(Long kelasId );
+//    List<User> findByKelasId(Long kelasId );
 
 
     boolean existsByUsername(String username);

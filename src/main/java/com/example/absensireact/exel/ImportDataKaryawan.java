@@ -61,6 +61,16 @@ public class ImportDataKaryawan {
                     user.setStatusKerja(getCellValue(statusKerjaCell));
                     user.setRole(getCellValue(roleCell));
 
+                    // Cek apakah email atau username sudah terdaftar
+                    if (siswaRepository.existsByEmail(user.getEmail())) {
+                        workbook.close();
+                        throw new BadRequestException("Email " + user.getEmail() + " telah digunakan");
+                    }
+                    if (siswaRepository.existsByUsername(user.getUsername())) {
+                        workbook.close();
+                        throw new BadRequestException("Username " + user.getUsername() + " telah digunakan");
+                    }
+
                     user.setAdmin(admin); // Set admin berdasarkan admin yang di-passing
                     userList.add(user); // Tambahkan ke daftar user
                 }

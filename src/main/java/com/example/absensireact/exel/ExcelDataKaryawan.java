@@ -44,12 +44,29 @@ public class ExcelDataKaryawan {
             headerCellStyle.setBorderTop(BorderStyle.THIN);
             headerCellStyle.setBorderLeft(BorderStyle.THIN);
             headerCellStyle.setBorderRight(BorderStyle.THIN);
-            headerCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerCellStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
             headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-            // Buat Header Row
+            // Buat judul di atas tabel
+            Row titleRow = sheet.createRow(0);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("Data Karyawan");
+
+            // Merging cells for the title (merge across the width of the table)
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 6));
+
+            // Buat gaya untuk judul
+            CellStyle titleCellStyle = workbook.createCellStyle();
+            Font titleFont = workbook.createFont();
+            titleFont.setBold(true);
+            titleFont.setFontHeightInPoints((short) 16);
+            titleCellStyle.setFont(titleFont);
+            titleCellStyle.setAlignment(HorizontalAlignment.CENTER);
+            titleCell.setCellStyle(titleCellStyle);
+
+            // Buat Header Row (pada baris kedua, karena baris pertama untuk judul)
             String[] headers = {"No", "Email", "Username", "Password", "Start Kerja", "Status Kerja", "Role"};
-            Row headerRow = sheet.createRow(0);
+            Row headerRow = sheet.createRow(1);
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -64,7 +81,7 @@ public class ExcelDataKaryawan {
             dataCellStyle.setBorderRight(BorderStyle.THIN);
 
             // Isi Data Karyawan
-            int rowIdx = 1;
+            int rowIdx = 2; // Mulai dari baris ketiga untuk data
             for (User user : users) {
                 Row row = sheet.createRow(rowIdx++);
 
@@ -110,6 +127,7 @@ public class ExcelDataKaryawan {
             return null;
         }
     }
+
 
     public static void templateExcelKaryawan(HttpServletResponse response) throws IOException {
         Workbook workbook = new XSSFWorkbook();
