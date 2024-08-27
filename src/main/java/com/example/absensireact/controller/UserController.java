@@ -219,8 +219,8 @@ public class UserController {
 //        }
 //    }
 
+//    @PutMapping("/user/edit-kar/{id}")
 
-    //    @PutMapping("/user/edit-kar/{id}")
 //    public ResponseEntity<User> editUser(
 //            @PathVariable("id") Long id,
 //            @RequestParam(required = false) Long idJabatan,
