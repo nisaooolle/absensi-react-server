@@ -10,9 +10,6 @@ import com.example.absensireact.exception.ResponseHelper;
 import com.example.absensireact.exel.ExcelDataKaryawan;
 import com.example.absensireact.exel.ExcelDataSiswa;
 import com.example.absensireact.exel.ImportDataKaryawan;
-import com.example.absensireact.exel.ImportSiswa;
-import com.example.absensireact.model.Admin;
-import com.example.absensireact.model.Organisasi;
 import com.example.absensireact.model.User;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
@@ -54,13 +51,10 @@ public class UserController {
 //    private ImportSiswa importSiswa;
 
     @Autowired
-    private ExcelDataSiswa excelDataSiswa;
-
-    @Autowired
-    private ExcelDataKaryawan excelDataKaryawan;
-
-    @Autowired
     private ImportDataKaryawan importDataKaryawan;
+
+    @Autowired
+    private ExcelDataSiswa excelDataSiswa;
 
     @Autowired
     private AppConfig appConfig;
@@ -225,8 +219,8 @@ public class UserController {
 //        }
 //    }
 
-
 //    @PutMapping("/user/edit-kar/{id}")
+
 //    public ResponseEntity<User> editUser(
 //            @PathVariable("id") Long id,
 //            @RequestParam(required = false) Long idJabatan,
@@ -386,5 +380,7 @@ public class UserController {
             }
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("SuperAdmin not found"));
     }
+
+
 
 }
