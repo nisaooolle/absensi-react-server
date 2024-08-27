@@ -30,7 +30,7 @@ public interface UserService {
 
     List<User> getAllByAdmin(Long idAdmin);
 
-    List<User> getAllByAdminandKelas(Long idAdmin, Long KlasId);
+//    List<User> getAllByAdminandKelas(Long idAdmin, Long KlasId);
 
     List<User> getAllBySuperAdmin(Long idSuperAdmin);
 
@@ -38,19 +38,19 @@ public interface UserService {
 
     User EditUserBySuper(Long id, Long idJabatan, Long idShift, User updateUser);
 
-    User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua);
+//    User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua);
 
-    User TambahUserKelas(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua, Long idKelas);
+//    User TambahUserKelas(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua, Long idKelas);
 
 
-    User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, Long idOrangTua, Long idKelas, UserDTO updatedUserDTO);
+//    User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, Long idOrangTua, Long idKelas, UserDTO updatedUserDTO);
 
     User putPassword(PasswordDTO passwordDTO, Long id);
 
 
     User ubahUsernamedanemail(Long id, User updateUser);
 
-    User EditUserBySuper(Long id, Long idShift, Long idOrangTua, Long idKelas, User updateUser);
+//    User EditUserBySuper(Long id, Long idShift, Long idOrangTua, Long idKelas, User updateUser);
 
     List<User> GetAllKaryawanByIdAdmin(Long idAdmin);
 
@@ -68,7 +68,7 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    List<User> getUsersByIdKelas(Long idKelas);
+//    List<User> getUsersByIdKelas(Long idKelas);
 
 
 

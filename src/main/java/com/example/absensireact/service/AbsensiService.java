@@ -34,7 +34,7 @@ public interface  AbsensiService {
 
     Map<String, List<Absensi>> getAbsensiByMingguan(Date startDate, Date endDate);
 
-    Map<String, List<Absensi>> getAbsensiByMingguanPerKelas(Date startDate, Date endDate, Long kelasId);
+//    Map<String, List<Absensi>> getAbsensiByMingguanPerKelas(Date startDate, Date endDate, Long kelasId);
 
     Absensi PostAbsensi(Long userId, MultipartFile image, String lokasiMasuk, String keteranganTerlambat) throws IOException, ParseException;
 
@@ -61,15 +61,15 @@ public interface  AbsensiService {
 
     List<Absensi> getAbsensiByUserId(Long userId);
 
-    List<Absensi> getAbsensiByKelas(Long kelasId);
+//    List<Absensi> getAbsensiByKelas(Long kelasId);
 
-    Map<String, List<Absensi>> getAbsensiByBulananPerKelas(int bulan, int tahun, Long kelasId);
+//    Map<String, List<Absensi>> getAbsensiByBulananPerKelas(int bulan, int tahun, Long kelasId);
 
-    Map<String, List<Absensi>> getAbsensiHarianByKelas(Date tanggal, Long kelasId);
+//    Map<String, List<Absensi>> getAbsensiHarianByKelas(Date tanggal, Long kelasId);
 
-    List<Absensi> getAbsensiByOrangTua(Long orangTuaId);
+//    List<Absensi> getAbsensiByOrangTua(Long orangTuaId);
 
-    List<Absensi> getStatusAbsenIzinByOrangTua(Long idOrangTua);
+//    List<Absensi> getStatusAbsenIzinByOrangTua(Long idOrangTua);
 
 
 }

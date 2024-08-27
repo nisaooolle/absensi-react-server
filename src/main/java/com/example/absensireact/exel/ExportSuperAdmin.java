@@ -1,12 +1,10 @@
 package com.example.absensireact.exel;
 
-import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.SuperAdmin;
 import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.OrganisasiRepository;
 import com.example.absensireact.repository.SuperAdminRepository;
-import com.example.absensireact.repository.OrangTuaRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -33,8 +31,6 @@ public class ExportSuperAdmin {
     @Autowired
     private SuperAdminRepository superAdminRepository;
 
-    @Autowired
-    private OrangTuaRepository orangTuaRepository;
 
     @Autowired
     private OrganisasiRepository organisasiRepository;

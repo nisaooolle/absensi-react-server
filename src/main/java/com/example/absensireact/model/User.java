@@ -46,13 +46,7 @@ public class User {
     @JoinColumn(name = "idAdmin")
     private Admin admin;
 
-    @ManyToOne
-    @JoinColumn(name = "idKelas")
-    private Kelas kelas;
 
-    @OneToOne
-    @JoinColumn(name = "idOrangTua")
-    private OrangTua orangTua;
 
     @ManyToOne
     @JoinColumn(name = "idSuperAdmin")
@@ -65,7 +59,7 @@ public class User {
 
     }
 
-    public User(Long id, String email, String password, String username, String fotoUser, String startKerja, String statusKerja, Organisasi organisasi, OrangTua orangTua, String status, Shift shift, Admin admin, Kelas kelas, SuperAdmin superAdmin, String role) {
+    public User(Long id, String email, String password, String username, String fotoUser, String startKerja, String statusKerja, Organisasi organisasi, String status, Shift shift, Admin admin, SuperAdmin superAdmin, String role) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -74,13 +68,11 @@ public class User {
         this.startKerja = startKerja;
         this.statusKerja = statusKerja;
         this.organisasi = organisasi;
+        this.status = status;
         this.shift = shift;
         this.admin = admin;
-        this.orangTua = orangTua;
-        this.kelas = kelas;
         this.superAdmin = superAdmin;
         this.role = role;
-        this.status = status;
     }
 
     public Long getId() {
@@ -165,13 +157,7 @@ public class User {
         this.admin = admin;
     }
 
-    public Kelas getKelas() {
-        return kelas;
-    }
 
-    public void setKelas(Kelas kelas) {
-        this.kelas = kelas;
-    }
 
     public SuperAdmin getSuperAdmin() {
         return superAdmin;
@@ -181,13 +167,7 @@ public class User {
         this.superAdmin = superAdmin;
     }
 
-    public OrangTua getOrangTua() {
-        return orangTua;
-    }
 
-    public void setOrangTua(OrangTua orangTua) {
-        this.orangTua = orangTua;
-    }
 
     public String getRole() {
         return role;
