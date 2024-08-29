@@ -1,10 +1,8 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.exception.NotFoundException;
-import com.example.absensireact.model.Admin;
 import com.example.absensireact.model.Notifications;
 import com.example.absensireact.model.User;
-import com.example.absensireact.repository.AdminRepository;
 import com.example.absensireact.repository.NotificationsRepository;
 import com.example.absensireact.repository.UserRepository;
 import com.example.absensireact.service.NotificationsService;
@@ -24,9 +22,6 @@ public class NotificationsImpl implements NotificationsService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AdminRepository adminRepository;
-
     @Override
     public List<Notifications>getAllNotif(){
         return notificationsRepository.findAll();
@@ -38,84 +33,38 @@ public class NotificationsImpl implements NotificationsService {
         if (userOptional.isEmpty()) {
             throw new NotFoundException("User id tiak ditemukan dengan id :" + userId);
         }
-        return notificationsRepository.findnotifByUserId(userId);
+      return notificationsRepository.findnotifByUserId(userId);
     }
 
     @Override
-    public Optional<Notifications>getById(Long id){
-        return notificationsRepository.findById(id);
-    }
-
-    @Override
-    public List<Notifications>getNotfiAllByAdminId(Long adminId){
-        Optional<Admin> adminoptional = adminRepository.findById(adminId);
-        if (adminoptional.isEmpty()) {
-            throw new NotFoundException("admin id tiak ditemukan dengan id :" + adminId);
-        }
-        return notificationsRepository.findnotifByAdmin(adminId);
-    }
-
-    @Override
-    public Notifications sendToAllUser(Long adminId, Notifications notifications) {
-        Admin admin = adminRepository.findById(adminId)
-                .orElseThrow(() -> new NotFoundException("id admin tidak ditemukan : " + adminId));
-
-        List<User> users = userRepository.findByIdAdmin(adminId);
-
-        if (users.isEmpty()) {
-            throw new NotFoundException("Tidak ada user yang terdaftar dengan id admin: " + adminId);
-        }
-        for (User user : users) {
-
-            notifications.setAdmin(admin);
-            notifications.setMessage(notifications.getMessage());
-            notifications.setUser(user);
-            notifications.setNamaAcara(notifications.getNamaAcara());
-            notifications.setTanggalAcara(notifications.getTanggalAcara());
-            notifications.setTempatAcara(notifications.getTempatAcara());
-            notificationsRepository.save(notifications);
-        }
-
-        return notifications;
-    }
-
-    @Override
-    public Notifications tambahNotif(Long adminId, Long userId, Notifications notifications){
-        Optional<Admin> adminOptional = adminRepository.findById(adminId);
-        if (adminOptional.isEmpty()) {
-            throw new NotFoundException("Admin id tidak ditemukan dengan id :" + adminId);
-        }
+    public Notifications tambahNotif(Long userId, String message){
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             throw new NotFoundException("User id tidak ditemukan dengan id :" + userId);
         }
         User user = userOptional.get();
-        Admin admin = adminOptional.get();
         Date newDate = new Date();
-        notifications.setAdmin(admin);
-        notifications.setMessage(notifications.getMessage());
-        notifications.setUser(user);
-        notifications.setNamaAcara(notifications.getNamaAcara());
-        notifications.setTanggalAcara(notifications.getTanggalAcara());
-        notifications.setTempatAcara(notifications.getTempatAcara());
+        Notifications notifications = new Notifications();
         notifications.setCreatedAt(newDate);
+        notifications.setUser(user);
+        notifications.setMessage(message);
         return notificationsRepository.save(notifications);
     }
 
     @Override
-    public Notifications editNotifById(Long id, Notifications notificationsUpdate){
+    public Notifications editNotifById(Long id, Notifications notifications){
         Optional<Notifications> notifcationsOptional = notificationsRepository.findById(id);
         if (notifcationsOptional.isEmpty()) {
             throw new NotFoundException("Id Notif tidak ditemukan dengan id :" + id);
         }
-        Notifications notification = notifcationsOptional.get();
-        notification.setMessage(notificationsUpdate.getMessage());
-        notification.setTempatAcara(notificationsUpdate.getTempatAcara());
-        notification.setNamaAcara(notificationsUpdate.getNamaAcara());
-        return notificationsRepository.save(notification);
+        Date newDate = new Date();
+        notifications.setMessage(notifications.getMessage());
+        notifications.setCreatedAt(newDate);
+        notifications.setUser(notifications.getUser());
+
+        return notificationsRepository.save(notifications);
     }
 
-    //    gagall
     @Override
     public Notifications editNotifByUserId(Long userId, Notifications notifications){
         Optional<User> userOptional = userRepository.findById(userId);

@@ -32,9 +32,9 @@ public class Admin {
     @JoinColumn(name = "idSuperAdmin")
     private SuperAdmin superAdmin;
 
-    public Admin(){
+   public Admin(){
 
-    }
+   }
 
     public Admin(Long id, String email, String password, String username, String imageAdmin, String role,  SuperAdmin superAdmin) {
         this.id = id;
@@ -94,6 +94,8 @@ public class Admin {
     public void setRole(String role) {
         this.role = role;
     }
+
+
 
     public SuperAdmin getSuperAdmin() {
         return superAdmin;

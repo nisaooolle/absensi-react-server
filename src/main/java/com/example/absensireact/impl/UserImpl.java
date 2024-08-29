@@ -1,7 +1,10 @@
 package com.example.absensireact.impl;
 
 import com.example.absensireact.config.AppConfig;
-import com.example.absensireact.dto.*;
+import com.example.absensireact.dto.ForGotPass;
+import com.example.absensireact.dto.PasswordDTO;
+import com.example.absensireact.dto.ResetPassDTO;
+import com.example.absensireact.dto.VerifyCode;
 import com.example.absensireact.exception.BadRequestException;
 import com.example.absensireact.exception.NotFoundException;
 import com.example.absensireact.model.*;
@@ -10,6 +13,7 @@ import com.example.absensireact.service.UserService;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,21 +24,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -42,9 +38,7 @@ import java.util.*;
 @Service
 public class UserImpl implements UserService {
 
-//    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
-
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
 
     @Autowired
     private UserRepository userRepository;
@@ -56,25 +50,16 @@ public class UserImpl implements UserService {
     private AdminRepository adminRepository;
 
     @Autowired
-    private SuperAdminRepository superAdminRepository;
-
-    @Autowired
     private JabatanRepository jabatanRepository;
 
     @Autowired
     private ShiftRepository shiftRepository;
-
-//    @Autowired
-//    private OrangTuaRepository orangTuaRepository;
 
     @Autowired
     private ResetPasswordRepository resetPasswordRepository;
 
     @Autowired
     private OrganisasiRepository organisasiRepository;
-
-//    @Autowired
-//    private KelasRepository kelasRepository;
 
     @Autowired
     private AppConfig appConfig;
@@ -365,7 +350,7 @@ public class UserImpl implements UserService {
                     "                                <p style=\"line-height: 140%; font-size: 14px;\"><span style=\"font-size: 12px; line-height: 16.8px;\">Jika Anda tidak memerlukan penyetelan ulang, abaikan pesan ini.</span></p>\n" +
                     "                                <p style=\"line-height: 140%; font-size: 14px;\">&nbsp;</p>\n" +
                     "                              </div>\n"
-                    +"  <a href=\\\"http://localhost:3000/reset-password/" + code + "\" style=\"background-color: #3498db; color: #ffffff; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;\">\n" +
+                                                    +" <a href=\"http://localhost:3000/\" style=\"background-color: #3498db; color: #ffffff; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;\">\n" +
                     "                                           Reset Password\n" +
                     "                                  </a>\n"+
 
@@ -376,7 +361,7 @@ public class UserImpl implements UserService {
                     "                            <td class=\"v-container-padding-padding\" style=\"overflow-wrap:break-word;word-break:break-word;padding:32px 46px ;font-family:arial,helvetica,sans-serif;\" align=\"left\">\n" +
                     "\n" +
                     "                              <div class=\"v-color v-text-align v-line-height\" style=\"color: #34495e; line-height: 140%; text-align: left; word-wrap: break-word;\">\n" +
-                    "                                <p style=\"line-height: 140%; font-size: 14px;\"><span style=\"font-family: Montserrat, sans-serif; font-size: 14px; line-height: 19.6px;\"><span style=\"font-size: 20px; line-height: 28px;\"><strong>Berikut code verifikasi akun presensi.com Anda: " + code + "</strong></span></span>\n" +
+                    "                                <p style=\"line-height: 140%; font-size: 14px;\"><span style=\"font-family: Montserrat, sans-serif; font-size: 14px; line-height: 19.6px;\"><span style=\"font-size: 20px; line-height: 28px;\"><strong>Berikut code verifikasi akun byrtagihan.com Anda: " + code + "</strong></span></span>\n" +
                     "                                </p>\n" +
                     "                              </div>\n" +
                     "\n" +
@@ -507,12 +492,12 @@ public class UserImpl implements UserService {
     }
     @Override
     public User Register(User user, Long idOrganisasi, Long idShift) {
-        if (adminRepository.existsByEmail(user.getEmail()) || userRepository.existsByEmail(user.getEmail())) {
-            throw new BadRequestException("Email sudah digunakan");
+        if (adminRepository.existsByEmail(user.getEmail())) {
+            throw new BadRequestException("Email sudah digunakan oleh admin");
         }
 
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new BadRequestException("Username sudah digunakan");
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new BadRequestException("Email sudah digunakan oleh user");
         }
 
         Organisasi organisasi = organisasiRepository.findById(idOrganisasi)
@@ -539,7 +524,7 @@ public class UserImpl implements UserService {
         user.setShift(shift);
         user.setStartKerja(tanggalKerja);
         user.setStatusKerja("aktif");
-        user.setStatus("Siswa");
+        user.setJabatan(null);
         user.setAdmin(admin);
         user.setOrganisasi(organisasi);
         user.setRole("USER");
@@ -570,23 +555,6 @@ public class UserImpl implements UserService {
         List<User> userList = userRepository.findByIdAdmin(idAdmin);
         return userList;
     }
-
-//    @Override
-//    public List<User> getAllByAdminandKelas(Long idAdmin, Long KlasId) {
-//        Admin admin = adminRepository.findById(idAdmin)
-//                .orElseThrow(() -> new NotFoundException("id Admin tidak ditemukan: " + idAdmin));
-//        Kelas kelas = kelasRepository.findById(KlasId)
-//                .orElseThrow(() -> new NotFoundException("id Kelas tidak ditemukan: " + KlasId));
-//        List<User> userList = userRepository.findByIdAdminAndKelasId(idAdmin, KlasId);
-//        return userList;
-//    }
-    @Override
-    public List<User> getAllBySuperAdmin(Long idSuperAdmin) {
-        SuperAdmin superAdmin = superAdminRepository.findById(idSuperAdmin)
-                .orElseThrow(() -> new NotFoundException("id Super Admin tidak ditemukan: " + idSuperAdmin));
-        List<User> userList = userRepository.findByIdSuperAdmin(idSuperAdmin);
-        return userList;
-    }
     @Override
     public List<User> getAllByShift(Long idShift) {
         Optional<Shift> shiftOptional = shiftRepository.findById(idShift);
@@ -602,43 +570,26 @@ public class UserImpl implements UserService {
         return users;
     }
 
+
     @Override
-    public User EditUserBySuper(Long id, Long idJabatan, Long idShift, User updateUser) {
-        return null;
+    public User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, User updatedUser) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("id user tidak ditemukan");
+        }
+        User user = userOptional.get();
+        user.setJabatan(jabatanRepository.findById(idJabatan)
+                .orElseThrow(() -> new NotFoundException("id jabatan tidak ditemukan")));
+        user.setShift(shiftRepository.findById(idShift)
+                .orElseThrow(() -> new NotFoundException("id shift tidak ditemukan")));
+        if (updatedUser.getUsername() != null) {
+            user.setUsername(updatedUser.getUsername());
+        }
+
+
+        return userRepository.save(user);
     }
 
-
-//    @Override
-//    public User editUsernameJabatanShift(Long id, Long idJabatan, Long idShift, Long idOrangTua, Long idKelas, UserDTO updatedUserDTO) {
-//        Optional<User> userOptional = userRepository.findById(id);
-//        if (userOptional.isEmpty()) {
-//            throw new NotFoundException("id user tidak ditemukan");
-//        }
-//
-//        User user = userOptional.get();
-//        boolean usernameExisting = userRepository.existsByUsername(user.getUsername());
-//
-//        if (usernameExisting ) {
-//            throw new IllegalStateException("Username dengan nama : " + user.getUsername() +  " sudah terdaftar");
-//
-//        }
-////        user.setJabatan(jabatanRepository.findById(idJabatan)
-////                .orElseThrow(() -> new NotFoundException("id jabatan tidak ditemukan")));
-//        user.setShift(shiftRepository.findById(idShift)
-//                .orElseThrow(() -> new NotFoundException("id shift tidak ditemukan")));
-//        user.setOrangTua(orangTuaRepository.findById(idOrangTua)
-//                .orElseThrow(() -> new NotFoundException("id orang tua tidak ditemukan")));
-//        user.setKelas(kelasRepository.findById(idKelas)
-//                .orElseThrow(() -> new NotFoundException("id Kelas tidak ditemukan")));
-//        if (updatedUserDTO.getUsername() != null) {
-//            user.setUsername(updatedUserDTO.getUsername());
-//        }
-//        if (updatedUserDTO.getEmail() != null) {
-//            user.setEmail(updatedUserDTO.getEmail());
-//        }
-//        return userRepository.save(user);
-//    }
-//
 
 
     @Override
@@ -661,134 +612,60 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public User ubahUsernamedanemail(Long id, User updateUser) {
+    public User ubahUsernamedanemail(Long id, User updateUser){
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
-            throw new NotFoundException("Id User tidak ditemukan: " + id);
+            throw new NotFoundException("Id User tidak ditemukan :" + id);
         }
-
         User user = userOptional.get();
-
-        // Cek apakah email sudah digunakan oleh user lain
-        Optional<User> userByEmail = userRepository.findByEmail(updateUser.getEmail());
-        if (userByEmail.isPresent() && !userByEmail.get().getId().equals(id)) {
-            throw new IllegalArgumentException("Email sudah digunakan");
-        }
-
-        // Cek apakah username sudah digunakan oleh user lain
-        Optional<User> userByUsername = userRepository.findByUsername(updateUser.getUsername());
-        if (userByUsername.isPresent() && !userByUsername.get().getId().equals(id)) {
-            throw new IllegalArgumentException("Username sudah digunakan");
-        }
-
         user.setEmail(updateUser.getEmail());
         user.setUsername(updateUser.getUsername());
+
 
         return userRepository.save(user);
     }
 
-//    @Override
-//    public User EditUserBySuper(Long id, Long idShift, Long idOrangTua, Long idKelas, User updateUser) {
-//        Optional<User> userOptional = userRepository.findById(id);
-//        if (userOptional.isEmpty()) {
-//            throw new NotFoundException("id user tidak ditemukan: " + id);
-//        }
-//
-//        User user = userOptional.get();
-//
-//        // Cek apakah username sudah digunakan oleh user lain
-//        Optional<User> userByUsername = userRepository.findByUsername(updateUser.getUsername());
-//        if (userByUsername.isPresent() && !userByUsername.get().getId().equals(id)) {
-//            throw new IllegalArgumentException("Username sudah digunakan");
-//        }
-//
-//        user.setUsername(updateUser.getUsername());
-//        user.setShift(shiftRepository.findById(idShift)
-//                .orElseThrow(() -> new NotFoundException("id Shift tidak ditemukan: " + idShift)));
-//        user.setOrangTua(orangTuaRepository.findById(idOrangTua)
-//                .orElseThrow(() -> new NotFoundException("id OrangTua tidak ditemukan: " + idOrangTua)));
-//        user.setKelas(kelasRepository.findById(idKelas)
-//                .orElseThrow(() -> new NotFoundException("id Kelas tidak ditemukan: " + idKelas)));
-//
-//        return userRepository.save(user);
-//    }
+    @Override
+    public User EditUserBySuper (Long id , Long idJabatan , Long idShift , User updateUser ){
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("id user tidak ditenukan : " + id);
+        }
+        User user = userOptional.get();
+        user.setUsername(updateUser.getUsername());
+        user.setJabatan(jabatanRepository.findById(idJabatan)
+                .orElseThrow(() -> new NotFoundException("id Jabatan tidak ditemukan :" + idJabatan)));
+        user.setShift(shiftRepository.findById(idShift)
+                .orElseThrow(() -> new NotFoundException("id Shift tidak ditemukan : " + idShift)));
+        return userRepository.save(user);
+    }
 
     @Override
-    public User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift) {
+    public User Tambahkaryawan(User user, Long idAdmin, Long idOrganisasi, Long idJabatan, Long idShift) {
         Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
         if (adminOptional.isPresent()) {
             Admin admin = adminOptional.get();
-
-            // Cek apakah email atau username sudah terdaftar
-            if (userRepository.existsByEmail(userDTO.getEmail())) {
-                throw new BadRequestException("Email " + userDTO.getEmail() + " telah digunakan");
-            }
-            if (userRepository.existsByUsername(userDTO.getUsername())) {
-                throw new BadRequestException("Username " + userDTO.getUsername() + " telah digunakan");
-            }
-
-            User user = new User();
-            user.setPassword(encoder.encode(userDTO.getPassword()));
+            user.setPassword(encoder.encode(user.getPassword()));
             user.setRole("USER");
 
-            user.setEmail(userDTO.getEmail());
-            user.setUsername(userDTO.getUsername());
+            user.setEmail(user.getEmail());
+            user.setUsername(user.getUsername());
             user.setOrganisasi(organisasiRepository.findById(idOrganisasi)
                     .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan")));
+            user.setJabatan(jabatanRepository.findById(idJabatan)
+                    .orElseThrow(() -> new NotFoundException("Jabatan tidak ditemukan")));
             user.setShift(shiftRepository.findById(idShift)
                     .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan")));
             user.setStartKerja(new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
+            user.setStatusKerja("aktif");
             user.setAdmin(admin);
 
             return userRepository.save(user);
         } else {
             throw new NotFoundException("Id Admin tidak ditemukan");
         }
-    }
+}
 
-    @Override
-    public User Tambahkaryawan(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua) {
-        return null;
-    }
-
-//    @Override
-//    public User TambahUserKelas(UserDTO userDTO, Long idAdmin, Long idOrganisasi, Long idShift, Long idOrangTua, Long idKelas) {
-//        Optional<Admin> adminOptional = adminRepository.findById(idAdmin);
-//        Optional<Kelas> kelasOptional = kelasRepository.findById(idKelas);
-//        if (adminOptional.isPresent() || kelasOptional.isPresent()) {
-//            Admin admin = adminOptional.get();
-//            Kelas kelas = kelasOptional.get();
-//
-//            // Cek apakah email atau username sudah terdaftar
-//            if (userRepository.existsByEmail(userDTO.getEmail())) {
-//                throw new BadRequestException("Email " + userDTO.getEmail() + " telah digunakan");
-//            }
-//            if (userRepository.existsByUsername(userDTO.getUsername())) {
-//                throw new BadRequestException("Username " + userDTO.getUsername() + " telah digunakan");
-//            }
-//
-//            User user = new User();
-//            user.setPassword(encoder.encode(userDTO.getPassword()));
-//            user.setRole("USER");
-//            user.setStatus("Siswa"); // Set status otomatis menjadi "Siswa"
-//
-//            user.setEmail(userDTO.getEmail());
-//            user.setUsername(userDTO.getUsername());
-//            user.setOrganisasi(organisasiRepository.findById(idOrganisasi)
-//                    .orElseThrow(() -> new NotFoundException("Organisasi tidak ditemukan")));
-//            user.setShift(shiftRepository.findById(idShift)
-//                    .orElseThrow(() -> new NotFoundException("Shift tidak ditemukan")));
-//            user.setOrangTua(orangTuaRepository.findById(idOrangTua)
-//                    .orElseThrow(() -> new NotFoundException("id Orang Tua tidak ditemukan : " + idOrangTua)));
-//            user.setStartKerja(new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID")).format(new Date()));
-//            user.setAdmin(admin);
-//            user.setKelas(kelas);
-//
-//            return userRepository.save(user);
-//        } else {
-//            throw new NotFoundException("Id Admin atau kelas tidak ditemukan");
-//        }
-//    }
 
 
     @Override
@@ -807,15 +684,18 @@ public class UserImpl implements UserService {
         return userRepository.findAll();
     }
 
-
+    @Override
+    public  User fotoUser(Long id, MultipartFile image) throws  IOException{
+        User exisUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User tidak ditemukan"));
+        String file = uploadFoto(image , "user");
+        exisUser.setFotoUser(file);
+        return userRepository.save(exisUser);
+    }
     @Override
     public User edit(Long id, User user) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User tidak ditemukan"));
-
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new BadRequestException("Username " + user.getUsername() + " telah digunakan");
-        }
 
         existingUser.setUsername(user.getUsername());
         existingUser.setOrganisasi(user.getOrganisasi());
@@ -825,56 +705,16 @@ public class UserImpl implements UserService {
 
     }
 
-//    @Override
-//    public  User fotoUser(Long id, MultipartFile image) throws  IOException{
-//        User exisUser = userRepository.findById(id)
-//                .orElseThrow(() -> new NotFoundException("User tidak ditemukan"));
-//        String file = uploadFoto(image , "user");
-//        exisUser.setFotoUser(file);
-//        return userRepository.save(exisUser);
-//    }
-//        private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
-//        String timestamp = String.valueOf(System.currentTimeMillis());
-//        String folderPath = "user/";
-//        String fullPath = folderPath + timestamp + "_" + fileName;
-//        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
-//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-//        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage.create(blobInfo, multipartFile.getBytes());
-//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
-//    }
-
-    private String uploadFoto(MultipartFile multipartFile) throws IOException {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", multipartFile.getResource());
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.exchange(BASE_URL, HttpMethod.POST, requestEntity, String.class);
-        String fileUrl = extractFileUrlFromResponse(response.getBody());
-        return fileUrl;
-    }
-
-    private String extractFileUrlFromResponse(String responseBody) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonResponse = mapper.readTree(responseBody);
-        JsonNode dataNode = jsonResponse.path("data");
-        String urlFile = dataNode.path("url_file").asText();
-
-        return urlFile;
-    }
-
-    @Override
-    public User fotoUser(Long id, MultipartFile image) throws IOException {
-        User exisUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User tidak ditemukan"));
-        String fileUrl = uploadFoto(image);
-        exisUser.setFotoUser(fileUrl);
-        return userRepository.save(exisUser);
+        private String uploadFoto(MultipartFile multipartFile, String fileName) throws IOException {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String folderPath = "user/";
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("absensireact.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.create(blobInfo, multipartFile.getBytes());
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
 
 
@@ -888,24 +728,22 @@ public class UserImpl implements UserService {
 
 
     @Override
-    public void delete(Long id) throws IOException {
-        Optional<User> userOptional = userRepository.findById(id);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            String fotoUrl = user.getFotoUser();
-            String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
-            deleteFoto(fileName);
-        } else {
-            throw new NotFoundException("User not found with id: " + id);
-        }
+   public void delete(Long id) throws IOException {
+    Optional<User> userOptional = userRepository.findById(id);
+    if (userOptional.isPresent()) {
+        User user = userOptional.get();
+        String fotoUrl = user.getFotoUser();
+        String fileName = fotoUrl.substring(fotoUrl.indexOf("/o/") + 3, fotoUrl.indexOf("?alt=media"));
+        deleteFoto(fileName);
+    } else {
+        throw new NotFoundException("User not found with id: " + id);
     }
+}
 
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
-
 
     private Date truncateTime(Date date) {
         Calendar calendar = Calendar.getInstance();
@@ -916,10 +754,4 @@ public class UserImpl implements UserService {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
-
-//    @Override
-//    public List<User> getUsersByIdKelas(Long idKelas) {
-//        return userRepository.findUsersByKelas(idKelas);
-//    }
-
 }
