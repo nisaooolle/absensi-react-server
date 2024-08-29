@@ -40,6 +40,7 @@ public class SuperAdminImpl implements SuperAdminService {
     static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/absensireact.appspot.com/o/%s?alt=media";
 
     private final SuperAdminRepository superAdminRepository;
+
     private final ResetPasswordRepository resetPasswordRepository;
     @Autowired
     PasswordEncoder encoder;
@@ -49,11 +50,6 @@ public class SuperAdminImpl implements SuperAdminService {
 
     @Autowired
     private GetVerification getVerification;
-
-    public SuperAdminImpl(SuperAdminRepository superAdminRepository, ResetPasswordRepository resetPasswordRepository) {
-        this.superAdminRepository = superAdminRepository;
-        this.resetPasswordRepository = resetPasswordRepository;
-    }
 
 
     private String newPassword() {
@@ -77,7 +73,10 @@ public class SuperAdminImpl implements SuperAdminService {
     }
 
 
-
+    public SuperAdminImpl(SuperAdminRepository superAdminRepository, ResetPasswordRepository resetPasswordRepository) {
+        this.superAdminRepository = superAdminRepository;
+        this.resetPasswordRepository = resetPasswordRepository;
+    }
     @Override
     public SuperAdmin ubahPassByForgot(ResetPassDTO updatePass){
         SuperAdmin superadmin = superAdminRepository.findByEmail(updatePass.getEmail())
@@ -468,6 +467,7 @@ public class SuperAdminImpl implements SuperAdminService {
         }
         return forGotPass;
     }
+
     @Override
     public SuperAdmin getAllSuperAdmin(){
         return (SuperAdmin) superAdminRepository.findAll();
@@ -575,7 +575,7 @@ public class SuperAdminImpl implements SuperAdminService {
         if (superOptional.isEmpty()) {
             throw new NotFoundException("Id admin tidak ditemukan");
         }
-        String fileUrl = uploadFoto(image , "admin" + id);
+        String fileUrl = uploadFoto(image , "superadmin" + id);
         SuperAdmin superAdmin = superOptional.get();
         superAdmin.setImageSuperAdmin(fileUrl);
         return superAdminRepository.save(superAdmin);

@@ -88,6 +88,12 @@ public class JabatanImpl implements JabatanService {
     @Override
     public Map<String, Boolean> deleteJabatan(Long idJabatan) {
         try {
+            List<User> users = userRepository.findByIdJabatan(idJabatan);
+            for (User user : users) {
+                user.setJabatan(null);
+                userRepository.save(user);
+            }
+
             jabatanRepository.deleteById(idJabatan);
 
             Map<String, Boolean> res = new HashMap<>();

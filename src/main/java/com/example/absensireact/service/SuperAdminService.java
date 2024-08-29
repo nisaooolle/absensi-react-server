@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 public interface SuperAdminService {
-    SuperAdmin ubahPassByForgot(ResetPassDTO updatePass);
+    SuperAdmin ubahPassByForgot (ResetPassDTO updatePass);
 
     Reset_Password validasiCodeUniqResPass(VerifyCode codeUser);
 
